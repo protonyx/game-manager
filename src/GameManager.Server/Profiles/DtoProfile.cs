@@ -14,5 +14,18 @@ public class DtoProfile : Profile
             .ForMember(t => t.Players, opt => opt.Ignore());
 
         CreateMap<Game, GameDTO>();
+        CreateMap<GameOptions, GameOptionsDTO>()
+            .ReverseMap()
+            .ForMember(t => t.GameId, opt => opt.Ignore());
+        CreateMap<Player, PlayerDTO>()
+            .ForMember(t => t.TrackerValues, opt => 
+                opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.Id, tv => tv.Value)));
+        CreateMap<Player, PlayerJoinDTO>()
+            .ForMember(t => t.PlayerId, opt => opt.MapFrom(t => t.Id));
+        CreateMap<Tracker, TrackerDTO>()
+            .ReverseMap()
+            .ForMember(t => t.Id, opt => opt.Ignore())
+            .ForMember(t => t.GameId, opt => opt.Ignore())
+            .ForMember(t => t.Game, opt => opt.Ignore());
     }
 }

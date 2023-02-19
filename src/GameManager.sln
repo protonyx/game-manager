@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameManager.Server", "GameManager.Server\GameManager.Server.csproj", "{DDFE6A34-9E74-4AC5-B293-589B1FF29499}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameManager.Tests", "GameManager.Tests\GameManager.Tests.csproj", "{88F67124-D87A-4914-8719-9026F4F838D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{DDFE6A34-9E74-4AC5-B293-589B1FF29499}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDFE6A34-9E74-4AC5-B293-589B1FF29499}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDFE6A34-9E74-4AC5-B293-589B1FF29499}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88F67124-D87A-4914-8719-9026F4F838D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88F67124-D87A-4914-8719-9026F4F838D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88F67124-D87A-4914-8719-9026F4F838D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88F67124-D87A-4914-8719-9026F4F838D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

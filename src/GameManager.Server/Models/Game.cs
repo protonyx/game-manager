@@ -9,6 +9,8 @@ public class Game
     public string EntryCode { get; set; }
     
     public GameOptions Options { get; set; }
+    
+    public Guid? CurrentTurnPlayerId { get; set; }
 
     public ICollection<Player> Players { get; set; } = new List<Player>();
 

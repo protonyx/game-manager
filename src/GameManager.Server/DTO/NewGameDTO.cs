@@ -6,7 +6,7 @@ public class NewGameDTO
 {
     public string Name { get; set; }
     
-    public GameOptions Options { get; set; }
+    public GameOptionsDTO Options { get; set; }
 
-    public ICollection<Tracker> Trackers { get; set; } = new List<Tracker>();
+    public ICollection<TrackerDTO> Trackers { get; set; } = new List<TrackerDTO>();
 }

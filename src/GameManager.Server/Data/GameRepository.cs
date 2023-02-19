@@ -32,6 +32,7 @@ public class GameRepository
     {
         IQueryable<Game> queryable = _context.Games
             .AsQueryable()
+            .AsNoTracking()
             .Include(t => t.Options);
 
         if (includePlayers)
@@ -43,6 +44,20 @@ public class GameRepository
             .FirstOrDefaultAsync();
 
         return game;
+    }
+
+    public async Task UpdateGameCurrentTurnAsync(Guid gameId, Guid playerId)
+    {
+        var game = await _context.Games.FindAsync(gameId);
+
+        if (game == null)
+        {
+            return;
+        }
+
+        game.CurrentTurnPlayerId = playerId;
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<Game?> GetGameByEntryCode(string entryCode)

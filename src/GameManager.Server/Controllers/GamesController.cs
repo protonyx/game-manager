@@ -1,8 +1,10 @@
 using AutoMapper;
 using GameManager.Server.Data;
 using GameManager.Server.DTO;
+using GameManager.Server.Messages;
 using GameManager.Server.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace GameManager.Server.Controllers;
 
@@ -12,12 +14,22 @@ public class GamesController : ControllerBase
 {
     private readonly GameRepository _gameRepository;
 
+    private readonly PlayerRepository _playerRepository;
+
     private readonly IMapper _mapper;
 
-    public GamesController(GameRepository gameRepository, IMapper mapper)
+    private readonly IHubContext<GameHub> _hubContext;
+
+    public GamesController(
+        GameRepository gameRepository, 
+        PlayerRepository playerRepository,
+        IMapper mapper,
+        IHubContext<GameHub> hubContext)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;
+        _playerRepository = playerRepository;
+        _hubContext = hubContext;
     }
 
     [HttpPost]
@@ -63,16 +75,33 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("Join")]
-    public async Task<IActionResult> JoinGame([FromQuery] string entryCode)
+    public async Task<IActionResult> JoinGame([FromBody] NewPlayerDTO player)
     {
-        var game = await _gameRepository.GetGameByEntryCode(entryCode);
+        var game = await _gameRepository.GetGameByEntryCode(player.EntryCode);
         
         if (game == null)
         {
             return NotFound();
         }
 
-        throw new NotImplementedException();
+        var newPlayer = new Player()
+        {
+            Name = player.Name
+        };
+
+        newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
+
+        var dto = _mapper.Map<PlayerJoinDTO>(newPlayer);
+
+        // Notify other players
+        await _hubContext.Clients.Group(game.Id.ToString())
+            .SendAsync(nameof(IGameHubClient.PlayerJoined), new PlayerJoinedMessage()
+            {
+                GameId = game.Id,
+                PlayerId = newPlayer.Id
+            });
+
+        return Ok(dto);
     }
 
 }

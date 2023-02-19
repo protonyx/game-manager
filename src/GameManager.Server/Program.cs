@@ -1,5 +1,8 @@
 using GameManager.Server;
+using GameManager.Server.Data;
 using GameManager.Server.Profiles;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSignalR();
+
+builder.Services.AddDbContext<GameContext>((sp, opt) =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    // var csb = new SqliteConnectionStringBuilder()
+    // {
+    //     DataSource = "gm.db",
+    // };
+    opt.UseSqlite(config.GetConnectionString("Database"));
+});
+builder.Services.AddScoped<GameRepository>();
+builder.Services.AddScoped<PlayerRepository>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -34,3 +49,7 @@ app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
 
 app.Run();
+
+public partial class Program
+{
+}

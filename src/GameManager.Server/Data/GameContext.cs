@@ -13,6 +13,12 @@ public class GameContext : DbContext
     
     public DbSet<TrackerValue> TrackerValues { get; set; }
 
+    public GameContext(DbContextOptions<GameContext> options)
+    : base(options)
+    {
+        
+    }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
