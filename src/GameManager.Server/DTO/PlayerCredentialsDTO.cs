@@ -1,10 +1,8 @@
 namespace GameManager.Server.DTO;
 
-public class PlayerJoinDTO
+public class PlayerCredentialsDTO
 {
     public Guid PlayerId { get; set; }
-    
-    public string Name { get; set; }
     
     public string Token { get; set; }
 }

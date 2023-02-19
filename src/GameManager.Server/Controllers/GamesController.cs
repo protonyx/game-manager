@@ -91,7 +91,7 @@ public class GamesController : ControllerBase
 
         newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
 
-        var dto = _mapper.Map<PlayerJoinDTO>(newPlayer);
+        var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
 
         // Notify other players
         await _hubContext.Clients.Group(game.Id.ToString())

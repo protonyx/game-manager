@@ -2,6 +2,7 @@ namespace GameManager.Server.DTO;
 
 public class PlayerDTO
 {
+    public Guid Id { get; set; }
     public int Order { get; set; }
     
     public string Name { get; set; }

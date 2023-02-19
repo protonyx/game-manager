@@ -62,7 +62,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         var playerResponse = await client.PostAsJsonAsync("api/Games/Join", newPlayer);
 
         playerResponse.EnsureSuccessStatusCode();
-        var player = JsonConvert.DeserializeObject<PlayerJoinDTO>(await playerResponse.Content.ReadAsStringAsync());
+        var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync());
 
         Assert.True(player != null);
         Assert.True(player.PlayerId != null);

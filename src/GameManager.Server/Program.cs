@@ -15,6 +15,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSignalR();
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddDbContext<GameContext>((sp, opt) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -43,7 +54,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
+
+app.UseCors();
 
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
