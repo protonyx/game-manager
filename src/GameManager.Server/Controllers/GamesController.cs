@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using GameManager.Server.Data;
 using GameManager.Server.DTO;
@@ -97,22 +98,30 @@ public class GamesController : ControllerBase
             Name = player.Name
         };
 
-        newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
+        try
+        {
+            newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
 
-        var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
+            var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
 
-        // Generate token
-        dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
+            // Generate token
+            dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
 
-        // Notify other players
-        await _hubContext.Clients.Group(game.Id.ToString())
-            .SendAsync(nameof(IGameHubClient.PlayerJoined), new PlayerJoinedMessage()
-            {
-                GameId = game.Id,
-                PlayerId = newPlayer.Id
-            });
+            // Notify other players
+            await _hubContext.Clients.Group(game.Id.ToString())
+                .SendAsync(nameof(IGameHubClient.PlayerJoined), new PlayerJoinedMessage()
+                {
+                    GameId = game.Id,
+                    PlayerId = newPlayer.Id
+                });
 
-        return Ok(dto);
+            return Ok(dto);
+        }
+        catch (ValidationException e)
+        {
+            ModelState.AddModelError(e.ValidationResult.MemberNames.First(), e.ValidationResult.ErrorMessage);
+            return BadRequest(ModelState);
+        }
     }
 
 }

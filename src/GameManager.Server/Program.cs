@@ -3,7 +3,7 @@ using GameManager.Server;
 using GameManager.Server.Data;
 using GameManager.Server.Profiles;
 using GameManager.Server.Services;
-using Microsoft.Data.Sqlite;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,7 +16,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol();
 
 builder.Services.AddCors(opt =>
 {
@@ -28,7 +29,10 @@ builder.Services.AddCors(opt =>
     });
 });
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(opt =>
+    {
+        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -41,21 +45,36 @@ builder.Services.AddAuthentication()
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+        options.Events = new JwtBearerEvents()
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                // If the request is for our hub...
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    (path.StartsWithSegments("/hubs")))
+                {
+                    // Read the token out of the query string
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddDbContext<GameContext>((sp, opt) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    // var csb = new SqliteConnectionStringBuilder()
-    // {
-    //     DataSource = "gm.db",
-    // };
     opt.UseSqlite(config.GetConnectionString("Database"));
 });
 builder.Services.AddScoped<GameRepository>();
 builder.Services.AddScoped<PlayerRepository>();
 
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddScoped<GameStateService>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -75,12 +94,20 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseAuthorization();
-
 app.UseCors();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
-app.MapHub<GameHub>("/hubs/game");
+app.MapHub<GameHub>("/hubs/game")
+    .RequireCors(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
 
 app.Run();
 

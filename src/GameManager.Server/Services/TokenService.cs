@@ -28,13 +28,13 @@ public class TokenService
     {
         var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.NameIdentifier, playerId.ToString()),
-            new Claim(ClaimTypes.Role, gameId.ToString())
+            new Claim("name", playerId.ToString()),
+            new Claim("sid", gameId.ToString())
         };
 
         if (isAdmin)
         {
-            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            claims.Add(new Claim("role", "admin"));
         }
         
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],

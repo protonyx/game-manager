@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using GameManager.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +19,16 @@ public class PlayerRepository
             .AsNoTracking()
             .Include(t => t.Trackers)
             .FirstOrDefaultAsync(t => t.Id == gameId);
+
+        var existingPlayers = await GetPlayersByGameId(gameId);
+
+        if (existingPlayers.Any(p => p.Name.Equals(newPlayer.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new ValidationException(new ValidationResult("Player already exists with that name",
+                new[] {nameof(Player.Name)}), null, newPlayer.Name);
+        }
         
-        var totalPlayers = _context.Players
-            .Count(p => p.GameId == gameId);
+        var totalPlayers = existingPlayers.Count();
 
         newPlayer.Id = Guid.NewGuid();
         newPlayer.GameId = gameId;
@@ -60,6 +68,15 @@ public class PlayerRepository
             .FirstOrDefaultAsync(t => t.Id == playerId);
 
         return player;
+    }
+
+    public async Task<ICollection<Player>> GetPlayersByGameId(Guid gameId)
+    {
+        var players = await _context.Players
+            .Where(p => p.GameId == gameId)
+            .ToListAsync();
+
+        return players;
     }
 
     public async Task<Player?> UpdatePlayerAsync(Guid playerId, Player updates)

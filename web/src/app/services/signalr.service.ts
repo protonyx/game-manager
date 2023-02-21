@@ -1,22 +1,29 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 import {environment} from '../../environments/environment';
+import {Store} from "@ngrx/store";
+import {selectCredentials} from "../state/games.selectors";
 
 @Injectable({
     providedIn: 'root'
 })
 export class SignalrService {
 
-    connection: HubConnection
+    connection?: HubConnection
 
-    constructor() {
+    credentials$ = this.store.select(selectCredentials)
 
+    constructor(private store: Store) {
+        this.credentials$.subscribe(data => {
+            console.log('creds', data);
+        })
     }
 
     public async connect(gameId: string, accessToken: string){
         const connection = new HubConnectionBuilder()
             .configureLogging(LogLevel.Information)
-            .withUrl(environment.baseUrl + 'hubs/game', {
+            .withAutomaticReconnect()
+            .withUrl(environment.baseUrl + '/hubs/game', {
                 accessTokenFactory: () => accessToken
             })
             .build();
@@ -35,9 +42,6 @@ export class SignalrService {
             await connection.start()
             console.log("SignalR connected")
 
-            // Register
-            await connection.invoke("RegisterClient", gameId);
-
             this.connection = connection
         } catch (err) {
             console.log(err)
@@ -46,10 +50,12 @@ export class SignalrService {
     }
 
     public async disconnect() {
-        await this.connection.stop()
+        if (this.connection)
+            await this.connection.stop()
     }
 
     public async endTurn(gameId: string, playerId: string) {
-        await this.connection.invoke("EndTurn", gameId, playerId)
+        if (this.connection)
+            await this.connection.invoke("EndTurn", gameId, playerId)
     }
 }

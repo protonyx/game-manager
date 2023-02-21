@@ -1,10 +1,12 @@
 using GameManager.Server.Data;
 using GameManager.Server.Messages;
 using GameManager.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GameManager.Server;
 
+[Authorize]
 public class GameHub : Hub<IGameHubClient>
 {
     private readonly GameStateService _gameStateService;
@@ -16,11 +18,18 @@ public class GameHub : Hub<IGameHubClient>
 
     public override async Task OnConnectedAsync()
     {
-        // Get the playerId from the authentication token
-        //Context.User.FindFirst("playerId");
-        // Lookup the game for that player
-        // Add the connection to a group named with the Group ID
-        //await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
+        if (Context.User != null)
+        {
+            // Get the gameId from the authentication token
+            var gameId = Context.User.FindFirst("sid");
+            
+            // Add the connection to a group named with the Group ID
+            if (gameId != null)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
+            }
+        }
+        
         await base.OnConnectedAsync();
     }
 

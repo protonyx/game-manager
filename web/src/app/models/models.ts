@@ -35,6 +35,7 @@ export interface Player {
 }
 
 export interface PlayerCredentials {
+    gameId: string
     playerId: string
     token: string
 }
