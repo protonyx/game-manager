@@ -1,8 +1,11 @@
+using System.Text;
 using GameManager.Server;
 using GameManager.Server.Data;
 using GameManager.Server.Profiles;
+using GameManager.Server.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +24,24 @@ builder.Services.AddCors(opt =>
     {
         policy.AllowAnyOrigin()
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowAnyHeader();
     });
 });
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
 builder.Services.AddDbContext<GameContext>((sp, opt) =>
 {
@@ -37,6 +54,8 @@ builder.Services.AddDbContext<GameContext>((sp, opt) =>
 });
 builder.Services.AddScoped<GameRepository>();
 builder.Services.AddScoped<PlayerRepository>();
+
+builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddAutoMapper(cfg =>
 {

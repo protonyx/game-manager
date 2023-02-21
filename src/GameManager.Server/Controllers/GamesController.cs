@@ -3,6 +3,8 @@ using GameManager.Server.Data;
 using GameManager.Server.DTO;
 using GameManager.Server.Messages;
 using GameManager.Server.Models;
+using GameManager.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -20,16 +22,20 @@ public class GamesController : ControllerBase
 
     private readonly IHubContext<GameHub> _hubContext;
 
+    private readonly TokenService _tokenService;
+
     public GamesController(
         GameRepository gameRepository, 
         PlayerRepository playerRepository,
         IMapper mapper,
-        IHubContext<GameHub> hubContext)
+        IHubContext<GameHub> hubContext,
+        TokenService tokenService)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;
         _playerRepository = playerRepository;
         _hubContext = hubContext;
+        _tokenService = tokenService;
     }
 
     [HttpPost]
@@ -45,6 +51,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetGame([FromRoute] Guid id)
     {
         var game = await _gameRepository.GetGameById(id);
@@ -60,6 +67,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id}/Players")]
+    [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
         var game = await _gameRepository.GetGameById(id, true);
@@ -92,6 +100,9 @@ public class GamesController : ControllerBase
         newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
 
         var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
+
+        // Generate token
+        dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
 
         // Notify other players
         await _hubContext.Clients.Group(game.Id.ToString())

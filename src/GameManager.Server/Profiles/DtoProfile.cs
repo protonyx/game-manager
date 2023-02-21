@@ -21,7 +21,8 @@ public class DtoProfile : Profile
             .ForMember(t => t.TrackerValues, opt => 
                 opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.Id, tv => tv.Value)));
         CreateMap<Player, PlayerCredentialsDTO>()
-            .ForMember(t => t.PlayerId, opt => opt.MapFrom(t => t.Id));
+            .ForMember(t => t.PlayerId, opt => opt.MapFrom(t => t.Id))
+            .ForMember(t => t.Token, opt => opt.Ignore());
         CreateMap<Tracker, TrackerDTO>()
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())

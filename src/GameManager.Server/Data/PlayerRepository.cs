@@ -24,8 +24,13 @@ public class PlayerRepository
 
         newPlayer.Id = Guid.NewGuid();
         newPlayer.GameId = gameId;
-        newPlayer.Token = Guid.NewGuid().ToString();
+        newPlayer.Token = string.Empty; //Guid.NewGuid().ToString();
         newPlayer.Order = totalPlayers + 1;
+
+        if (totalPlayers == 0)
+        {
+            newPlayer.IsAdmin = true;
+        }
 
         newPlayer.TrackerValues = new List<TrackerValue>();
 

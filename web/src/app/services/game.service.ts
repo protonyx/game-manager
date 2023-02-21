@@ -12,12 +12,12 @@ export class GameService {
   constructor(private http: HttpClient) { }
 
   public createGame(newGame: NewGame): Observable<Game> {
-    const url = environment.baseUrl + '/api/Game'
+    const url = environment.baseUrl + '/api/Games'
     return this.http.post<Game>(url, newGame)
   }
 
   public joinGame(game: JoinGame): Observable<PlayerCredentials> {
-    const url = environment.baseUrl + '/api/Game/Join'
+    const url = environment.baseUrl + '/api/Games/Join'
     return this.http.post<PlayerCredentials>(url, game)
   }
 }

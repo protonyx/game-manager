@@ -1,17 +1,17 @@
 
 
-export class NewGame {
+export interface NewGame {
     name: string
-    options: GameOptions = new GameOptions()
-    trackers: Tracker[] = []
+    options: GameOptions
+    trackers: Tracker[]
 }
 
-export class JoinGame {
+export interface JoinGame {
     entryCode: string
     name: string
 }
 
-export class Game {
+export interface Game {
     id: string
     name: string
     entryCode: string
@@ -19,22 +19,22 @@ export class Game {
     trackers: Tracker[]
 }
 
-export class GameOptions {
-    shareOtherPlayerTrackers: boolean = true
+export interface GameOptions {
+    shareOtherPlayerTrackers: boolean
 }
 
-export class Tracker {
+export interface Tracker {
     name: string
-    startingValue: number = 0
+    startingValue: number
 }
 
-export class Player {
+export interface Player {
     order: number
     name: string
     trackerValues: object
 }
 
-export class PlayerCredentials {
+export interface PlayerCredentials {
     playerId: string
     token: string
 }
