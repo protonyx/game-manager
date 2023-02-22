@@ -9,6 +9,13 @@ export const selectGame = createSelector(
     }
 );
 
+export const selectPlayers = createSelector(
+    selectGameFeature,
+    (game) => {
+        return game.players;
+    }
+)
+
 export const selectCredentials = createSelector(
     selectGameFeature,
     (game) => {

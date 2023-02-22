@@ -15,7 +15,7 @@ export interface Game {
     id: string
     name: string
     entryCode: string
-    players: Player[]
+    options: GameOptions
     trackers: Tracker[]
 }
 

@@ -1,7 +1,6 @@
 import {createReducer, on} from "@ngrx/store";
 
 import {GamesApiActions} from "./games.actions";
-import {Game} from "../models/models";
 
 export const initialState: any = {};
 
@@ -12,5 +11,8 @@ export const gamesReducer = createReducer(
     }),
     on(GamesApiActions.retrievedGameState, (state, {game}) => {
         return {...state, game: game};
+    }),
+    on(GamesApiActions.retrievedPlayers, (state, {players}) => {
+        return {...state, players: players};
     })
 );

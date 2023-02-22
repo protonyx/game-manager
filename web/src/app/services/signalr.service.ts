@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 import {environment} from '../../environments/environment';
-import {Store} from "@ngrx/store";
-import {selectCredentials} from "../state/games.selectors";
 
 @Injectable({
     providedIn: 'root'
@@ -10,14 +8,6 @@ import {selectCredentials} from "../state/games.selectors";
 export class SignalrService {
 
     connection?: HubConnection
-
-    credentials$ = this.store.select(selectCredentials)
-
-    constructor(private store: Store) {
-        this.credentials$.subscribe(data => {
-            console.log('creds', data);
-        })
-    }
 
     public async connect(gameId: string, accessToken: string){
         const connection = new HubConnectionBuilder()

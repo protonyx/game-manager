@@ -1,5 +1,5 @@
 import {createActionGroup, props} from "@ngrx/store";
-import {Game, JoinGame, PlayerCredentials} from "../models/models";
+import {Game, JoinGame, Player, PlayerCredentials} from "../models/models";
 
 export const GamesActions = createActionGroup({
     source: 'Games',
@@ -13,6 +13,7 @@ export const GamesApiActions = createActionGroup({
     source: 'Games API',
     events: {
         'Joined Game': props<{ credentials: PlayerCredentials }>(),
-        'Retrieved Game State': props<{ game: Game }>()
+        'Retrieved Game State': props<{ game: Game }>(),
+        'Retrieved Players': props<{ players: Player[] }>()
     }
 });

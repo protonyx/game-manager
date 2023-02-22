@@ -28,18 +28,14 @@ public class GameRepository
         return game;
     }
 
-    public async Task<Game?> GetGameById(Guid gameId, bool includePlayers = true)
+    public async Task<Game?> GetGameById(Guid gameId)
     {
         IQueryable<Game> queryable = _context.Games
             .AsQueryable()
             .AsNoTracking()
-            .Include(t => t.Options);
+            .Include(t => t.Options)
+            .Include(t => t.Trackers);
 
-        if (includePlayers)
-        {
-            queryable = queryable.Include(t => t.Players);
-        }
-            
         var game = await queryable.Where(t => t.Id == gameId)
             .FirstOrDefaultAsync();
 

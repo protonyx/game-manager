@@ -21,21 +21,23 @@ public class GameStateService
 
     public async Task<Guid?> GetCurrentTurn(Guid gameId)
     {
-        var game = await _gameRepository.GetGameById(gameId, false);
+        var game = await _gameRepository.GetGameById(gameId);
 
         return game?.CurrentTurnPlayerId;
     }
 
     public async Task AdvanceTurn(Guid gameId)
     {
-        var game = await _gameRepository.GetGameById(gameId, true);
+        var game = await _gameRepository.GetGameById(gameId);
 
-        if (game == null || !game.Players.Any())
+        var players = await _playerRepository.GetPlayersByGameId(gameId);
+
+        if (game == null || !players.Any())
         {
             return;
         }
         
-        var firstPlayer = game.Players.OrderBy(t => t.Order).First();
+        var firstPlayer = players.OrderBy(t => t.Order).First();
 
         if (game.CurrentTurnPlayerId == null)
         {
@@ -44,7 +46,7 @@ public class GameStateService
             return;
         }
         
-        var currentPlayer = game.Players.FirstOrDefault(t => t.Id == game.CurrentTurnPlayerId);
+        var currentPlayer = players.FirstOrDefault(t => t.Id == game.CurrentTurnPlayerId);
 
         if (currentPlayer == null)
         {
@@ -53,7 +55,7 @@ public class GameStateService
             return;
         }
 
-        var nextPlayer = game.Players
+        var nextPlayer = players
             .OrderBy(t => t.Order)
             .FirstOrDefault(t => t.Order > currentPlayer.Order);
 

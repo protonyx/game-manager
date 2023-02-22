@@ -71,16 +71,18 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
-        var game = await _gameRepository.GetGameById(id, true);
+        var game = await _gameRepository.GetGameById(id);
 
         if (game == null)
         {
             return NotFound();
         }
 
-        var players = _mapper.Map<ICollection<PlayerDTO>>(game.Players);
+        var players = await _playerRepository.GetPlayersByGameId(id);
+
+        var ret = _mapper.Map<ICollection<PlayerDTO>>(players);
         
-        return Ok(players);
+        return Ok(ret);
     }
 
     [HttpPost("Join")]

@@ -29,11 +29,14 @@ public class PlayerRepository
         }
         
         var totalPlayers = existingPlayers.Count();
+        var maxOrder = existingPlayers.Any()
+            ? existingPlayers.Max(t => t.Order)
+            : 0;
 
         newPlayer.Id = Guid.NewGuid();
         newPlayer.GameId = gameId;
         newPlayer.Token = string.Empty; //Guid.NewGuid().ToString();
-        newPlayer.Order = totalPlayers + 1;
+        newPlayer.Order = maxOrder + 1;
 
         if (totalPlayers == 0)
         {
@@ -73,6 +76,9 @@ public class PlayerRepository
     public async Task<ICollection<Player>> GetPlayersByGameId(Guid gameId)
     {
         var players = await _context.Players
+            .AsQueryable()
+            .AsNoTracking()
+            .Include(t => t.TrackerValues)
             .Where(p => p.GameId == gameId)
             .ToListAsync();
 

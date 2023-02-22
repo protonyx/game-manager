@@ -7,8 +7,8 @@ public class GameDTO
     public string Name { get; set; }
 
     public string EntryCode { get; set; }
-
-    public ICollection<PlayerDTO> Players { get; set; }
+    
+    public GameOptionsDTO Options { get; set; }
     
     public ICollection<TrackerDTO> Trackers { get; set; }
 }

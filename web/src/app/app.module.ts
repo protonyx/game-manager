@@ -14,12 +14,14 @@ import {JoinGameComponent} from './components/join-game/join-game.component';
 import {JoinGamePageComponent} from './pages/join-game-page/join-game-page.component';
 import {gamesReducer} from "./state/games.reducer";
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { GamePageComponent } from './pages/game-page/game-page.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         JoinGameComponent,
-        JoinGamePageComponent
+        JoinGamePageComponent,
+        GamePageComponent
     ],
     imports: [
         BrowserModule,
