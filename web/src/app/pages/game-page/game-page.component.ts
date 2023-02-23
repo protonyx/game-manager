@@ -27,12 +27,12 @@ export class GamePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.credentials$.subscribe(data => {
-      this.signalr.connect(data.gameId, data.token);
+      this.signalr.connect(data!.gameId, data!.token);
 
-      this.gameService.getGame(data.gameId, data.token).subscribe(game => {
+      this.gameService.getGame(data!.gameId, data!.token).subscribe(game => {
         this.store.dispatch(GamesApiActions.retrievedGameState({game: game}));
       })
-      this.gameService.getPlayers(data.gameId, data.token).subscribe(players => {
+      this.gameService.getPlayers(data!.gameId, data!.token).subscribe(players => {
         this.store.dispatch(GamesApiActions.retrievedPlayers({players: players}));
       })
     })

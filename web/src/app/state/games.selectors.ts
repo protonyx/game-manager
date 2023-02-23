@@ -1,6 +1,8 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
+import {GameState} from "./game.state";
 
-export const selectGameFeature = createFeatureSelector<any>('game');
+
+export const selectGameFeature = createFeatureSelector<GameState>('game');
 
 export const selectGame = createSelector(
     selectGameFeature,
