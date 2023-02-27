@@ -1,6 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 import {environment} from '../../environments/environment';
+import {Store} from "@ngrx/store";
+import {GameActions, GameHubActions} from "../state/game.actions";
+import {
+    GameStateChangedMessage,
+    PlayerJoinedMessage,
+    PlayerLeftMessage,
+    PlayerStateChangedMessage
+} from "../models/messages";
 
 @Injectable({
     providedIn: 'root'
@@ -8,6 +16,8 @@ import {environment} from '../../environments/environment';
 export class SignalrService {
 
     connection?: HubConnection
+
+    constructor(private store: Store){}
 
     public async connect(gameId: string, accessToken: string){
         const connection = new HubConnectionBuilder()
@@ -18,15 +28,25 @@ export class SignalrService {
             })
             .build();
 
-        connection.on("GameStateChanged", () => {
-            console.log()
-        })
-        connection.on("PlayerJoined", () => {
-            console.log()
+        connection.on("GameStateChanged", (data: GameStateChangedMessage) => {
+            console.log(data)
+            this.store.dispatch(GameHubActions.gameUpdated(data))
+        });
+        connection.on("PlayerJoined", (data: PlayerJoinedMessage) => {
+            console.log(data)
+            this.store.dispatch(GameHubActions.playerJoined(data))
+        });
+        connection.on("PlayerStateChanged", (data: PlayerStateChangedMessage) => {
+            console.log(data)
+            this.store.dispatch(GameHubActions.playerUpdated(data))
+        });
+        connection.on("PlayerLeft", (data: PlayerLeftMessage) => {
+            console.log(data)
+            this.store.dispatch(GameHubActions.playerLeft(data))
         })
         connection.onclose(async () => {
             //await start()
-        })
+        });
 
         try {
             await connection.start()
@@ -44,8 +64,13 @@ export class SignalrService {
             await this.connection.stop()
     }
 
-    public async endTurn(gameId: string, playerId: string) {
+    public async heartbeat() {
         if (this.connection)
-            await this.connection.invoke("EndTurn", gameId, playerId)
+            await this.connection.invoke("Heartbeat")
+    }
+
+    public async endTurn() {
+        if (this.connection)
+            await this.connection.invoke("EndTurn")
     }
 }

@@ -62,6 +62,11 @@ public class GamesController : ControllerBase
             return NotFound();
         }
 
+        if (!await VerifyActivePlayerAsync())
+        {
+            return Forbid();
+        }
+
         var dto = _mapper.Map<GameDTO>(game);
 
         return Ok(dto);
@@ -76,6 +81,11 @@ public class GamesController : ControllerBase
         if (game == null)
         {
             return NotFound();
+        }
+        
+        if (!await VerifyActivePlayerAsync())
+        {
+            return Forbid();
         }
 
         var players = await _playerRepository.GetPlayersByGameId(id);
@@ -110,12 +120,14 @@ public class GamesController : ControllerBase
             dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
 
             // Notify other players
+            var message = new PlayerJoinedMessage()
+            {
+                GameId = game.Id,
+                Player = _mapper.Map<PlayerDTO>(newPlayer)
+            };
+            
             await _hubContext.Clients.Group(game.Id.ToString())
-                .SendAsync(nameof(IGameHubClient.PlayerJoined), new PlayerJoinedMessage()
-                {
-                    GameId = game.Id,
-                    PlayerId = newPlayer.Id
-                });
+                .SendAsync(nameof(IGameHubClient.PlayerJoined), message);
 
             return Ok(dto);
         }
@@ -124,6 +136,21 @@ public class GamesController : ControllerBase
             ModelState.AddModelError(e.ValidationResult.MemberNames.First(), e.ValidationResult.ErrorMessage);
             return BadRequest(ModelState);
         }
+    }
+
+    private async Task<bool> VerifyActivePlayerAsync()
+    {
+        // Check that the user represents an active player
+        var playerId = User.GetPlayerId();
+
+        if (!playerId.HasValue)
+        {
+            return false;
+        }
+
+        var player = await _playerRepository.GetPlayerById(playerId.Value);
+
+        return player != null;
     }
 
 }

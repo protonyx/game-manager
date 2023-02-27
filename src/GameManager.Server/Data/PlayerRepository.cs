@@ -37,6 +37,7 @@ public class PlayerRepository
         newPlayer.GameId = gameId;
         newPlayer.Token = string.Empty; //Guid.NewGuid().ToString();
         newPlayer.Order = maxOrder + 1;
+        newPlayer.LastHeartbeat = DateTime.UtcNow;
 
         if (totalPlayers == 0)
         {
@@ -123,6 +124,8 @@ public class PlayerRepository
             {
                 player.Order += 1;
             }
+            
+            // TODO: Send notifications for all updated players
 
             await _context.SaveChangesAsync();
         }

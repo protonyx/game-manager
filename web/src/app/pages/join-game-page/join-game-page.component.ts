@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {JoinGame} from "../../models/models";
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
-import {GamesActions, GamesApiActions} from "../../state/games.actions";
+import {GameActions, GamesApiActions} from "../../state/game.actions";
 import {Router} from "@angular/router";
 
 @Component({
@@ -20,7 +20,7 @@ export class JoinGamePageComponent {
     }
 
     public onJoinGame(event: JoinGame): void {
-        this.store.dispatch(GamesActions.joinGame({ joinGame: event }));
+        this.store.dispatch(GameActions.joinGame({ joinGame: event }));
 
         this.gameService.joinGame(event)
             .subscribe(data => {

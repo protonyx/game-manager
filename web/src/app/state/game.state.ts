@@ -5,3 +5,9 @@ export interface GameState {
     game: Game | null;
     players: Player[];
 }
+
+export const initialState: GameState = {
+    credentials: null,
+    game: null,
+    players: []
+};

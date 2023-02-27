@@ -3,7 +3,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {BrowserModule} from '@angular/platform-browser';
 import {ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {StoreModule} from '@ngrx/store';
+import {ActionReducer, ActionReducerMap, MetaReducer, StoreModule} from '@ngrx/store';
 import {StoreRouterConnectingModule, routerReducer} from '@ngrx/router-store';
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
@@ -12,9 +12,30 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {JoinGameComponent} from './components/join-game/join-game.component';
 import {JoinGamePageComponent} from './pages/join-game-page/join-game-page.component';
-import {gamesReducer} from "./state/games.reducer";
+import {name as gameName, reducer as gameReducer} from "./state/game.reducer";
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { GamePageComponent } from './pages/game-page/game-page.component';
+import {GameState} from "./state/game.state";
+import {localStorageSync} from "ngrx-store-localstorage";
+
+interface appState {
+    router: any,
+    game: GameState
+}
+
+
+const reducers: ActionReducerMap<appState> = {
+    router: routerReducer,
+    game: gameReducer
+};
+
+export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {
+    return localStorageSync({
+        keys: [gameName],
+        rehydrate: true
+    })(reducer);
+}
+const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 @NgModule({
     declarations: [
@@ -27,10 +48,10 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
         BrowserModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        StoreModule.forRoot({
-            router: routerReducer,
-            game: gamesReducer
-        }, {}),
+        StoreModule.forRoot(
+            reducers,
+            {metaReducers}
+        ),
         StoreRouterConnectingModule.forRoot(),
         ReactiveFormsModule,
         HttpClientModule,

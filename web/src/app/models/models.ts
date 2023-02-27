@@ -29,6 +29,7 @@ export interface Tracker {
 }
 
 export interface Player {
+    id: string
     order: number
     name: string
     trackerValues: object

@@ -1,4 +1,3 @@
-using GameManager.Server.Data;
 using GameManager.Server.Messages;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,35 +17,38 @@ public class GameHub : Hub<IGameHubClient>
 
     public override async Task OnConnectedAsync()
     {
-        if (Context.User != null)
+        var gameId = Context.User?.GetGameId();
+        
+        if (gameId.HasValue)
         {
-            // Get the gameId from the authentication token
-            var gameId = Context.User.FindFirst("sid");
-            
             // Add the connection to a group named with the Group ID
-            if (gameId != null)
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, gameId.ToString());
-            }
+            await Groups.AddToGroupAsync(Context.ConnectionId, gameId.Value.ToString());
         }
         
         await base.OnConnectedAsync();
     }
 
-    public async Task RegisterClient(Guid gameId)
+    public async Task Heartbeat()
     {
-        var connectionId = Context.ConnectionId;
-        await Groups.AddToGroupAsync(connectionId, gameId.ToString());
-    }
+        var playerId = Context.User?.GetPlayerId();
 
-    public async Task Heartbeat(Guid playerId)
-    {
-        await _gameStateService.UpdatePlayerHeartbeat(playerId);
+        if (playerId.HasValue)
+        {
+            await _gameStateService.UpdatePlayerHeartbeat(playerId.Value);
+        }
     }
     
-    public async Task EndTurn(Guid gameId, Guid playerId)
+    public async Task EndTurn()
     {
-        var currentPlayerTurn = await _gameStateService.GetCurrentTurn(gameId);
+        var gameId = Context.User?.GetGameId();
+        var playerId = Context.User?.GetPlayerId();
+
+        if (!gameId.HasValue || !playerId.HasValue)
+        {
+            return;
+        }
+        
+        var currentPlayerTurn = await _gameStateService.GetCurrentTurn(gameId.Value);
 
         if (currentPlayerTurn != playerId)
         {
@@ -54,11 +56,11 @@ public class GameHub : Hub<IGameHubClient>
             return;
         }
 
-        await _gameStateService.AdvanceTurn(gameId);
+        await _gameStateService.AdvanceTurn(gameId.Value);
         
         await Clients.All.GameStateChanged(new GameStateChangedMessage()
         {
-            GameId = gameId
+            GameId = gameId.Value
         });
     }
 }
