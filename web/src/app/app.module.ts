@@ -17,6 +17,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import {GameState} from "./state/game.state";
 import {localStorageSync} from "ngrx-store-localstorage";
+import { CurrentTurnComponent } from './components/current-turn/current-turn.component';
+import {MatCardModule} from "@angular/material/card";
 
 interface appState {
     router: any,
@@ -42,7 +44,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         AppComponent,
         JoinGameComponent,
         JoinGamePageComponent,
-        GamePageComponent
+        GamePageComponent,
+        CurrentTurnComponent
     ],
     imports: [
         BrowserModule,
@@ -57,7 +60,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         HttpClientModule,
         MatInputModule,
         MatButtonModule,
-        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
+        StoreDevtoolsModule.instrument({maxAge: 25, logOnly: !isDevMode()}),
+        MatCardModule,
     ],
     providers: [],
     bootstrap: [AppComponent]

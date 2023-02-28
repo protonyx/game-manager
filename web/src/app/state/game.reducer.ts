@@ -30,6 +30,9 @@ export const gameFeature = createFeature({
         }),
         on(GamesApiActions.retrievedPlayers, (state, {players}) => {
             return {...state, players: players};
+        }),
+        on(GamesApiActions.retrievedCurrentPlayer, (state, {player}) => {
+            return {...state, currentPlayer: player};
         })
     ),
 });
@@ -39,6 +42,7 @@ export const {
     reducer, // feature reducer
     selectGameState, // feature selector
     selectCredentials,
+    selectCurrentPlayer,
     selectGame,
     selectPlayers
 } = gameFeature;

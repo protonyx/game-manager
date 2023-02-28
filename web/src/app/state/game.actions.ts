@@ -29,6 +29,7 @@ export const GamesApiActions = createActionGroup({
     events: {
         'Joined Game': props<{ credentials: PlayerCredentials }>(),
         'Retrieved Game': props<{ game: Game }>(),
-        'Retrieved Players': props<{ players: Player[] }>()
+        'Retrieved Players': props<{ players: Player[] }>(),
+        'Retrieved Current Player': props<{ player: Player }>()
     }
 });

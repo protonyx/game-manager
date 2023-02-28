@@ -16,7 +16,6 @@ public class PlayerRepository
     public async Task<Player> CreatePlayerAsync(Guid gameId, Player newPlayer)
     {
         var game = await _context.Games
-            .AsNoTracking()
             .Include(t => t.Trackers)
             .FirstOrDefaultAsync(t => t.Id == gameId);
 
@@ -58,6 +57,12 @@ public class PlayerRepository
         }
 
         _context.Add(newPlayer);
+
+        if (!game.CurrentTurnPlayerId.HasValue)
+        {
+            var startPlayer = existingPlayers.OrderBy(t => t.Order).First();
+            game.CurrentTurnPlayerId ??= startPlayer.Id;
+        }
 
         await _context.SaveChangesAsync();
 

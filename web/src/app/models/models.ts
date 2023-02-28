@@ -16,6 +16,7 @@ export interface Game {
     name: string
     entryCode: string
     options: GameOptions
+    currentTurnPlayerId: string
     trackers: Tracker[]
 }
 

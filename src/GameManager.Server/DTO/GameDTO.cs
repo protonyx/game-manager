@@ -10,5 +10,7 @@ public class GameDTO
     
     public GameOptionsDTO Options { get; set; }
     
+    public Guid? CurrentTurnPlayerId { get; set; }
+    
     public ICollection<TrackerDTO> Trackers { get; set; }
 }

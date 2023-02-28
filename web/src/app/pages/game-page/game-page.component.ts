@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
 import {Subject, Subscription, takeUntil, tap, timer} from "rxjs";
-import {selectCredentials, selectGame, selectPlayers} from "../../state/game.reducer";
+import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
 import {SignalrService} from "../../services/signalr.service";
 import {GamesApiActions} from "../../state/game.actions";
 import {PlayerCredentials} from "../../models/models";
@@ -15,6 +15,8 @@ import {PlayerCredentials} from "../../models/models";
 export class GamePageComponent implements OnInit, OnDestroy {
 
   credentials$ = this.store.select(selectCredentials)
+
+  currentPlayer$ = this.store.select(selectCurrentPlayer)
 
   game$ = this.store.select(selectGame)
 
@@ -38,6 +40,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
           this.store.dispatch(GamesApiActions.retrievedGame({game: game}));
           this.connect(credentials);
         })
+        this.gameService.getPlayer(credentials!.playerId, credentials!.token).subscribe(player => {
+          this.store.dispatch(GamesApiActions.retrievedCurrentPlayer({player: player}));
+        })
         this.gameService.getPlayers(credentials!.gameId, credentials!.token).subscribe(players => {
           this.store.dispatch(GamesApiActions.retrievedPlayers({players: players}));
         })
@@ -48,6 +53,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.next(true);
     this.unsubscribe$.unsubscribe();
+  }
+
+  onEndTurn() {
+    this.signalr.endTurn();
   }
 
   private connect(credentials: PlayerCredentials) {

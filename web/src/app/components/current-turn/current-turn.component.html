@@ -1,0 +1,14 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Current Turn</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p *ngIf="isMyTurn">YOUR TURN!</p>
+        <p *ngIf="!isMyTurn">{{ currentTurn?.name }}</p>
+        {{ currentTurn | json }}
+    </mat-card-content>
+    <mat-card-actions *ngIf="isMyTurn">
+        <button mat-button (click)="onEndTurn()">End Turn</button>
+    </mat-card-actions>
+
+</mat-card>

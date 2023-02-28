@@ -31,6 +31,16 @@ export class GameService {
     return this.http.get<Game>(url, httpOptions);
   }
 
+  public getPlayer(playerId: string, token: string): Observable<Player> {
+    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    }
+    return this.http.get<Player>(url, httpOptions);
+  }
+
   public getPlayers(gameId: string, token: string): Observable<Player[]> {
     const url = `${environment.baseUrl}/api/Games/${gameId}/Players`;
     const httpOptions = {

@@ -120,14 +120,23 @@ public class GamesController : ControllerBase
             dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
 
             // Notify other players
-            var message = new PlayerJoinedMessage()
+            var playerJoinedMessage = new PlayerJoinedMessage()
             {
                 GameId = game.Id,
                 Player = _mapper.Map<PlayerDTO>(newPlayer)
             };
             
             await _hubContext.Clients.Group(game.Id.ToString())
-                .SendAsync(nameof(IGameHubClient.PlayerJoined), message);
+                .SendAsync(nameof(IGameHubClient.PlayerJoined), playerJoinedMessage);
+
+            var gameUpdatedMessage = new GameStateChangedMessage()
+            {
+                GameId = game.Id,
+                Game = _mapper.Map<GameDTO>(game)
+            };
+            
+            await _hubContext.Clients.Group(game.Id.ToString())
+                .SendAsync(nameof(IGameHubClient.GameStateChanged), gameUpdatedMessage);
 
             return Ok(dto);
         }

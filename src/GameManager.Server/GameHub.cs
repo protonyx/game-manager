@@ -1,3 +1,5 @@
+using AutoMapper;
+using GameManager.Server.DTO;
 using GameManager.Server.Messages;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -57,10 +59,5 @@ public class GameHub : Hub<IGameHubClient>
         }
 
         await _gameStateService.AdvanceTurn(gameId.Value);
-        
-        await Clients.All.GameStateChanged(new GameStateChangedMessage()
-        {
-            GameId = gameId.Value
-        });
     }
 }

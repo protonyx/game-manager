@@ -1,3 +1,10 @@
 <p>{{ game$ | async | json }}</p>
 
 <p>{{ players$ | async | json }}</p>
+
+<p>Current Player: {{ currentPlayer$ | async | json }}</p>
+
+<app-current-turn [game]="game$ | async"
+                  [players]="players$ | async"
+                  [currentPlayer]="currentPlayer$ | async"
+                  (endTurn)="onEndTurn()"></app-current-turn>
