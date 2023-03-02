@@ -27,6 +27,7 @@ export const GameHubActions = createActionGroup({
 export const GamesApiActions = createActionGroup({
     source: 'Games API',
     events: {
+        'Created Game': props<{ game: Game }>(),
         'Joined Game': props<{ credentials: PlayerCredentials }>(),
         'Retrieved Game': props<{ game: Game }>(),
         'Retrieved Players': props<{ players: Player[] }>(),
