@@ -11,7 +11,7 @@ import {NewGamePageComponent} from "../../pages/new-game-page/new-game-page.comp
 export class NewGameComponent {
 
   @Output()
-  submit: EventEmitter<NewGame> = new EventEmitter<NewGame>();
+  newGame: EventEmitter<NewGame> = new EventEmitter<NewGame>();
 
   gameForm = this.fb.group({
     name: ['', Validators.required],
@@ -47,7 +47,7 @@ export class NewGameComponent {
   }
 
   onSubmit() {
-    this.submit.emit(this.gameForm.value as NewGame)
+    this.newGame.emit(this.gameForm.value as NewGame)
   }
 
 }

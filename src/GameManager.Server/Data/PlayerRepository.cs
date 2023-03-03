@@ -60,8 +60,8 @@ public class PlayerRepository
 
         if (!game.CurrentTurnPlayerId.HasValue)
         {
-            var startPlayer = existingPlayers.OrderBy(t => t.Order).First();
-            game.CurrentTurnPlayerId ??= startPlayer.Id;
+            var startPlayer = existingPlayers.MinBy(t => t.Order);
+            game.CurrentTurnPlayerId ??= startPlayer?.Id;
         }
 
         await _context.SaveChangesAsync();
