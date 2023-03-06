@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FormControl, FormBuilder, Validators} from '@angular/forms';
 import {JoinGame} from "../../models/models";
 
@@ -9,18 +9,27 @@ import {JoinGame} from "../../models/models";
 })
 export class JoinGameComponent {
 
+    @Input()
+    public loading: boolean | undefined;
+
+    @Input()
+    public errorMessage: string | undefined;
+
     @Output()
     public joinGame: EventEmitter<JoinGame> = new EventEmitter<JoinGame>();
 
     joinGameForm = this.fb.group({
         entryCode: ['', Validators.required],
-        name: new FormControl('', Validators.required)
+        playerName: new FormControl('', Validators.required)
     });
 
     constructor(private fb: FormBuilder) {
     }
 
     onSubmit(): void {
-        this.joinGame.emit(this.joinGameForm.value as JoinGame);
+        this.joinGame.emit({
+            entryCode: this.joinGameForm.value.entryCode as string,
+            name: this.joinGameForm.value.playerName as string
+        });
     }
 }

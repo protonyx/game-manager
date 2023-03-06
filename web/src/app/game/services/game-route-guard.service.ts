@@ -22,7 +22,7 @@ export class GameRouteGuard implements CanActivate {
                 if (ev) {
                     return true;
                 } else {
-                    this.router.navigate([]);
+                    this.router.navigate(['join']);
                     return false;
                 }
             })

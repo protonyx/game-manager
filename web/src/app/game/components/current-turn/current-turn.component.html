@@ -7,8 +7,9 @@
         <p *ngIf="!isMyTurn">{{ currentTurn?.name }}</p>
         {{ currentTurn | json }}
     </mat-card-content>
-    <mat-card-actions *ngIf="isMyTurn">
-        <button mat-button (click)="onEndTurn()">End Turn</button>
+    <mat-card-actions>
+        <button mat-button (click)="onNudge()" *ngIf="!isMyTurn">Nudge</button>
+        <button mat-raised-button type="button"(click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>
     </mat-card-actions>
 
 </mat-card>

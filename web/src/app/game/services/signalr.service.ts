@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
-import {environment} from '../../environments/environment';
+import {environment} from '../../../environments/environment';
 import {Store} from "@ngrx/store";
 import {GameActions, GameHubActions} from "../state/game.actions";
 import {

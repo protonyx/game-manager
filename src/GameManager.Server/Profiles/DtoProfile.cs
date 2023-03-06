@@ -19,7 +19,7 @@ public class DtoProfile : Profile
             .ForMember(t => t.GameId, opt => opt.Ignore());
         CreateMap<Player, PlayerDTO>()
             .ForMember(t => t.TrackerValues, opt => 
-                opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.Id, tv => tv.Value)));
+                opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.TrackerId, tv => tv.Value)));
         CreateMap<Player, PlayerCredentialsDTO>()
             .ForMember(t => t.PlayerId, opt => opt.MapFrom(t => t.Id))
             .ForMember(t => t.Token, opt => opt.Ignore());

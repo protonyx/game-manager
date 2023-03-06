@@ -102,7 +102,10 @@ public class GamesController : ControllerBase
         
         if (game == null)
         {
-            return NotFound();
+            return Problem(
+                title: "Invalid entry code",
+                detail: "The provided entry code is invalid.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         var newPlayer = new Player()

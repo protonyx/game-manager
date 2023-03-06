@@ -1,4 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.login-container {
+  height: 80vh;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+}
+
+.login-actions {
+  margin-left: unset !important;
+}

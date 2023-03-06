@@ -25,6 +25,7 @@ export interface GameOptions {
 }
 
 export interface Tracker {
+    id: string
     name: string
     startingValue: number
 }
@@ -33,7 +34,7 @@ export interface Player {
     id: string
     order: number
     name: string
-    trackerValues: object
+    trackerValues: any
 }
 
 export interface PlayerCredentials {

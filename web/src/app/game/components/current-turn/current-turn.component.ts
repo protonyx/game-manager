@@ -34,6 +34,10 @@ export class CurrentTurnComponent implements OnChanges {
     }
   }
 
+  onNudge() {
+
+  }
+
   onEndTurn() {
     this.endTurn.emit();
   }

@@ -1,6 +1,9 @@
 <p>{{ game$ | async | json }}</p>
 
-<p>{{ players$ | async | json }}</p>
+<app-player-list [game]="game$ | async"
+                 [players]="players$ | async"
+                 [currentPlayer]="currentPlayer$ | async"
+                 ></app-player-list>
 
 <p>Current Player: {{ currentPlayer$ | async | json }}</p>
 
