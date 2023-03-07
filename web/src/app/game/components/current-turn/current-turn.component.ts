@@ -28,7 +28,15 @@ export class CurrentTurnComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['game'] || changes['players']) && !!this.game && !!this.players && !!this.currentPlayer) {
       // Get the current turn player
-      this.currentTurn = this.players?.filter(p => p.id === this.game?.currentTurnPlayerId)[0]
+      const currentTurnIdx = this.players?.findIndex(p => p.id === this.game?.currentTurnPlayerId)
+
+      if (currentTurnIdx >= 0) {
+        this.currentTurn = this.players[currentTurnIdx]
+
+        if (this.players.length > 1) {
+          this.nextTurn = this.players[(currentTurnIdx + 1) % this.players.length]
+        }
+      }
 
       this.isMyTurn = this.currentTurn?.id === this.currentPlayer.id;
     }

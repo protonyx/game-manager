@@ -17,8 +17,6 @@ export class PlayerListComponent implements OnChanges {
     @Input()
     public currentPlayer: Player | null = null;
 
-    public orderedPlayers: Player[] | null = null;
-
     dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
     columnsToDisplay = ['name'];
@@ -29,9 +27,7 @@ export class PlayerListComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if ((changes['game'] || changes['players']) && !!this.game && !!this.players && !!this.currentPlayer) {
-            // Get the current turn player
-            this.orderedPlayers = [...this.players].sort((a, b) => a.order - b.order);
-            this.dataSource = new MatTableDataSource<Player>(this.orderedPlayers)
+            this.dataSource = new MatTableDataSource<Player>(this.players)
 
             this.columnsToDisplay = ['name'];
             for (const tracker of this.game.trackers) {

@@ -12,18 +12,21 @@ import {name as gameName, reducer as gameReducer} from "./game/state/game.reduce
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import {GameState} from "./game/state/game.state";
 import {localStorageSync} from "ngrx-store-localstorage";
-import { LayoutComponent } from './shared/layout/layout.component';
 import {SharedModule} from "./shared/shared.module";
+import {LayoutState} from "./shared/state/layout.state";
+import {reducer as layoutReducer} from "./shared/state/layout.reducer";
 
 interface appState {
     router: any,
-    game: GameState
+    game: GameState,
+    layout: LayoutState
 }
 
 
 const reducers: ActionReducerMap<appState> = {
     router: routerReducer,
-    game: gameReducer
+    game: gameReducer,
+    layout: layoutReducer
 };
 
 export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {

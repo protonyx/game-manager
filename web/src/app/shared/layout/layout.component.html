@@ -3,6 +3,16 @@
     <!-- Top Navbar -->
     <mat-toolbar class="navbar" color="primary">
 
+        <button mat-icon-button>
+            <mat-icon>menu</mat-icon>
+        </button>
+
+        <span>{{ title$ | async }}</span>
+
+        <span class="navbar-spacer"></span>
+
+        <span *ngIf="entryCode$ | async">Entry Code: <strong>{{ entryCode$ | async }}</strong></span>
+
     </mat-toolbar>
 
     <router-outlet></router-outlet>

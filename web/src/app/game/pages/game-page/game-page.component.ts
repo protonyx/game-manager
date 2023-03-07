@@ -6,6 +6,7 @@ import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from 
 import {SignalrService} from "../../services/signalr.service";
 import {GamesApiActions} from "../../state/game.actions";
 import {PlayerCredentials} from "../../models/models";
+import {LayoutActions} from "../../../shared/state/layout.actions";
 
 @Component({
   selector: 'app-game-page',
@@ -38,6 +39,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
       if (credentials) {
         this.gameService.getGame(credentials!.gameId, credentials!.token).subscribe(game => {
           this.store.dispatch(GamesApiActions.retrievedGame({game: game}));
+          this.store.dispatch(LayoutActions.setTitle({title: game.name}))
           this.connect(credentials);
         })
         this.gameService.getPlayer(credentials!.playerId, credentials!.token).subscribe(player => {

@@ -1,11 +1,7 @@
-<p>{{ game$ | async | json }}</p>
-
 <app-player-list [game]="game$ | async"
                  [players]="players$ | async"
                  [currentPlayer]="currentPlayer$ | async"
                  ></app-player-list>
-
-<p>Current Player: {{ currentPlayer$ | async | json }}</p>
 
 <app-current-turn [game]="game$ | async"
                   [players]="players$ | async"

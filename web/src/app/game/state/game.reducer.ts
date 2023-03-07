@@ -12,14 +12,17 @@ export const gameFeature = createFeature({
             return {...state, game: game}
         }),
         on(GameHubActions.playerJoined, (state, message) => {
-            return {...state, players: [...state.players, message.player]}
+            let newPlayers = [...state.players, message.player].sort((a, b) => a.order - b.order);
+            return {...state, players: newPlayers}
         }),
         on(GameHubActions.playerUpdated, (state, message) => {
             let filteredPlayers = state.players.filter(item => item.id !== message.player.id)
-            return {...state, players: [...filteredPlayers, message.player]}
+            let newPlayers = [...filteredPlayers, message.player].sort((a, b) => a.order - b.order);
+            return {...state, players: newPlayers}
         }),
         on(GameHubActions.playerLeft, (state, message) => {
             let newPlayers = state.players.filter(item => item.id !== message.playerId)
+            newPlayers.sort((a, b) => a.order - b.order);
             return {...state, players: newPlayers}
         }),
         on(GamesApiActions.joinedGame, (state, {credentials}) => {
@@ -29,7 +32,8 @@ export const gameFeature = createFeature({
             return {...state, game: game};
         }),
         on(GamesApiActions.retrievedPlayers, (state, {players}) => {
-            return {...state, players: players};
+            let newPlayers = [...players].sort((a, b) => a.order - b.order);
+            return {...state, players: newPlayers};
         }),
         on(GamesApiActions.retrievedCurrentPlayer, (state, {player}) => {
             return {...state, currentPlayer: player};

@@ -86,6 +86,7 @@ public class PlayerRepository
             .AsNoTracking()
             .Include(t => t.TrackerValues)
             .Where(p => p.GameId == gameId)
+            .OrderBy(p => p.Order)
             .ToListAsync();
 
         return players;
