@@ -1,5 +1,5 @@
 import {NgModule, isDevMode} from '@angular/core';
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {BrowserModule} from '@angular/platform-browser';
 import {ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -15,6 +15,7 @@ import {localStorageSync} from "ngrx-store-localstorage";
 import {SharedModule} from "./shared/shared.module";
 import {LayoutState} from "./shared/state/layout.state";
 import {reducer as layoutReducer} from "./shared/state/layout.reducer";
+import {AuthInterceptorService} from "./game/services/auth-interceptor.service";
 
 interface appState {
     router: any,
@@ -55,7 +56,9 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         StoreDevtoolsModule.instrument({maxAge: 25, logOnly: !isDevMode()}),
         SharedModule,
     ],
-    providers: [],
+    providers: [
+        {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true}
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

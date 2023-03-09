@@ -8,12 +8,12 @@
             {{ currentTurn?.name }}
         </p>
         <p *ngIf="nextTurn">
-            Up Next: {{ nextTurn?.name }}
+            Up Next: {{ nextTurn.name }}
         </p>
     </mat-card-content>
     <mat-card-actions>
         <button mat-button (click)="onNudge()" *ngIf="!isMyTurn">Nudge</button>
-        <button mat-raised-button type="button" (click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>
+        <button mat-raised-button type="button" (click)="onEndTurn()" *ngIf="isMyTurn || isAdmin">End Turn</button>
     </mat-card-actions>
 
 </mat-card>

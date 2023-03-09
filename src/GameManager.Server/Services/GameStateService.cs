@@ -47,36 +47,23 @@ public class GameStateService
             return;
         }
         
-        var firstPlayer = players.OrderBy(t => t.Order).First();
-
-        if (game.CurrentTurnPlayerId == null)
-        {
-            await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, firstPlayer.Id);
-
-            return;
-        }
-        
         var currentPlayer = players.FirstOrDefault(t => t.Id == game.CurrentTurnPlayerId);
-
-        if (currentPlayer == null)
-        {
-            await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, firstPlayer.Id);
-
-            return;
-        }
-
-        var nextPlayer = players
-            .OrderBy(t => t.Order)
-            .FirstOrDefault(t => t.Order > currentPlayer.Order);
+        var firstPlayer = players.FirstOrDefault();
+        var nextPlayer = currentPlayer == null
+            ? firstPlayer
+            : players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? firstPlayer;
 
         if (nextPlayer == null)
         {
-            await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, firstPlayer.Id);
-
             return;
         }
 
-        await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, nextPlayer.Id);
+        game = await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, nextPlayer.Id);
+
+        if (game == null)
+        {
+            return;
+        }
         
         // Notify players
         var gameUpdatedMessage = new GameStateChangedMessage()

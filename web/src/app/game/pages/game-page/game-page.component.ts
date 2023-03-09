@@ -27,6 +27,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
+  isAdmin: boolean = false;
+
   constructor(
       private gameService: GameService,
       private signalr: SignalrService,
@@ -37,15 +39,17 @@ export class GamePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.credentials$.subscribe(credentials => {
       if (credentials) {
-        this.gameService.getGame(credentials!.gameId, credentials!.token).subscribe(game => {
+        this.isAdmin = credentials.isAdmin;
+
+        this.gameService.getGame(credentials!.gameId).subscribe(game => {
           this.store.dispatch(GamesApiActions.retrievedGame({game: game}));
           this.store.dispatch(LayoutActions.setTitle({title: game.name}))
           this.connect(credentials);
         })
-        this.gameService.getPlayer(credentials!.playerId, credentials!.token).subscribe(player => {
+        this.gameService.getPlayer(credentials!.playerId).subscribe(player => {
           this.store.dispatch(GamesApiActions.retrievedCurrentPlayer({player: player}));
         })
-        this.gameService.getPlayers(credentials!.gameId, credentials!.token).subscribe(players => {
+        this.gameService.getPlayers(credentials!.gameId).subscribe(players => {
           this.store.dispatch(GamesApiActions.retrievedPlayers({players: players}));
         })
       }

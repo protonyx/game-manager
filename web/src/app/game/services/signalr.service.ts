@@ -29,19 +29,19 @@ export class SignalrService {
             .build();
 
         connection.on("GameStateChanged", (data: GameStateChangedMessage) => {
-            console.log(data)
+            console.log("SignalR - GameStateChanged", data);
             this.store.dispatch(GameHubActions.gameUpdated(data))
         });
         connection.on("PlayerJoined", (data: PlayerJoinedMessage) => {
-            console.log(data)
+            console.log("SignalR - PlayerJoined", data);
             this.store.dispatch(GameHubActions.playerJoined(data))
         });
         connection.on("PlayerStateChanged", (data: PlayerStateChangedMessage) => {
-            console.log(data)
+            console.log("SignalR - PlayerStateChanged", data);
             this.store.dispatch(GameHubActions.playerUpdated(data))
         });
         connection.on("PlayerLeft", (data: PlayerLeftMessage) => {
-            console.log(data)
+            console.log("SignalR - PlayerLeft", data);
             this.store.dispatch(GameHubActions.playerLeft(data))
         })
         connection.onclose(async () => {

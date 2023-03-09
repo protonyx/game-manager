@@ -44,6 +44,7 @@ public class GameHub : Hub<IGameHubClient>
     {
         var gameId = Context.User?.GetGameId();
         var playerId = Context.User?.GetPlayerId();
+        var isAdmin = Context.User?.IsInRole("admin") ?? false;
 
         if (!gameId.HasValue || !playerId.HasValue)
         {
@@ -52,7 +53,7 @@ public class GameHub : Hub<IGameHubClient>
         
         var currentPlayerTurn = await _gameStateService.GetCurrentTurn(gameId.Value);
 
-        if (currentPlayerTurn != playerId)
+        if (currentPlayerTurn != playerId && !isAdmin)
         {
             // Only the current player can end the turn
             return;

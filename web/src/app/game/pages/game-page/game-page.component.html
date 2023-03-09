@@ -1,9 +1,11 @@
 <app-player-list [game]="game$ | async"
                  [players]="players$ | async"
                  [currentPlayer]="currentPlayer$ | async"
+                 [isAdmin]="isAdmin"
                  ></app-player-list>
 
 <app-current-turn [game]="game$ | async"
                   [players]="players$ | async"
                   [currentPlayer]="currentPlayer$ | async"
+                  [isAdmin]="isAdmin"
                   (endTurn)="onEndTurn()"></app-current-turn>

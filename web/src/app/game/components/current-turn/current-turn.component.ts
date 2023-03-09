@@ -17,7 +17,10 @@ export class CurrentTurnComponent implements OnChanges {
   public currentPlayer: Player | null = null;
 
   @Output()
-  public endTurn: EventEmitter<any> = new EventEmitter()
+  public endTurn: EventEmitter<any> = new EventEmitter();
+
+  @Input()
+    public isAdmin: boolean = false;
 
   public isMyTurn: boolean = false;
 

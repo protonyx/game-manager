@@ -42,18 +42,20 @@ public class GameRepository
         return game;
     }
 
-    public async Task UpdateGameCurrentTurnAsync(Guid gameId, Guid playerId)
+    public async Task<Game?> UpdateGameCurrentTurnAsync(Guid gameId, Guid playerId)
     {
         var game = await _context.Games.FindAsync(gameId);
 
         if (game == null)
         {
-            return;
+            return null;
         }
 
         game.CurrentTurnPlayerId = playerId;
 
         await _context.SaveChangesAsync();
+
+        return game;
     }
 
     public async Task<Game?> GetGameByEntryCode(string entryCode)

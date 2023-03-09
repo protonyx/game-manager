@@ -15,7 +15,8 @@ public class TokenService
     {
         _configuration = configuration;
         
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+        var key = configuration["Jwt:Key"];
+        var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(key));
         _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
 

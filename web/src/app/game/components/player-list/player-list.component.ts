@@ -17,6 +17,9 @@ export class PlayerListComponent implements OnChanges {
     @Input()
     public currentPlayer: Player | null = null;
 
+    @Input()
+    public isAdmin: boolean = false;
+
     dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
     columnsToDisplay = ['name'];
