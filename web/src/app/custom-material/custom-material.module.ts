@@ -8,6 +8,8 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatTableModule} from "@angular/material/table";
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {MatListModule} from "@angular/material/list";
 
 
 @NgModule({
@@ -22,6 +24,8 @@ import {MatTableModule} from "@angular/material/table";
         MatTableModule,
         MatToolbarModule,
         MatProgressBarModule,
+        MatSidenavModule,
+        MatListModule
     ],
     exports: [
         CommonModule,
@@ -33,6 +37,8 @@ import {MatTableModule} from "@angular/material/table";
         MatTableModule,
         MatToolbarModule,
         MatProgressBarModule,
+        MatSidenavModule,
+        MatListModule
     ]
 })
 export class CustomMaterialModule {

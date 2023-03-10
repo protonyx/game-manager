@@ -1,12 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
-import {Subject, Subscription, takeUntil, tap, timer} from "rxjs";
+import {catchError, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
 import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
 import {SignalrService} from "../../services/signalr.service";
-import {GamesApiActions} from "../../state/game.actions";
+import {GameActions, GamesApiActions} from "../../state/game.actions";
 import {PlayerCredentials} from "../../models/models";
 import {LayoutActions} from "../../../shared/state/layout.actions";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-game-page',
@@ -32,7 +33,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
   constructor(
       private gameService: GameService,
       private signalr: SignalrService,
-      private store: Store) {
+      private store: Store,
+      private router: Router) {
 
   }
 
@@ -41,7 +43,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
       if (credentials) {
         this.isAdmin = credentials.isAdmin;
 
-        this.gameService.getGame(credentials!.gameId).subscribe(game => {
+        this.gameService.getGame(credentials!.gameId).pipe(
+            catchError((err, caught) => {
+              this.store.dispatch(GameActions.leaveGame({gameId: credentials.gameId}))
+
+              throw err;
+            })
+        ).subscribe(game => {
           this.store.dispatch(GamesApiActions.retrievedGame({game: game}));
           this.store.dispatch(LayoutActions.setTitle({title: game.name}))
           this.connect(credentials);
@@ -59,10 +67,19 @@ export class GamePageComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.next(true);
     this.unsubscribe$.unsubscribe();
+
+    this.signalr.disconnect();
   }
 
-  onEndTurn() {
+  onEndTurn(): void {
     this.signalr.endTurn();
+  }
+
+  async onLeave(): Promise<void> {
+    await this.signalr.disconnect();
+    this.store.dispatch(GameActions.leaveGame({gameId: ''}));
+
+    await this.router.navigate(['./join']);
   }
 
   private connect(credentials: PlayerCredentials) {

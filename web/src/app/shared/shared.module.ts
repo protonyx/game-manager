@@ -13,7 +13,7 @@ import {LayoutComponent} from "./layout/layout.component";
         RouterModule,
         CustomMaterialModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     exports: [
         CustomMaterialModule,

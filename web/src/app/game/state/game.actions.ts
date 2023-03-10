@@ -11,6 +11,7 @@ export const GameActions = createActionGroup({
     source: 'Games',
     events: {
         'Join Game': props<{ joinGame: JoinGame }>(),
+        'Leave Game': props<{ gameId: string }>(),
     }
 });
 
@@ -20,7 +21,7 @@ export const GameHubActions = createActionGroup({
         'Game Updated': props<GameStateChangedMessage>(),
         'Player Joined': props<PlayerJoinedMessage>(),
         'Player Updated': props<PlayerStateChangedMessage>(),
-        'Player Left': props<PlayerLeftMessage>(),
+        'Player Left': props<PlayerLeftMessage>()
     }
 });
 

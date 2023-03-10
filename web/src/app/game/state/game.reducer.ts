@@ -8,6 +8,9 @@ export const gameFeature = createFeature({
     name: 'game',
     reducer: createReducer(
         initialState,
+        on(GameActions.leaveGame, (state, {gameId}) => {
+           return {...state, credentials: null, game: null};
+        }),
         on(GameHubActions.gameUpdated, (state, {game}) => {
             return {...state, game: game}
         }),

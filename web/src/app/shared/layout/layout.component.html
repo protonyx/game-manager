@@ -1,9 +1,9 @@
-<div class="navbar-container">
+<div class="navbar-container" [class.navbar-is-mobile]="mobileQuery.matches">
 
     <!-- Top Navbar -->
     <mat-toolbar class="navbar" color="primary">
 
-        <button mat-icon-button>
+        <button mat-icon-button (click)="snav.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
 
@@ -15,5 +15,40 @@
 
     </mat-toolbar>
 
-    <router-outlet></router-outlet>
+    <mat-sidenav-container class="navbar-sidenav-container">
+        <mat-sidenav #snav
+                     fixedTopGap="56"
+                     [mode]="mobileQuery.matches ? 'over' : 'side'"
+                     [fixedInViewport]="mobileQuery.matches"
+                     class="sidenav">
+            <mat-nav-list>
+                <h3 mat-subheader>Home</h3>
+
+                <a mat-list-item [routerLink]="['/game/new']" routerLinkActive="active">
+                    <button mat-icon-button>
+                        <mat-icon>
+                            add
+                        </mat-icon>
+                    </button>
+
+                    <p mat-line> Create Game </p>
+                </a>
+
+                <a mat-list-item [routerLink]="['/game/join']" routerLinkActive="active">
+                    <button mat-icon-button>
+                        <mat-icon>
+                            login
+                        </mat-icon>
+                    </button>
+
+                    <p mat-line> Join Game </p>
+                </a>
+            </mat-nav-list>
+        </mat-sidenav>
+
+        <mat-sidenav-content class="sidenav-content">
+            <router-outlet></router-outlet>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+
 </div>
