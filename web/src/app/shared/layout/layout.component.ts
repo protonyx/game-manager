@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Store} from "@ngrx/store";
 import {selectTitle} from "../state/layout.reducer";
 import {selectGame} from "../../game/state/game.reducer";
@@ -12,11 +12,11 @@ import {MediaMatcher} from "@angular/cdk/layout";
 })
 export class LayoutComponent {
 
-  title$ = this.store.select(selectTitle)
+  @Input()
+  public title: string | null = "Game Manager";
 
-  entryCode$ = this.store.select(selectGame).pipe(
-      map(g => g?.entryCode)
-  )
+  @Input()
+  public entryCode: string | null | undefined;
 
   mobileQuery: MediaQueryList;
 

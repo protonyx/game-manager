@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 import {environment} from '../../../environments/environment';
 import {Store} from "@ngrx/store";
-import {GameActions, GameHubActions} from "../state/game.actions";
+import {GameHubActions} from "../state/game.actions";
 import {
     GameStateChangedMessage,
     PlayerJoinedMessage,
@@ -13,7 +13,7 @@ import {
 @Injectable({
     providedIn: 'root'
 })
-export class SignalrService {
+export class GameHubService {
 
     connection?: HubConnection
 
@@ -45,23 +45,26 @@ export class SignalrService {
             this.store.dispatch(GameHubActions.playerLeft(data))
         })
         connection.onclose(async () => {
-            //await start()
+            console.log("SignalR disconnected");
         });
 
         try {
-            await connection.start()
-            console.log("SignalR connected")
+            await connection.start();
+            console.log("SignalR connected");
 
             this.connection = connection
         } catch (err) {
             console.log(err)
-            // setTimeout(start, 5000)
         }
     }
 
     public async disconnect() {
         if (this.connection)
-            await this.connection.stop()
+        {
+            await this.connection.stop();
+
+            this.connection = undefined;
+        }
     }
 
     public async heartbeat() {

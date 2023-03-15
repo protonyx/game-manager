@@ -12,5 +12,7 @@ public class GameDTO
     
     public Guid? CurrentTurnPlayerId { get; set; }
     
+    public DateTime? LastTurnStartTime { get; set; }
+    
     public ICollection<TrackerDTO> Trackers { get; set; }
 }

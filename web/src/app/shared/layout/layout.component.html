@@ -7,11 +7,11 @@
             <mat-icon>menu</mat-icon>
         </button>
 
-        <span>{{ title$ | async }}</span>
+        <span>{{ title }}</span>
 
         <span class="navbar-spacer"></span>
 
-        <span *ngIf="entryCode$ | async">Entry Code: <strong>{{ entryCode$ | async }}</strong></span>
+        <span *ngIf="entryCode">Entry Code: <strong>{{ entryCode }}</strong></span>
 
     </mat-toolbar>
 
@@ -22,7 +22,9 @@
                      [fixedInViewport]="mobileQuery.matches"
                      class="sidenav">
             <mat-nav-list>
-                <h3 mat-subheader>Home</h3>
+                <a mat-list-item [routerLink]="['/']" routerLinkActive="active">
+                    Home
+                </a>
 
                 <a mat-list-item [routerLink]="['/game/new']" routerLinkActive="active">
                     <button mat-icon-button>

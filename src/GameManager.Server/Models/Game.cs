@@ -11,6 +11,8 @@ public class Game
     public GameOptions Options { get; set; }
     
     public Guid? CurrentTurnPlayerId { get; set; }
+    
+    public DateTime? LastTurnStartTime { get; set; }
 
     public ICollection<Player> Players { get; set; } = new List<Player>();
 

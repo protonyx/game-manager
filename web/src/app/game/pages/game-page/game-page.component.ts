@@ -3,7 +3,7 @@ import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
 import {catchError, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
 import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
-import {SignalrService} from "../../services/signalr.service";
+import {GameHubService} from "../../services/game-hub.service";
 import {GameActions, GamesApiActions} from "../../state/game.actions";
 import {PlayerCredentials} from "../../models/models";
 import {LayoutActions} from "../../../shared/state/layout.actions";
@@ -32,7 +32,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   constructor(
       private gameService: GameService,
-      private signalr: SignalrService,
+      private signalr: GameHubService,
       private store: Store,
       private router: Router) {
 

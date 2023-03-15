@@ -52,6 +52,7 @@ public class GameRepository
         }
 
         game.CurrentTurnPlayerId = playerId;
+        game.LastTurnStartTime = DateTime.Now;
 
         await _context.SaveChangesAsync();
 

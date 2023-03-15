@@ -34,7 +34,7 @@ public class PlayerRepository
 
         newPlayer.Id = Guid.NewGuid();
         newPlayer.GameId = gameId;
-        newPlayer.Token = string.Empty; //Guid.NewGuid().ToString();
+        newPlayer.Active = true;
         newPlayer.Order = maxOrder + 1;
         newPlayer.LastHeartbeat = DateTime.UtcNow;
 
