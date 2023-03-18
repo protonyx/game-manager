@@ -23,9 +23,19 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();            
+        }
     });
 });
 
@@ -36,6 +46,18 @@ builder.Services.AddAuthentication(opt =>
     .AddJwtBearer(options =>
     {
         var key = builder.Configuration["Jwt:Key"];
+        byte[] keyBytes;
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            // Generate a random key
+            keyBytes = new byte[16];
+            Random.Shared.NextBytes(keyBytes);
+            TokenService.DefaultKey = keyBytes;
+        }
+        else
+        {
+            keyBytes = Convert.FromBase64String(key);
+        }
         
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -45,7 +67,7 @@ builder.Services.AddAuthentication(opt =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(key))
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
         };
         options.Events = new JwtBearerEvents()
         {
@@ -85,17 +107,15 @@ builder.Services.AddAutoMapper(cfg =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Run migrations
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseHttpsRedirection();
+    var db = scope.ServiceProvider.GetRequiredService<GameContext>();
+    db.Database.Migrate();
 }
 
+// Configure the HTTP request pipeline.
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseCors();
@@ -103,15 +123,12 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSwaggerUI();
+
 app.MapControllers();
-app.MapHub<GameHub>("/hubs/game")
-    .RequireCors(policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
+app.MapHub<GameHub>("/hubs/game");
+app.MapFallbackToFile("index.html");
+app.MapSwagger();
 
 app.Run();
 

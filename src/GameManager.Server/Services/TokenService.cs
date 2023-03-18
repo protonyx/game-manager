@@ -11,12 +11,18 @@ public class TokenService
 
     private readonly SigningCredentials _signingCredentials;
 
+    public static byte[] DefaultKey;
+
     public TokenService(IConfiguration configuration)
     {
         _configuration = configuration;
         
         var key = configuration["Jwt:Key"];
-        var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(key));
+        var keyBytes = string.IsNullOrWhiteSpace(key)
+            ? DefaultKey
+            : Convert.FromBase64String(key);
+        
+        var securityKey = new SymmetricSecurityKey(keyBytes);
         _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
 
