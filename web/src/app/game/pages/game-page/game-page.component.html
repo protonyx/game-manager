@@ -2,6 +2,7 @@
                  [players]="players$ | async"
                  [currentPlayer]="currentPlayer$ | async"
                  [isAdmin]="isAdmin"
+                 (playerOrderUpdated)="onPlayerOrderUpdated($event)"
                  ></app-player-list>
 
 <app-current-turn [game]="game$ | async"

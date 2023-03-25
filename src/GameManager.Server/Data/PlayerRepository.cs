@@ -123,12 +123,23 @@ public class PlayerRepository
         if (existing.Order != updates.Order)
         {
             var players = await _context.Players
-                .Where(t => t.GameId == existing.GameId && t.Order > updates.Order)
+                .Where(t => t.GameId == existing.GameId)
                 .ToListAsync();
 
-            foreach (var player in players)
+            // Move all players down
+            foreach (var player in players.Where(p => p.Order >= updates.Order))
             {
                 player.Order += 1;
+            }
+            
+            existing.Order = updates.Order;
+            
+            players.Sort(new PlayerComparer());
+
+            // Reindex order starting at 1
+            for (int i = 0; i < players.Count; i++)
+            {
+                players[i].Order = i + 1;
             }
             
             // TODO: Send notifications for all updated players
@@ -136,11 +147,20 @@ public class PlayerRepository
             await _context.SaveChangesAsync();
         }
 
-        existing.Order = updates.Order;
-
         await _context.SaveChangesAsync();
 
         return existing;
+    }
+
+    internal class PlayerComparer : IComparer<Player>
+    {
+        public int Compare(Player x, Player y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (ReferenceEquals(null, y)) return 1;
+            if (ReferenceEquals(null, x)) return -1;
+            return x.Order.CompareTo(y.Order);
+        }
     }
 
     public async Task UpdatePlayerHeartbeat(Guid playerId)

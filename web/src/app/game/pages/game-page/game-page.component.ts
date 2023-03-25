@@ -5,7 +5,7 @@ import {catchError, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
 import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
 import {GameHubService} from "../../services/game-hub.service";
 import {GameActions, GamesApiActions} from "../../state/game.actions";
-import {PlayerCredentials} from "../../models/models";
+import {Player, PlayerCredentials} from "../../models/models";
 import {LayoutActions} from "../../../shared/state/layout.actions";
 import {Router} from "@angular/router";
 
@@ -80,6 +80,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.store.dispatch(GameActions.leaveGame({gameId: ''}));
 
     await this.router.navigate(['./join']);
+  }
+
+  onPlayerOrderUpdated(player: Player): void {
+    this.gameService.updatePlayer(player.id, player).subscribe(data => {
+      // TODO: Update player state in store
+    });
   }
 
   private connect(credentials: PlayerCredentials) {

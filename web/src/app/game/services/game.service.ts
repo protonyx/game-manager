@@ -38,4 +38,10 @@ export class GameService {
 
     return this.http.get<Player[]>(url);
   }
+
+  public updatePlayer(playerId: string, player: Player): Observable<Player> {
+    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+
+    return this.http.put<Player>(url, player);
+  }
 }

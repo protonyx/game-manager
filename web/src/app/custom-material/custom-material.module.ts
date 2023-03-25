@@ -10,15 +10,21 @@ import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatTableModule} from "@angular/material/table";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatListModule} from "@angular/material/list";
+import {MatChipsModule} from "@angular/material/chips";
+import {MatBadgeModule} from "@angular/material/badge";
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 
 @NgModule({
     declarations: [],
     imports: [
         CommonModule,
+        DragDropModule,
+        MatBadgeModule,
         MatButtonModule,
         MatCardModule,
         MatCheckboxModule,
+        MatChipsModule,
         MatIconModule,
         MatInputModule,
         MatTableModule,
@@ -29,9 +35,12 @@ import {MatListModule} from "@angular/material/list";
     ],
     exports: [
         CommonModule,
+        DragDropModule,
+        MatBadgeModule,
         MatButtonModule,
         MatCardModule,
         MatCheckboxModule,
+        MatChipsModule,
         MatIconModule,
         MatInputModule,
         MatTableModule,
