@@ -104,6 +104,10 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<DtoProfile>();
 });
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+});
 
 var app = builder.Build();
 

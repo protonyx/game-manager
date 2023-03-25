@@ -2,12 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using GameManager.Server.Data;
 using GameManager.Server.DTO;
-using GameManager.Server.Messages;
 using GameManager.Server.Models;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace GameManager.Server.Controllers;
 
@@ -21,21 +19,17 @@ public class GamesController : ControllerBase
 
     private readonly IMapper _mapper;
 
-    private readonly IHubContext<GameHub> _hubContext;
-
     private readonly TokenService _tokenService;
 
     public GamesController(
         GameRepository gameRepository, 
         PlayerRepository playerRepository,
         IMapper mapper,
-        IHubContext<GameHub> hubContext,
         TokenService tokenService)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;
         _playerRepository = playerRepository;
-        _hubContext = hubContext;
         _tokenService = tokenService;
     }
 
@@ -122,25 +116,6 @@ public class GamesController : ControllerBase
             // Generate token
             dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
 
-            // Notify other players
-            var playerJoinedMessage = new PlayerJoinedMessage()
-            {
-                GameId = game.Id,
-                Player = _mapper.Map<PlayerDTO>(newPlayer)
-            };
-            
-            await _hubContext.Clients.Group(game.Id.ToString())
-                .SendAsync(nameof(IGameHubClient.PlayerJoined), playerJoinedMessage);
-
-            var gameUpdatedMessage = new GameStateChangedMessage()
-            {
-                GameId = game.Id,
-                Game = _mapper.Map<GameDTO>(game)
-            };
-            
-            await _hubContext.Clients.Group(game.Id.ToString())
-                .SendAsync(nameof(IGameHubClient.GameStateChanged), gameUpdatedMessage);
-
             return Ok(dto);
         }
         catch (ValidationException e)
@@ -162,7 +137,7 @@ public class GamesController : ControllerBase
 
         var player = await _playerRepository.GetPlayerById(playerId.Value);
 
-        return player != null;
+        return player is {Active: true};
     }
 
 }

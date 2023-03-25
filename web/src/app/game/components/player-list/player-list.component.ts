@@ -26,7 +26,7 @@ export class PlayerListComponent implements OnChanges {
 
     dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
-    columnsToDisplay = ['turn', 'name'];
+    columnsToDisplay = ['order', 'name'];
 
     get trackers(): Tracker[] {
         return this.game?.trackers || [];
@@ -36,7 +36,13 @@ export class PlayerListComponent implements OnChanges {
         if ((changes['game'] || changes['players']) && !!this.game && !!this.players && !!this.currentPlayer) {
             this.dataSource = new MatTableDataSource<Player>(this.players)
 
-            this.columnsToDisplay = ['position', 'turn', 'name'];
+            this.columnsToDisplay = [];
+
+            if (this.isAdmin) {
+                this.columnsToDisplay.push('position')
+            }
+
+            this.columnsToDisplay.push('order', 'name');
             for (const tracker of this.game.trackers) {
                 this.columnsToDisplay.push(tracker.id);
             }

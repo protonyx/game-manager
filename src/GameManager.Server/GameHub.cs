@@ -1,6 +1,3 @@
-using AutoMapper;
-using GameManager.Server.DTO;
-using GameManager.Server.Messages;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -25,6 +22,13 @@ public class GameHub : Hub<IGameHubClient>
         {
             // Add the connection to a group named with the Group ID
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.Value.ToString());
+        }
+
+        var playerId = Context.User?.GetPlayerId();
+
+        if (playerId.HasValue)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, playerId.Value.ToString());
         }
         
         await base.OnConnectedAsync();

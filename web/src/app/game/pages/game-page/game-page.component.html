@@ -1,12 +1,30 @@
-<app-player-list [game]="game$ | async"
-                 [players]="players$ | async"
-                 [currentPlayer]="currentPlayer$ | async"
-                 [isAdmin]="isAdmin"
-                 (playerOrderUpdated)="onPlayerOrderUpdated($event)"
-                 ></app-player-list>
+<mat-accordion multi="true">
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Player List
+            </mat-panel-title>
+        </mat-expansion-panel-header>
 
-<app-current-turn [game]="game$ | async"
-                  [players]="players$ | async"
-                  [currentPlayer]="currentPlayer$ | async"
-                  [isAdmin]="isAdmin"
-                  (endTurn)="onEndTurn()"></app-current-turn>
+        <app-player-list [game]="game$ | async"
+                         [players]="players$ | async"
+                         [currentPlayer]="currentPlayer$ | async"
+                         [isAdmin]="isAdmin"
+                         (playerOrderUpdated)="onPlayerOrderUpdated($event)"
+        ></app-player-list>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Current Player
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-current-turn [game]="game$ | async"
+                          [players]="players$ | async"
+                          [currentPlayer]="currentPlayer$ | async"
+                          [isAdmin]="isAdmin"
+                          (endTurn)="onEndTurn()">
+        </app-current-turn>
+    </mat-expansion-panel>
+</mat-accordion>

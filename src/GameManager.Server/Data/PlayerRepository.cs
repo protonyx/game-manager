@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using GameManager.Server.Models;
+using GameManager.Server.Notifications;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Server.Data;
@@ -8,9 +10,12 @@ public class PlayerRepository
 {
     private readonly GameContext _context;
 
-    public PlayerRepository(GameContext context)
+    private readonly IMediator _mediator;
+
+    public PlayerRepository(GameContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
 
     public async Task<Player> CreatePlayerAsync(Guid gameId, Player newPlayer)
@@ -57,14 +62,21 @@ public class PlayerRepository
         }
 
         _context.Add(newPlayer);
+        
+        await _context.SaveChangesAsync();
 
+        await _mediator.Publish(new PlayerCreatedNotification(newPlayer));
+
+        // Update game state if no current turn
         if (!game.CurrentTurnPlayerId.HasValue)
         {
             var startPlayer = existingPlayers.MinBy(t => t.Order);
             game.CurrentTurnPlayerId ??= startPlayer?.Id;
-        }
+            
+            await _context.SaveChangesAsync();
 
-        await _context.SaveChangesAsync();
+            await _mediator.Publish(new GameUpdatedNotification(game));
+        }
 
         return newPlayer;
     }
@@ -85,7 +97,7 @@ public class PlayerRepository
             .AsQueryable()
             .AsNoTracking()
             .Include(t => t.TrackerValues)
-            .Where(p => p.GameId == gameId)
+            .Where(p => p.GameId == gameId && p.Active)
             .OrderBy(p => p.Order)
             .ToListAsync();
 
@@ -118,49 +130,45 @@ public class PlayerRepository
         }
 
         await _context.SaveChangesAsync();
+
+        await _mediator.Publish(new PlayerUpdatedNotification(existing));
         
         // Update player orders, if changed
         if (existing.Order != updates.Order)
         {
             var players = await _context.Players
-                .Where(t => t.GameId == existing.GameId)
+                .Where(t => t.GameId == existing.GameId && t.Active)
+                .OrderBy(t => t.Order)
                 .ToListAsync();
 
-            // Move all players down
-            foreach (var player in players.Where(p => p.Order >= updates.Order))
+            var fromIndex = players.FindIndex(p => p.Id == playerId);
+            var toIndex = updates.Order - 1;
+
+            var target = players[fromIndex];
+            var delta = toIndex < fromIndex ? -1 : 1;
+
+            for (int i = fromIndex; i != toIndex; i += delta)
             {
-                player.Order += 1;
+                players[i] = players[i + delta];
             }
-            
-            existing.Order = updates.Order;
-            
-            players.Sort(new PlayerComparer());
+
+            players[toIndex] = target;
 
             // Reindex order starting at 1
             for (int i = 0; i < players.Count; i++)
             {
                 players[i].Order = i + 1;
             }
-            
-            // TODO: Send notifications for all updated players
 
             await _context.SaveChangesAsync();
-        }
 
-        await _context.SaveChangesAsync();
+            foreach (var player in players)
+            {
+                await _mediator.Publish(new PlayerUpdatedNotification(player));
+            }
+        }
 
         return existing;
-    }
-
-    internal class PlayerComparer : IComparer<Player>
-    {
-        public int Compare(Player x, Player y)
-        {
-            if (ReferenceEquals(x, y)) return 0;
-            if (ReferenceEquals(null, y)) return 1;
-            if (ReferenceEquals(null, x)) return -1;
-            return x.Order.CompareTo(y.Order);
-        }
     }
 
     public async Task UpdatePlayerHeartbeat(Guid playerId)
@@ -185,7 +193,21 @@ public class PlayerRepository
 
         if (player != null)
         {
-            _context.Players.Remove(player);
+            player.Active = false;
+            player.Order = 0;
+            
+            await _context.SaveChangesAsync();
+            
+            // Update player order for remaining players
+            var players = await _context.Players
+                .Where(t => t.GameId == player.GameId && t.Active)
+                .OrderBy(t => t.Order)
+                .ToListAsync();
+            
+            for (int i = 0; i < players.Count; i++)
+            {
+                players[i].Order = i + 1;
+            }
 
             await _context.SaveChangesAsync();
         }

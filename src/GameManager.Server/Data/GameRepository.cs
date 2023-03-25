@@ -1,5 +1,7 @@
 using System.Text;
 using GameManager.Server.Models;
+using GameManager.Server.Notifications;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Server.Data;
@@ -12,9 +14,12 @@ public class GameRepository
 
     private readonly GameContext _context;
 
-    public GameRepository(GameContext context)
+    private readonly IMediator _mediator;
+
+    public GameRepository(GameContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
 
     public async Task<Game> CreateGameAsync(Game game)
@@ -55,6 +60,8 @@ public class GameRepository
         game.LastTurnStartTime = DateTime.Now;
 
         await _context.SaveChangesAsync();
+
+        await _mediator.Publish(new GameUpdatedNotification(game));
 
         return game;
     }

@@ -1,7 +1,6 @@
 using AutoMapper;
 using GameManager.Server.Data;
 using GameManager.Server.DTO;
-using GameManager.Server.Messages;
 using GameManager.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +17,12 @@ public class PlayersController : ControllerBase
 
     private readonly IMapper _mapper;
 
-    private readonly IHubContext<GameHub> _hubContext;
-
     public PlayersController(
         PlayerRepository playerRepository,
-        IMapper mapper,
-        IHubContext<GameHub> hubContext)
+        IMapper mapper)
     {
         _playerRepository = playerRepository;
         _mapper = mapper;
-        _hubContext = hubContext;
     }
 
     [HttpGet("{id}")]
@@ -69,16 +64,6 @@ public class PlayersController : ControllerBase
         }
         
         dto = _mapper.Map<PlayerDTO>(player);
-        
-        // Notify other players
-        var message = new PlayerStateChangedMessage()
-        {
-            GameId = player.GameId,
-            Player = dto
-        };
-
-        await _hubContext.Clients.Group(player.GameId.ToString())
-            .SendAsync(nameof(IGameHubClient.PlayerStateChanged), message);
 
         return Ok(dto);
     }
@@ -88,22 +73,12 @@ public class PlayersController : ControllerBase
     {
         var player = await _playerRepository.GetPlayerById(id);
 
-        if (player == null)
+        if (player is not {Active: true})
         {
             return NotFound();
         }
         
         await _playerRepository.RemovePlayer(id);
-        
-        // Notify other players
-        var message = new PlayerLeftMessage()
-        {
-            GameId = player.GameId,
-            PlayerId = player.Id
-        };
-
-        await _hubContext.Clients.Group(player.GameId.ToString())
-            .SendAsync(nameof(IGameHubClient.PlayerLeft), message);
 
         return NoContent();
     }

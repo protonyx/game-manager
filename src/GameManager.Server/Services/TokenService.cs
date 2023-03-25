@@ -26,11 +26,6 @@ public class TokenService
         _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
 
-    public SigningCredentials GetSigningCredentials()
-    {
-        return _signingCredentials;
-    }
-
     public string GenerateToken(Guid gameId, Guid playerId, bool isAdmin)
     {
         var claims = new List<Claim>()

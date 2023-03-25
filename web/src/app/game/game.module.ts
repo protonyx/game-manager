@@ -9,6 +9,7 @@ import {NewGamePageComponent} from "./pages/new-game-page/new-game-page.componen
 import {GameRoutingModule} from "./game-routing.module";
 import {SharedModule} from "../shared/shared.module";
 import { PlayerListComponent } from './components/player-list/player-list.component';
+import { TurnTimerComponent } from './components/turn-timer/turn-timer.component';
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import { PlayerListComponent } from './components/player-list/player-list.compon
         NewGameComponent,
         NewGamePageComponent,
         PlayerListComponent,
+        TurnTimerComponent,
     ],
     imports: [
         CommonModule,
