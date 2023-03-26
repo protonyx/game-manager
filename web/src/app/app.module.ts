@@ -16,6 +16,8 @@ import {SharedModule} from "./shared/shared.module";
 import {LayoutState} from "./shared/state/layout.state";
 import {reducer as layoutReducer} from "./shared/state/layout.reducer";
 import {AuthInterceptorService} from "./game/services/auth-interceptor.service";
+import { EffectsModule } from '@ngrx/effects';
+import {GameEffects} from "./game/state/game.effects";
 
 interface appState {
     router: any,
@@ -55,6 +57,7 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         HttpClientModule,
         StoreDevtoolsModule.instrument({maxAge: 25, logOnly: !isDevMode()}),
         SharedModule,
+        EffectsModule.forRoot([GameEffects]),
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true}

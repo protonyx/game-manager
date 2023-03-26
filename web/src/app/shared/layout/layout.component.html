@@ -22,28 +22,58 @@
                      [fixedInViewport]="mobileQuery.matches"
                      class="sidenav">
             <mat-nav-list>
-                <a mat-list-item [routerLink]="['/']" routerLinkActive="active">
-                    Home
-                </a>
-
-                <a mat-list-item [routerLink]="['/game/new']" routerLinkActive="active">
+                <a mat-list-item
+                   [routerLink]="['/game/new']"
+                   routerLinkActive="active"
+                   *ngIf="!entryCode"
+                >
                     <button mat-icon-button>
                         <mat-icon>
                             add
                         </mat-icon>
                     </button>
 
-                    <p mat-line> Create Game </p>
+                    <span> Create Game </span>
                 </a>
 
-                <a mat-list-item [routerLink]="['/game/join']" routerLinkActive="active">
+                <a mat-list-item
+                   [routerLink]="['/game/join']"
+                   routerLinkActive="active"
+                   *ngIf="!entryCode"
+                >
                     <button mat-icon-button>
                         <mat-icon>
                             login
                         </mat-icon>
                     </button>
 
-                    <p mat-line> Join Game </p>
+                    <span> Join Game </span>
+                </a>
+
+                <a mat-list-item
+                   [routerLink]="['/game']"
+                   routerLinkActive="active"
+                   *ngIf="entryCode"
+                >
+                    <button mat-icon-button>
+                        <mat-icon>
+                            home
+                        </mat-icon>
+                    </button>
+
+                    <span> Game </span>
+                </a>
+
+                <a mat-list-item
+                   (click)="onLeaveGame()"
+                   *ngIf="entryCode">
+                    <button mat-icon-button>
+                        <mat-icon>
+                            logout
+                        </mat-icon>
+                    </button>
+
+                    <span> Leave Game </span>
                 </a>
             </mat-nav-list>
         </mat-sidenav>

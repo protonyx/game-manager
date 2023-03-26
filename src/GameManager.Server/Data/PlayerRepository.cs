@@ -210,6 +210,8 @@ public class PlayerRepository
             }
 
             await _context.SaveChangesAsync();
+
+            await this._mediator.Publish(new PlayerDeletedNotification(player));
         }
     }
 }

@@ -8,8 +8,8 @@ import {NewGameComponent} from "./components/new-game/new-game.component";
 import {NewGamePageComponent} from "./pages/new-game-page/new-game-page.component";
 import {GameRoutingModule} from "./game-routing.module";
 import {SharedModule} from "../shared/shared.module";
-import { PlayerListComponent } from './components/player-list/player-list.component';
-import { TurnTimerComponent } from './components/turn-timer/turn-timer.component';
+import {PlayerListComponent} from './components/player-list/player-list.component';
+import {TurnTimerComponent} from './components/turn-timer/turn-timer.component';
 
 
 @NgModule({

@@ -1,4 +1,4 @@
-import {createActionGroup, props} from "@ngrx/store";
+import {createAction, createActionGroup, emptyProps, props} from "@ngrx/store";
 import {Game, JoinGame, Player, PlayerCredentials} from "../models/models";
 import {
     GameStateChangedMessage,
@@ -11,7 +11,7 @@ export const GameActions = createActionGroup({
     source: 'Games',
     events: {
         'Join Game': props<{ joinGame: JoinGame }>(),
-        'Leave Game': props<{ gameId: string }>(),
+        'Leave Game': emptyProps(),
     }
 });
 
@@ -33,5 +33,12 @@ export const GamesApiActions = createActionGroup({
         'Retrieved Game': props<{ game: Game }>(),
         'Retrieved Players': props<{ players: Player[] }>(),
         'Retrieved Current Player': props<{ player: Player }>()
+    }
+});
+
+export const PlayersApiActions = createActionGroup({
+    source: 'Players API',
+    events: {
+        'Player Removed': props<{ playerId: string }>()
     }
 });

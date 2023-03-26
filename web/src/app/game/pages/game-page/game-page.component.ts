@@ -45,7 +45,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
         this.gameService.getGame(credentials!.gameId).pipe(
             catchError((err, caught) => {
-              this.store.dispatch(GameActions.leaveGame({gameId: credentials.gameId}))
+              this.store.dispatch(GameActions.leaveGame())
 
               throw err;
             })
@@ -77,7 +77,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   async onLeave(): Promise<void> {
     await this.signalr.disconnect();
-    this.store.dispatch(GameActions.leaveGame({gameId: ''}));
+    this.store.dispatch(GameActions.leaveGame());
 
     await this.router.navigate(['./join']);
   }

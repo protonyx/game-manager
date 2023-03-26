@@ -1,6 +1,6 @@
 import {createFeature, createReducer, on} from "@ngrx/store";
 
-import {GameActions, GameHubActions, GamesApiActions} from "./game.actions";
+import {GameActions, GameHubActions, GamesApiActions, PlayersApiActions} from "./game.actions";
 import {GameState, initialState} from "./game.state";
 
 
@@ -8,9 +8,6 @@ export const gameFeature = createFeature({
     name: 'game',
     reducer: createReducer(
         initialState,
-        on(GameActions.leaveGame, (state, {gameId}) => {
-           return {...state, credentials: null, game: null};
-        }),
         on(GameHubActions.gameUpdated, (state, {game}) => {
             return {...state, game: game}
         }),
@@ -40,6 +37,13 @@ export const gameFeature = createFeature({
         }),
         on(GamesApiActions.retrievedCurrentPlayer, (state, {player}) => {
             return {...state, currentPlayer: player};
+        }),
+        on(PlayersApiActions.playerRemoved, (state, {playerId}) => {
+            if (state.currentPlayer?.id === playerId) {
+                return {...state, currentPlayer: null, credentials: null, game: null, players: []};
+            } else {
+                return {...state};
+            }
         })
     ),
 });
