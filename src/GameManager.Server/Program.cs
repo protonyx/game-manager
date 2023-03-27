@@ -1,5 +1,6 @@
 using System.Text;
 using GameManager.Server;
+using GameManager.Server.Authentication;
 using GameManager.Server.Data;
 using GameManager.Server.Profiles;
 using GameManager.Server.Services;
@@ -69,24 +70,7 @@ builder.Services.AddAuthentication(opt =>
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
         };
-        options.Events = new JwtBearerEvents()
-        {
-            OnMessageReceived = context =>
-            {
-                var accessToken = context.Request.Query["access_token"];
-
-                // If the request is for our hub...
-                var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    (path.StartsWithSegments("/hubs")))
-                {
-                    // Read the token out of the query string
-                    context.Token = accessToken;
-                }
-
-                return Task.CompletedTask;
-            }
-        };
+        options.EventsType = typeof(CustomJwtBearerEvents);
     });
 
 builder.Services.AddDbContext<GameContext>((sp, opt) =>
@@ -94,6 +78,7 @@ builder.Services.AddDbContext<GameContext>((sp, opt) =>
     var config = sp.GetRequiredService<IConfiguration>();
     opt.UseSqlite(config.GetConnectionString("Database"));
 });
+builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddScoped<GameRepository>();
 builder.Services.AddScoped<PlayerRepository>();
 

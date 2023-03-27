@@ -43,13 +43,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
       if (credentials) {
         this.isAdmin = credentials.isAdmin;
 
-        this.gameService.getGame(credentials!.gameId).pipe(
-            catchError((err, caught) => {
-              this.store.dispatch(GameActions.leaveGame())
-
-              throw err;
-            })
-        ).subscribe(game => {
+        this.gameService.getGame(credentials!.gameId).subscribe(game => {
           this.store.dispatch(GamesApiActions.retrievedGame({game: game}));
           this.store.dispatch(LayoutActions.setTitle({title: game.name}))
           this.connect(credentials);

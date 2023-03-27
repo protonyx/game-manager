@@ -12,6 +12,7 @@ export const GameActions = createActionGroup({
     events: {
         'Join Game': props<{ joinGame: JoinGame }>(),
         'Leave Game': emptyProps(),
+        'Clear Credentials': emptyProps()
     }
 });
 
@@ -32,7 +33,8 @@ export const GamesApiActions = createActionGroup({
         'Joined Game': props<{ credentials: PlayerCredentials }>(),
         'Retrieved Game': props<{ game: Game }>(),
         'Retrieved Players': props<{ players: Player[] }>(),
-        'Retrieved Current Player': props<{ player: Player }>()
+        'Retrieved Current Player': props<{ player: Player }>(),
+        'Authentication Error': emptyProps()
     }
 });
 

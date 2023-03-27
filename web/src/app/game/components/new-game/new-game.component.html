@@ -1,11 +1,9 @@
+<form class="game-form" [formGroup]="gameForm">
+    <mat-form-field appearance="outline">
+        <mat-label>Game Name</mat-label>
+        <input matInput formControlName="name">
+    </mat-form-field>
 
-<form [formGroup]="gameForm" (ngSubmit)="onSubmit()">
-    <p>
-        <mat-form-field appearance="outline">
-            <mat-label>Game Name</mat-label>
-            <input matInput formControlName="name">
-        </mat-form-field>
-    </p>
     <h3>Options</h3>
     <div formGroupName="options">
         <p>
@@ -14,22 +12,28 @@
             </mat-checkbox>
         </p>
     </div>
-    <div>
+    <div style="margin-bottom: 10px">
         <h3>Trackers</h3>
         <ng-container *ngFor="let trackerForm of trackerControls; let i = index">
-            <div [formGroup]="trackerForm">
+            <div class="trackers" [formGroup]="trackerForm">
                 <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
                     <input matInput
                            formControlName="name"
                            placeholder="Tracker Name">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
+                    <mat-label>Starting Value</mat-label>
                     <input matInput
                            formControlName="startingValue"
                            placeholder="0">
                 </mat-form-field>
-                <mat-icon class="delete-btn" (click)="deleteTracker(i)">
-                    delete_forever</mat-icon>
+                <button mat-button (click)="deleteTracker(i)">
+                    <mat-icon class="delete-btn">
+                        delete_forever
+                    </mat-icon>
+                    Remove
+                </button>
             </div>
         </ng-container>
         <button mat-mini-fab (click)="addTracker()">
@@ -37,5 +41,5 @@
         </button>
     </div>
 
-    <button type="submit" [disabled]="gameForm.invalid" mat-raised-button>Create</button>
+    <button type="button" [disabled]="gameForm.invalid" mat-raised-button (click)="onSubmit()">Create</button>
 </form>

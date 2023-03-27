@@ -38,6 +38,10 @@ export const gameFeature = createFeature({
         on(GamesApiActions.retrievedCurrentPlayer, (state, {player}) => {
             return {...state, currentPlayer: player};
         }),
+        on(GameActions.clearCredentials, (state) => {
+            // Game or Player is no longer valid, remove game state
+            return {...state, currentPlayer: null, credentials: null, game: null, players: []};
+        }),
         on(PlayersApiActions.playerRemoved, (state, {playerId}) => {
             if (state.currentPlayer?.id === playerId) {
                 return {...state, currentPlayer: null, credentials: null, game: null, players: []};

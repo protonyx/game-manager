@@ -8,7 +8,7 @@ namespace GameManager.Server.Data;
 
 public class GameRepository
 {
-    private const string ValidEntryCodeCharacters = "ABCEFGHJKMNPQRTWXY0123456789";
+    private const string ValidEntryCodeCharacters = "ABCEFHJKMNPQRTWXY0123456789";
 
     private const int EntryCodeLength = 4;
 
