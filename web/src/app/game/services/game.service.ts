@@ -46,6 +46,34 @@ export class GameService {
         return this.http.put<Player>(url, player);
     }
 
+    public patchPlayer(playerId: string, ops: any[]): Observable<Player> {
+        const url = `${environment.baseUrl}/api/Players/${playerId}`;
+
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json-patch+json'
+        });
+
+        return this.http.patch<Player>(url, ops, {
+            headers: headers
+        });
+    }
+
+    public setPlayerOrder(playerId: string, newOrder: number): Observable<Player> {
+        const ops = [
+            { op: "replace", path: "/order", value: newOrder }
+        ];
+
+        return this.patchPlayer(playerId, ops);
+    }
+
+    public setPlayerName(playerId: string, newName: string): Observable<Player> {
+        const ops = [
+            { op: "replace", path: "/name", value: newName }
+        ];
+
+        return this.patchPlayer(playerId, ops);
+    }
+
     public removePlayer(playerId: string): Observable<Object> {
         const url = `${environment.baseUrl}/api/Players/${playerId}`;
 

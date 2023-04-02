@@ -77,9 +77,17 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onPlayerOrderUpdated(player: Player): void {
-    this.gameService.updatePlayer(player.id, player).subscribe(data => {
+    this.gameService.setPlayerOrder(player.id, player.order).subscribe(data => {
       // TODO: Update player state in store
-    });
+    })
+    // this.gameService.updatePlayer(player.id, player).subscribe(data => {
+    // });
+  }
+
+  onPlayerNameUpdated(player: Player): void {
+    this.gameService.setPlayerName(player.id, player.name).subscribe(data => {
+      // pass
+    })
   }
 
   private connect(credentials: PlayerCredentials) {

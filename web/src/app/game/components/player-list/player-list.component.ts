@@ -24,6 +24,9 @@ export class PlayerListComponent implements OnChanges {
     @Output()
     public playerOrderUpdated: EventEmitter<Player> = new EventEmitter<Player>();
 
+    @Output()
+    public playerNameUpdated: EventEmitter<Player> = new EventEmitter<Player>();
+
     dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
     columnsToDisplay = ['order', 'name'];

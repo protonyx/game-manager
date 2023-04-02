@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using AutoMapper;
 using GameManager.Server.DTO;
+using GameManager.Server.Profiles;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 
@@ -14,6 +16,17 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     public BasicTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
+    }
+
+    [Fact]
+    public void Test_AutoMapper_Profiles()
+    {
+        var mappingConfig = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<DtoProfile>();
+        });
+        
+        mappingConfig.AssertConfigurationIsValid();
     }
     
     [Fact]

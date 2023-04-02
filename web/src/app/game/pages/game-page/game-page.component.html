@@ -11,6 +11,7 @@
                          [currentPlayer]="currentPlayer$ | async"
                          [isAdmin]="isAdmin"
                          (playerOrderUpdated)="onPlayerOrderUpdated($event)"
+                         (playerNameUpdated)="onPlayerNameUpdated($event)"
         ></app-player-list>
     </mat-expansion-panel>
 
