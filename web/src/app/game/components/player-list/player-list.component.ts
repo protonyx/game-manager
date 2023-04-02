@@ -25,7 +25,10 @@ export class PlayerListComponent implements OnChanges {
     public playerOrderUpdated: EventEmitter<Player> = new EventEmitter<Player>();
 
     @Output()
-    public playerNameUpdated: EventEmitter<Player> = new EventEmitter<Player>();
+    public editPlayer: EventEmitter<Player> = new EventEmitter<Player>();
+
+    @Output()
+    public kickPlayer: EventEmitter<Player> = new EventEmitter<Player>();
 
     dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
@@ -42,7 +45,7 @@ export class PlayerListComponent implements OnChanges {
             this.columnsToDisplay = [];
 
             if (this.isAdmin) {
-                this.columnsToDisplay.push('position')
+                this.columnsToDisplay.push('position', 'actions')
             }
 
             this.columnsToDisplay.push('order', 'name');
@@ -75,5 +78,13 @@ export class PlayerListComponent implements OnChanges {
         const newPlayer = {...player, order: newIndex + 1}
         // @ts-ignore
         this.playerOrderUpdated.emit(newPlayer);
+    }
+
+    handleEditPlayer(player: Player): void {
+        this.editPlayer.emit(player);
+    }
+
+    handleRemovePlayer(player: Player): void {
+        this.kickPlayer.emit(player);
     }
 }

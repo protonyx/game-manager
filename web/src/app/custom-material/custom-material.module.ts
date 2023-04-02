@@ -14,6 +14,7 @@ import {MatChipsModule} from "@angular/material/chips";
 import {MatBadgeModule} from "@angular/material/badge";
 import {DragDropModule} from "@angular/cdk/drag-drop";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {MatDialogModule} from "@angular/material/dialog";
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
         MatCardModule,
         MatCheckboxModule,
         MatChipsModule,
+        MatDialogModule,
         MatExpansionModule,
         MatIconModule,
         MatInputModule,
@@ -43,6 +45,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
         MatCardModule,
         MatCheckboxModule,
         MatChipsModule,
+        MatDialogModule,
         MatExpansionModule,
         MatIconModule,
         MatInputModule,
