@@ -1,0 +1,32 @@
+<form [formGroup]="joinGameForm">
+    <mat-card>
+        <mat-card-title>Join Game</mat-card-title>
+        <mat-card-content>
+
+            <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Entry Code</mat-label>
+                <input matInput formControlName="entryCode">
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Player Name</mat-label>
+                <input matInput formControlName="playerName">
+            </mat-form-field>
+
+            <mat-error *ngIf="errorMessage">
+                {{ errorMessage }}
+            </mat-error>
+        </mat-card-content>
+
+        <mat-card-actions class="login-actions">
+            <button mat-raised-button
+                    type="button"
+                    [disabled]="joinGameForm.invalid || loading"
+                    (click)="onSubmit()"
+                    >Join</button>
+        </mat-card-actions>
+
+    </mat-card>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+</form>

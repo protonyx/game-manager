@@ -1,0 +1,13 @@
+.game-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-form > input {
+  width: 100%;
+}
+
+.trackers > mat-form-field {
+  width: 40%;
+  margin-right: 10px;
+}
