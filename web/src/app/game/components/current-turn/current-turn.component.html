@@ -1,4 +1,4 @@
-<h1 *ngIf="isMyTurn">It is Your Turn!</h1>
+<h1 *ngIf="isMyTurn">Your Turn!</h1>
 <h2 *ngIf="!isMyTurn">
     {{ currentTurn?.name }} is currently playing.
 </h2>
@@ -9,7 +9,7 @@
 <app-turn-timer [startTime]="game!.lastTurnStartTime"></app-turn-timer>
 
 <mat-action-row>
-    <button mat-raised-button type="button" color="primary" (click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>
+    <button mat-raised-button type="button" color="accent" (click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>
     <button mat-raised-button type="button" color="warn" (click)="onEndTurn()" *ngIf="!isMyTurn && isAdmin">
         Force End Turn
     </button>

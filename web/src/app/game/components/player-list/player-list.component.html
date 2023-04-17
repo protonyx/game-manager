@@ -25,10 +25,12 @@
     <ng-container matColumnDef="order">
         <th mat-header-cell *matHeaderCellDef> Order</th>
         <td mat-cell *matCellDef="let element">
+            <!--
             <ng-container *ngIf="checkIsPlayerTurn(element)">
                 <span matBadge="*" matBadgeOverlap="false">{{ element.order }}</span>
             </ng-container>
-            <ng-container *ngIf="!checkIsPlayerTurn(element)">
+            -->
+            <ng-container>
                 {{ element.order }}
             </ng-container>
         </td>

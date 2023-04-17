@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
-import {catchError, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
+import {catchError, combineLatest, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
 import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
 import {GameHubService} from "../../services/game-hub.service";
 import {GameActions, GamesApiActions} from "../../state/game.actions";
@@ -34,6 +34,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     trackers: Tracker[] | undefined;
 
+    isMyTurn: boolean = false;
+
     constructor(
         private gameService: GameService,
         private signalr: GameHubService,
@@ -49,7 +51,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.credentials$.subscribe(credentials => {
+        this.credentials$.pipe(
+            takeUntil(this.unsubscribe$)
+        ).subscribe(credentials => {
             if (credentials) {
                 this.isAdmin = credentials.isAdmin;
 
@@ -65,6 +69,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
                     this.store.dispatch(GamesApiActions.retrievedPlayers({players: players}));
                 })
             }
+        });
+
+        combineLatest({
+            game: this.game$,
+            currentPlayer: this.currentPlayer$
+        }).pipe(
+            takeUntil(this.unsubscribe$)
+        ).subscribe(data => {
+            this.isMyTurn = data.game?.currentTurnPlayerId === data.currentPlayer?.id;
         })
     }
 
@@ -90,12 +103,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameService.setPlayerOrder(player.id, player.order).subscribe(data => {
             // TODO: Update player state in store
         })
-        // this.gameService.updatePlayer(player.id, player).subscribe(data => {
-        // });
-    }
-
-    onPlayerNameUpdated(player: Player): void {
-        this.gameService.setPlayerName(player.id, player.name).subscribe();
     }
 
     onPlayerEdit(player: Player): void {
@@ -113,7 +120,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 ];
                 if (this.trackers && this.trackers.length > 0) {
                     this.trackers.forEach(t => {
-                        ops.push({ op: "replace", path: `/trackerValues/${t.id}`, value: data.trackers[t.id] })
+                        ops.push({op: "replace", path: `/trackerValues/${t.id}`, value: data.trackers[t.id]})
                     });
                 }
                 this.gameService.patchPlayer(player.id, ops).subscribe();

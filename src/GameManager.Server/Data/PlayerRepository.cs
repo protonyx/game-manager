@@ -24,6 +24,12 @@ public class PlayerRepository
             .Include(t => t.Trackers)
             .FirstOrDefaultAsync(t => t.Id == gameId);
 
+        if (game == null)
+        {
+            throw new ValidationException(new ValidationResult("Game does not exist",
+                new[] {nameof(gameId)}), null, gameId);
+        }
+
         var existingPlayers = await GetPlayersByGameId(gameId);
 
         if (existingPlayers.Any(p => p.Name.Equals(newPlayer.Name, StringComparison.OrdinalIgnoreCase)))
@@ -43,7 +49,7 @@ public class PlayerRepository
         newPlayer.Order = maxOrder + 1;
         newPlayer.LastHeartbeat = DateTime.UtcNow;
 
-        if (totalPlayers == 0)
+        if (!existingPlayers.Any(p => p.IsAdmin))
         {
             newPlayer.IsAdmin = true;
         }

@@ -1,0 +1,6 @@
+@import "@angular/material/theming";
+@import '../../../variables.scss';
+
+.is-active {
+  background: mat-color($primaryPalette) !important;
+}

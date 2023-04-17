@@ -5,8 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>5ed8b4db-2380-4b4c-be07-ed357d95ee43</UserSecretsId>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-    <PublishProfile>DefaultContainer</PublishProfile>
   </PropertyGroup>
 
   <ItemGroup>

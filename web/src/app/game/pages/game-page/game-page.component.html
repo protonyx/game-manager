@@ -16,10 +16,10 @@
         ></app-player-list>
     </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel [expanded]="true" [class.is-active]="isMyTurn">
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Current Player
+                Current Turn
             </mat-panel-title>
         </mat-expansion-panel-header>
         <app-current-turn [game]="game$ | async"
