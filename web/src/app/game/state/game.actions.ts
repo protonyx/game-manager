@@ -1,5 +1,5 @@
 import {createAction, createActionGroup, emptyProps, props} from "@ngrx/store";
-import {Game, JoinGame, Player, PlayerCredentials} from "../models/models";
+import {Game, JoinGame, Player, PlayerCredentials, TrackerValue} from "../models/models";
 import {
     GameStateChangedMessage,
     PlayerJoinedMessage,
@@ -12,7 +12,8 @@ export const GameActions = createActionGroup({
     events: {
         'Join Game': props<{ joinGame: JoinGame }>(),
         'Leave Game': emptyProps(),
-        'Clear Credentials': emptyProps()
+        'Clear Credentials': emptyProps(),
+        'Update Tracker': props<{ tracker: TrackerValue }>()
     }
 });
 
@@ -41,6 +42,7 @@ export const GamesApiActions = createActionGroup({
 export const PlayersApiActions = createActionGroup({
     source: 'Players API',
     events: {
+        'Player Updated': props<{ player: Player }>(),
         'Player Removed': props<{ playerId: string }>()
     }
 });

@@ -74,6 +74,14 @@ export class GameService {
         return this.patchPlayer(playerId, ops);
     }
 
+    public setPlayerTracker(playerId: string, trackerId: string, value: number): Observable<Player> {
+        const ops = [
+            { op: "replace", path: `/trackerValues/${trackerId}`, value }
+        ];
+
+        return this.patchPlayer(playerId, ops);
+    }
+
     public removePlayer(playerId: string): Observable<Object> {
         const url = `${environment.baseUrl}/api/Players/${playerId}`;
 

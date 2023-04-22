@@ -1,11 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
-import {catchError, combineLatest, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
+import {catchError, combineLatest, map, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
 import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
 import {GameHubService} from "../../services/game-hub.service";
 import {GameActions, GamesApiActions} from "../../state/game.actions";
-import {Player, PlayerCredentials, Tracker} from "../../models/models";
+import {Player, PlayerCredentials, Tracker, TrackerValue} from "../../models/models";
 import {LayoutActions} from "../../../shared/state/layout.actions";
 import {Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
@@ -24,6 +24,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     game$ = this.store.select(selectGame)
 
+    trackers$ = this.game$.pipe(
+        map(g => g?.trackers)
+    )
+
     players$ = this.store.select(selectPlayers)
 
     heartbeat$: Subscription | undefined;
@@ -32,7 +36,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     isAdmin: boolean = false;
 
-    trackers: Tracker[] | undefined;
+    trackers: Tracker[] | null | undefined;
 
     isMyTurn: boolean = false;
 
@@ -127,6 +131,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
             }
 
         })
+    }
+
+    onTrackerUpdate(trackerValue: TrackerValue): void {
+        this.store.dispatch(GameActions.updateTracker({ tracker: trackerValue }))
     }
 
     onPlayerKick(player: Player): void {

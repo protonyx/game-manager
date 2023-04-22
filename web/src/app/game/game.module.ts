@@ -11,6 +11,7 @@ import {SharedModule} from "../shared/shared.module";
 import {PlayerListComponent} from './components/player-list/player-list.component';
 import {TurnTimerComponent} from './components/turn-timer/turn-timer.component';
 import { PlayerEditComponent } from './components/player-edit/player-edit.component';
+import { TrackerEditorComponent } from './components/tracker-editor/tracker-editor.component';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { PlayerEditComponent } from './components/player-edit/player-edit.compon
         PlayerListComponent,
         TurnTimerComponent,
         PlayerEditComponent,
+        TrackerEditorComponent,
     ],
     imports: [
         CommonModule,

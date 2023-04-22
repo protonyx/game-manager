@@ -2,6 +2,7 @@ import {createFeature, createReducer, on} from "@ngrx/store";
 
 import {GameActions, GameHubActions, GamesApiActions, PlayersApiActions} from "./game.actions";
 import {GameState, initialState} from "./game.state";
+import {Player} from "../models/models";
 
 
 export const gameFeature = createFeature({
@@ -41,6 +42,14 @@ export const gameFeature = createFeature({
         on(GameActions.clearCredentials, (state) => {
             // Game or Player is no longer valid, remove game state
             return {...state, currentPlayer: null, credentials: null, game: null, players: []};
+        }),
+        on(GameActions.updateTracker, (state, {tracker}) => {
+            const player = {...state.currentPlayer, trackerValues: {
+                ...state.currentPlayer?.trackerValues,
+                    [tracker.trackerId]: tracker.value
+                }
+            } as Player;
+            return {...state, currentPlayer: player};
         }),
         on(PlayersApiActions.playerRemoved, (state, {playerId}) => {
             if (state.currentPlayer?.id === playerId) {

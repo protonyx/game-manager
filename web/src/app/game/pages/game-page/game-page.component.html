@@ -29,4 +29,16 @@
                           (endTurn)="onEndTurn()">
         </app-current-turn>
     </mat-expansion-panel>
+
+    <mat-expansion-panel [expanded]="true" *ngIf="trackers && trackers.length > 0">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Trackers
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-tracker-editor [trackers]="trackers$ | async"
+                            [player]="currentPlayer$ | async"
+                            (updateTrackers)="onTrackerUpdate($event)">
+        </app-tracker-editor>
+    </mat-expansion-panel>
 </mat-accordion>

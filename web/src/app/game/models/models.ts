@@ -31,6 +31,11 @@ export interface Tracker {
     startingValue: number
 }
 
+export interface TrackerValue {
+    trackerId: string,
+    value: number
+}
+
 export interface Player {
     id: string
     order: number
