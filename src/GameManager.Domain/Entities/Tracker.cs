@@ -9,6 +9,4 @@ public class Tracker
     public string Name { get; set; }
 
     public int StartingValue { get; set; } = 0;
-    
-    public Game Game { get; set; }
 }

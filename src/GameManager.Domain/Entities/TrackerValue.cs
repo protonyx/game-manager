@@ -9,8 +9,4 @@ public class TrackerValue
     public Guid TrackerId { get; set; }
     
     public int Value { get; set; }
-
-    public Player Player { get; set; }
-    
-    public Tracker Tracker { get; set; }
 }

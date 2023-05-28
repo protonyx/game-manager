@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using GameManager.Application.Data;
+using GameManager.Application.Features.Games.Commands;
 using GameManager.Server.Data;
 using GameManager.Server.DTO;
 using GameManager.Server.Models;
 using GameManager.Server.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,24 +16,24 @@ namespace GameManager.Server.Controllers;
 [ApiController]
 public class GamesController : ControllerBase
 {
-    private readonly GameRepository _gameRepository;
+    private readonly IGameRepository _gameRepository;
 
-    private readonly PlayerRepository _playerRepository;
+    private readonly IPlayerRepository _playerRepository;
 
     private readonly IMapper _mapper;
 
-    private readonly TokenService _tokenService;
+    private readonly IMediator _mediator;
 
     public GamesController(
-        GameRepository gameRepository, 
-        PlayerRepository playerRepository,
+        IGameRepository gameRepository, 
+        IPlayerRepository playerRepository,
         IMapper mapper,
-        TokenService tokenService)
+        IMediator mediator)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;
         _playerRepository = playerRepository;
-        _tokenService = tokenService;
+        _mediator = mediator;
     }
 
     [HttpPost]
@@ -38,7 +41,7 @@ public class GamesController : ControllerBase
     {
         var model = _mapper.Map<Game>(game);
 
-        var newGame = await _gameRepository.CreateGameAsync(model);
+        var newGame = await _gameRepository.CreateAsync(model);
 
         var ret = _mapper.Map<GameDTO>(newGame);
 
@@ -49,7 +52,7 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGame([FromRoute] Guid id)
     {
-        var game = await _gameRepository.GetGameById(id);
+        var game = await _gameRepository.GetByIdAsync(id);
 
         if (game == null)
         {
@@ -70,7 +73,7 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
-        var game = await _gameRepository.GetGameById(id);
+        var game = await _gameRepository.GetByIdAsync(id);
 
         if (game == null)
         {
@@ -90,39 +93,25 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("Join")]
-    public async Task<IActionResult> JoinGame([FromBody] NewPlayerDTO player)
+    [ProducesResponseType(typeof(PlayerCredentialsDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> JoinGame(
+        [FromBody] JoinGameCommand player,
+        CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetGameByEntryCode(player.EntryCode);
-        
-        if (game == null)
+        var response = await _mediator.Send(player, cancellationToken);
+
+        if (response.ValidationResults.Any())
         {
-            return Problem(
-                title: "Invalid entry code",
-                detail: "The provided entry code is invalid.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-
-        var newPlayer = new Player()
-        {
-            Name = player.Name
-        };
-
-        try
-        {
-            newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
-
-            var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
-
-            // Generate token
-            dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
-
-            return Ok(dto);
-        }
-        catch (ValidationException e)
-        {
-            ModelState.AddModelError(e.ValidationResult.MemberNames.First(), e.ValidationResult.ErrorMessage);
+            foreach (var validationResult in response.ValidationResults)
+            {
+                ModelState.AddModelError(validationResult.MemberNames.First(), validationResult.ErrorMessage);
+            }
+            
             return BadRequest(ModelState);
         }
+
+        return Ok(response.Credentials);
     }
 
     private async Task<bool> VerifyActivePlayerAsync()
@@ -135,7 +124,7 @@ public class GamesController : ControllerBase
             return false;
         }
 
-        var player = await _playerRepository.GetPlayerById(playerId.Value);
+        var player = await _playerRepository.GetByIdAsync(playerId.Value);
 
         return player is {Active: true};
     }

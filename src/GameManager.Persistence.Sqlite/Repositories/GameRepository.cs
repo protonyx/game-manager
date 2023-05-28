@@ -1,39 +1,34 @@
 using System.Text;
+using GameManager.Application.Data;
 using GameManager.Server.Models;
 using GameManager.Server.Notifications;
+using GameManager.Server.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Server.Data;
 
-public class GameRepository
+public class GameRepository : BaseRepository<Game>, IGameRepository
 {
-    private const string ValidEntryCodeCharacters = "ABCEFHJKMNPQRTWXY0123456789";
-
+    private readonly IMediator _mediator;
+    
     private const int EntryCodeLength = 4;
 
-    private readonly GameContext _context;
-
-    private readonly IMediator _mediator;
-
     public GameRepository(GameContext context, IMediator mediator)
+        : base(context)
     {
-        _context = context;
         _mediator = mediator;
     }
 
-    public async Task<Game> CreateGameAsync(Game game)
+    public override async Task<Game> CreateAsync(Game game)
     {
         game.Id = Guid.NewGuid();
-        game.EntryCode = GenerateEntryCode(EntryCodeLength);
+        game.EntryCode = EntryCodeFactory.Create(EntryCodeLength);
 
-        _context.Games.Add(game);
-        await _context.SaveChangesAsync();
-
-        return game;
+        return await base.CreateAsync(game);
     }
 
-    public async Task<Game?> GetGameById(Guid gameId)
+    public override async Task<Game?> GetByIdAsync(Guid gameId)
     {
         IQueryable<Game> queryable = _context.Games
             .AsQueryable()
@@ -66,7 +61,7 @@ public class GameRepository
         return game;
     }
 
-    public async Task<Game?> GetGameByEntryCode(string entryCode)
+    public async Task<Game?> GetGameByEntryCodeAsync(string entryCode)
     {
         var game = await _context.Games
             .Where(t => t.EntryCode == entryCode.ToUpper())
@@ -75,17 +70,4 @@ public class GameRepository
         return game;
     }
 
-    private string GenerateEntryCode(int length)
-    {
-        var sb = new StringBuilder(length);
-
-        for (int i = 0; i < length; i++)
-        {
-            var idx = Random.Shared.Next() % ValidEntryCodeCharacters.Length;
-
-            sb.Append(ValidEntryCodeCharacters[idx]);
-        }
-
-        return sb.ToString();
-    }
 }

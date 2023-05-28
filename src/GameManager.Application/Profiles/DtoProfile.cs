@@ -12,8 +12,7 @@ public class DtoProfile : Profile
             .ForMember(t => t.Id, opt => opt.Ignore())
             .ForMember(t => t.EntryCode, opt => opt.Ignore())
             .ForMember(t => t.CurrentTurnPlayerId, opt => opt.Ignore())
-            .ForMember(t => t.LastTurnStartTime, opt => opt.Ignore())
-            .ForMember(t => t.Players, opt => opt.Ignore());
+            .ForMember(t => t.LastTurnStartTime, opt => opt.Ignore());
 
         CreateMap<Game, GameDTO>();
         CreateMap<GameOptions, GameOptionsDTO>()
@@ -38,7 +37,6 @@ public class DtoProfile : Profile
         CreateMap<Tracker, TrackerDTO>()
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())
-            .ForMember(t => t.GameId, opt => opt.Ignore())
-            .ForMember(t => t.Game, opt => opt.Ignore());
+            .ForMember(t => t.GameId, opt => opt.Ignore());
     }
 }

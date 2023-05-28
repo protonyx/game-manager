@@ -29,7 +29,7 @@ public class PlayersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlayer([FromRoute] Guid id)
     {
-        var player = await _playerRepository.GetPlayerById(id);
+        var player = await _playerRepository.GetByIdAsync(id);
 
         if (player == null)
         {
@@ -48,7 +48,7 @@ public class PlayersController : ControllerBase
     {
         var playerUpdates = _mapper.Map<Player>(dto);
 
-        var player = await _playerRepository.UpdatePlayerAsync(id, playerUpdates);
+        var player = await _playerRepository.UpdateAsync(playerUpdates);
 
         if (player == null)
         {
@@ -70,7 +70,7 @@ public class PlayersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var player = await _playerRepository.GetPlayerById(id);
+        var player = await _playerRepository.GetByIdAsync(id);
 
         if (player == null)
         {
@@ -88,7 +88,7 @@ public class PlayersController : ControllerBase
 
         _mapper.Map(dto, player);
 
-        await _playerRepository.UpdatePlayerAsync(id, player);
+        await _playerRepository.UpdateAsync(player);
 
         _mapper.Map(player, dto);
 
@@ -98,14 +98,14 @@ public class PlayersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePlayer([FromRoute] Guid id)
     {
-        var player = await _playerRepository.GetPlayerById(id);
+        var player = await _playerRepository.GetByIdAsync(id);
 
         if (player is not {Active: true})
         {
             return NotFound();
         }
         
-        await _playerRepository.RemovePlayer(id);
+        await _playerRepository.DeleteAsync(player);
 
         return NoContent();
     }

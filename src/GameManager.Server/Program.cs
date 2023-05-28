@@ -1,4 +1,6 @@
 using System.Text;
+using GameManager.Application;
+using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
 using GameManager.Server.Data;
@@ -47,20 +49,8 @@ builder.Services.AddAuthentication(opt =>
     })
     .AddJwtBearer(options =>
     {
-        var key = builder.Configuration["Jwt:Key"];
-        byte[] keyBytes;
-        if (string.IsNullOrWhiteSpace(key))
-        {
-            // Generate a random key
-            keyBytes = new byte[16];
-            Random.Shared.NextBytes(keyBytes);
-            TokenService.DefaultKey = keyBytes;
-        }
-        else
-        {
-            keyBytes = Convert.FromBase64String(key);
-        }
-        
+        var tokenService = new TokenService(builder.Configuration);
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -69,31 +59,19 @@ builder.Services.AddAuthentication(opt =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
+            IssuerSigningKey = tokenService.GetSigningKey()
         };
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
 
-builder.Services.AddDbContext<GameContext>((sp, opt) =>
-{
-    var config = sp.GetRequiredService<IConfiguration>();
-    opt.UseSqlite(config.GetConnectionString("Database"));
-});
-builder.Services.AddScoped<CustomJwtBearerEvents>();
-builder.Services.AddScoped<GameRepository>();
-builder.Services.AddScoped<PlayerRepository>();
 
-builder.Services.AddSingleton<TokenService>();
+builder.Services.AddScoped<CustomJwtBearerEvents>();
+
+builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<GameStateService>();
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<DtoProfile>();
-});
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-});
+builder.Services.AddApplicationServices();
+builder.Services.AddSqlitePersistenceServices();
 
 var app = builder.Build();
 

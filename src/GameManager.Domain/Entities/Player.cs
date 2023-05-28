@@ -15,8 +15,6 @@ public class Player
     public bool IsAdmin { get; set; }
     
     public DateTime? LastHeartbeat { get; set; }
-    
-    public Game Game { get; set; }
 
-    public ICollection<TrackerValue> TrackerValues { get; set; }
+    public ICollection<TrackerValue> TrackerValues { get; set; } = new List<TrackerValue>();
 }

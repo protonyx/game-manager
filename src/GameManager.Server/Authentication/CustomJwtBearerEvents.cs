@@ -1,4 +1,5 @@
-﻿using GameManager.Server.Data;
+﻿using GameManager.Application.Data;
+using GameManager.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GameManager.Server.Authentication;
@@ -6,9 +7,9 @@ namespace GameManager.Server.Authentication;
 public class CustomJwtBearerEvents : JwtBearerEvents
 {
 
-    private readonly GameRepository _gameRepository;
+    private readonly IGameRepository _gameRepository;
 
-    public CustomJwtBearerEvents(GameRepository gameRepository)
+    public CustomJwtBearerEvents(IGameRepository gameRepository)
     {
         _gameRepository = gameRepository;
     }
@@ -38,7 +39,7 @@ public class CustomJwtBearerEvents : JwtBearerEvents
         if (gameId.HasValue)
         {
             // Game must still be valid
-            var game = await _gameRepository.GetGameById(gameId.Value);
+            var game = await _gameRepository.GetByIdAsync(gameId.Value);
 
             if (game == null)
             {

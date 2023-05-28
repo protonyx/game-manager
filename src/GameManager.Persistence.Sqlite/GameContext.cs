@@ -43,15 +43,15 @@ public class GameContext : DbContext
 
             e.HasIndex(t => t.GameId);
 
-            e.HasOne(t => t.Game)
-                .WithMany(t => t.Players)
+            e.HasOne<Game>()
+                .WithMany()
                 .HasForeignKey(t => t.GameId);
         });
         modelBuilder.Entity<Tracker>(e =>
         {
             e.HasKey(t => t.Id);
 
-            e.HasOne(t => t.Game)
+            e.HasOne<Game>()
                 .WithMany(t => t.Trackers)
                 .HasForeignKey(t => t.GameId);
         });
@@ -59,11 +59,11 @@ public class GameContext : DbContext
         {
             e.HasKey(t => t.Id);
 
-            e.HasOne(t => t.Player)
+            e.HasOne<Player>()
                 .WithMany(t => t.TrackerValues)
                 .HasForeignKey(t => t.PlayerId);
 
-            e.HasOne(t => t.Tracker)
+            e.HasOne<Tracker>()
                 .WithMany()
                 .HasForeignKey(t => t.TrackerId);
         });

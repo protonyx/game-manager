@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using AutoMapper;
+using GameManager.Application.Features.Games.Commands;
 using GameManager.Server.DTO;
 using GameManager.Server.Profiles;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -64,7 +65,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.True(game.EntryCode.Length == 4);
         
         // Join the new game
-        var newPlayer = new NewPlayerDTO()
+        var newPlayer = new JoinGameCommand()
         {
             EntryCode = game.EntryCode,
             Name = "Test Player"

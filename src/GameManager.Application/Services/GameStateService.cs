@@ -1,14 +1,14 @@
-using GameManager.Server.Data;
+using GameManager.Application.Data;
 
 namespace GameManager.Server.Services;
 
 public class GameStateService
 {
-    private readonly GameRepository _gameRepository;
+    private readonly IGameRepository _gameRepository;
 
-    private readonly PlayerRepository _playerRepository;
+    private readonly IPlayerRepository _playerRepository;
 
-    public GameStateService(GameRepository gameRepository, PlayerRepository playerRepository)
+    public GameStateService(IGameRepository gameRepository, IPlayerRepository playerRepository)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
@@ -21,14 +21,14 @@ public class GameStateService
 
     public async Task<Guid?> GetCurrentTurn(Guid gameId)
     {
-        var game = await _gameRepository.GetGameById(gameId);
+        var game = await _gameRepository.GetByIdAsync(gameId);
 
         return game?.CurrentTurnPlayerId;
     }
 
     public async Task AdvanceTurn(Guid gameId)
     {
-        var game = await _gameRepository.GetGameById(gameId);
+        var game = await _gameRepository.GetByIdAsync(gameId);
 
         var players = await _playerRepository.GetPlayersByGameId(gameId);
 
