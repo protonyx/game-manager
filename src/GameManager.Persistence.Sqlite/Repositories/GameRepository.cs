@@ -1,12 +1,11 @@
-using System.Text;
 using GameManager.Application.Data;
-using GameManager.Server.Models;
-using GameManager.Server.Notifications;
-using GameManager.Server.Services;
+using GameManager.Application.Features.Games.Notifications;
+using GameManager.Application.Services;
+using GameManager.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GameManager.Server.Data;
+namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class GameRepository : BaseRepository<Game>, IGameRepository
 {

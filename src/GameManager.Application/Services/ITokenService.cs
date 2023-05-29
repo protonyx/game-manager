@@ -1,4 +1,4 @@
-﻿namespace GameManager.Server.Services;
+﻿namespace GameManager.Application.Services;
 
 public interface ITokenService
 {

@@ -1,20 +1,17 @@
 using AutoMapper;
-using GameManager.Server.DTO;
-using GameManager.Server.Models;
+using GameManager.Application.DTO;
+using GameManager.Domain.Entities;
 
-namespace GameManager.Server.Profiles;
+namespace GameManager.Application.Profiles;
 
 public class DtoProfile : Profile
 {
     public DtoProfile()
     {
-        CreateMap<NewGameDTO, Game>()
+        CreateMap<Game, GameDTO>()
+            .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())
-            .ForMember(t => t.EntryCode, opt => opt.Ignore())
-            .ForMember(t => t.CurrentTurnPlayerId, opt => opt.Ignore())
-            .ForMember(t => t.LastTurnStartTime, opt => opt.Ignore());
-
-        CreateMap<Game, GameDTO>();
+            .ForMember(t => t.EntryCode, opt => opt.Ignore());
         CreateMap<GameOptions, GameOptionsDTO>()
             .ReverseMap()
             .ForMember(t => t.GameId, opt => opt.Ignore());
@@ -31,9 +28,6 @@ public class DtoProfile : Profile
                         Value = kv.Value
                     })
                     .ToList()));
-        CreateMap<Player, PlayerCredentialsDTO>()
-            .ForMember(t => t.PlayerId, opt => opt.MapFrom(t => t.Id))
-            .ForMember(t => t.Token, opt => opt.Ignore());
         CreateMap<Tracker, TrackerDTO>()
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())

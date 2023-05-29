@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using GameManager.Application.Data;
-using GameManager.Server.Models;
-using GameManager.Server.Notifications;
+using GameManager.Application.Features.Games.Notifications;
+using GameManager.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GameManager.Server.Data;
+namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 {

@@ -1,4 +1,4 @@
-﻿using GameManager.Server.Profiles;
+﻿using GameManager.Application.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameManager.Application;

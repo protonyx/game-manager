@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace GameManager.Server.Services;
+namespace GameManager.Application.Services;
 
 public static class EntryCodeFactory
 {

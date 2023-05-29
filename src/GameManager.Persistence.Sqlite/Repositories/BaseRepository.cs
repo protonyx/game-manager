@@ -1,7 +1,7 @@
 ﻿using GameManager.Application.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace GameManager.Server.Data;
+namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class BaseRepository<T> : IAsyncRepository<T> where T : class
 {

@@ -1,12 +1,12 @@
-namespace GameManager.Server.Models;
+namespace GameManager.Domain.Entities;
 
 public class Game
 {
     public Guid Id { get; set; }
-    
-    public string Name { get; set; }
-    
-    public string EntryCode { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public string EntryCode { get; set; } = string.Empty;
 
     public GameOptions Options { get; set; } = new GameOptions();
     

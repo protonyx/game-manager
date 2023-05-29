@@ -1,5 +1,5 @@
 ﻿using GameManager.Application.Data;
-using GameManager.Server.Data;
+using GameManager.Persistence.Sqlite.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

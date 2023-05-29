@@ -1,4 +1,4 @@
-namespace GameManager.Server.Models;
+namespace GameManager.Domain.Entities;
 
 public class GameOptions
 {

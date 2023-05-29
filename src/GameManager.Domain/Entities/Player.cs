@@ -1,4 +1,4 @@
-namespace GameManager.Server.Models;
+namespace GameManager.Domain.Entities;
 
 public class Player
 {
@@ -7,8 +7,8 @@ public class Player
     public Guid GameId { get; set; }
 
     public int Order { get; set; }
-    
-    public string Name { get; set; }
+
+    public string Name { get; set; } = string.Empty;
     
     public bool Active { get; set; }
     

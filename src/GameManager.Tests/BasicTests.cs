@@ -1,9 +1,12 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using AutoMapper;
+using GameManager.Application.DTO;
 using GameManager.Application.Features.Games.Commands;
-using GameManager.Server.DTO;
-using GameManager.Server.Profiles;
+using GameManager.Application.Features.Games.Commands.CreateGame;
+using GameManager.Application.Features.Games.Commands.JoinGame;
+using GameManager.Application.Profiles;
+using GameManager.Server;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 
@@ -36,7 +39,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var client = _factory.CreateClient();
 
-        var newGame = new NewGameDTO()
+        var newGame = new CreateGameCommand()
         {
             Name = "Test",
             Options = new GameOptionsDTO()
@@ -62,7 +65,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         gameResponse.EnsureSuccessStatusCode();
         var game = JsonConvert.DeserializeObject<GameDTO>(await gameResponse.Content.ReadAsStringAsync());
         Assert.True(game != null);
-        Assert.True(game.EntryCode.Length == 4);
+        Assert.True(game!.EntryCode.Length == 4);
         
         // Join the new game
         var newPlayer = new JoinGameCommand()
@@ -76,10 +79,9 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         var playerResponse = await client.PostAsJsonAsync("api/Games/Join", newPlayer);
 
         playerResponse.EnsureSuccessStatusCode();
-        var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync());
+        var player = JsonConvert.DeserializeObject<JoinGameCommandResponse>(await playerResponse.Content.ReadAsStringAsync());
 
         Assert.True(player != null);
-        Assert.True(player.PlayerId != null);
-        Assert.True(!string.IsNullOrWhiteSpace(player.Token));
+        Assert.True(!string.IsNullOrWhiteSpace(player!.Token));
     }
 }

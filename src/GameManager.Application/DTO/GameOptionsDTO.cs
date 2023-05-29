@@ -1,4 +1,4 @@
-namespace GameManager.Server.DTO;
+namespace GameManager.Application.DTO;
 
 public class GameOptionsDTO
 {

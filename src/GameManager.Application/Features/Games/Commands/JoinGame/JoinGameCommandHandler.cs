@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using GameManager.Application.Data;
-using GameManager.Server.DTO;
-using GameManager.Server.Models;
-using GameManager.Server.Services;
+using GameManager.Application.Services;
+using GameManager.Domain.Entities;
 using MediatR;
 
-namespace GameManager.Application.Features.Games.Commands;
+namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameResponse>
+public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameCommandResponse>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -30,9 +29,9 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameR
         _mapper = mapper;
     }
 
-    public async Task<JoinGameResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+    public async Task<JoinGameCommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
-        var ret = new JoinGameResponse();
+        var ret = new JoinGameCommandResponse();
         
         var game = await _gameRepository.GetGameByEntryCodeAsync(request.EntryCode);
         
@@ -55,10 +54,10 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameR
         {
             newPlayer = await _playerRepository.CreateAsync(newPlayer);
         
-            ret.Credentials = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
-
-            // Generate token
-            ret.Credentials.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
+            ret.GameId = game.Id;
+            ret.PlayerId = newPlayer.Id;
+            ret.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
+            ret.IsAdmin = newPlayer.IsAdmin;
         }
         catch (ValidationException e)
         {

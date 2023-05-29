@@ -1,7 +1,7 @@
-using GameManager.Server.Models;
+using GameManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GameManager.Server.Data;
+namespace GameManager.Persistence.Sqlite;
 
 public class GameContext : DbContext
 {

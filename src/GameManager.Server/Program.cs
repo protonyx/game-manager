@@ -1,10 +1,9 @@
-using System.Text;
 using GameManager.Application;
+using GameManager.Application.Services;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
-using GameManager.Server.Data;
-using GameManager.Server.Profiles;
+using GameManager.Server.Filters;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(opt =>
+    {
+        opt.Filters.Add<RequireActivePlayerFilter>();
+    })
     .AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -43,14 +45,14 @@ builder.Services.AddCors(opt =>
     });
 });
 
+var tokenService = new TokenService(builder.Configuration);
+
 builder.Services.AddAuthentication(opt =>
     {
         opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
-        var tokenService = new TokenService(builder.Configuration);
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -67,8 +69,7 @@ builder.Services.AddAuthentication(opt =>
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 
-builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddScoped<GameStateService>();
+builder.Services.AddSingleton<ITokenService>(tokenService);
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();
@@ -100,6 +101,9 @@ app.MapSwagger();
 
 app.Run();
 
-public partial class Program
+namespace GameManager.Server
 {
+    public partial class Program
+    {
+    }
 }

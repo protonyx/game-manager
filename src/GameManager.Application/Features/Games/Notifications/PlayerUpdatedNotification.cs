@@ -1,7 +1,7 @@
-﻿using GameManager.Server.Models;
+﻿using GameManager.Domain.Entities;
 using MediatR;
 
-namespace GameManager.Server.Notifications;
+namespace GameManager.Application.Features.Games.Notifications;
 
 public class PlayerUpdatedNotification : INotification
 {

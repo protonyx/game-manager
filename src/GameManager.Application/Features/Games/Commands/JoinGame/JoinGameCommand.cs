@@ -1,10 +1,10 @@
 ﻿using MediatR;
 
-namespace GameManager.Application.Features.Games.Commands;
+namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommand : IRequest<JoinGameResponse>
+public class JoinGameCommand : IRequest<JoinGameCommandResponse>
 {
-    public string EntryCode { get; set; }
+    public string EntryCode { get; set; } = string.Empty;
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

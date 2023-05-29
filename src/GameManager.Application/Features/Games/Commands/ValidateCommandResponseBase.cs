@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using GameManager.Server.DTO;
+using System.Text.Json.Serialization;
 
 namespace GameManager.Application.Features.Games.Commands;
 
-public class JoinGameResponse
+public class ValidateCommandResponseBase
 {
+    [JsonIgnore]
     public ICollection<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
 
-    public PlayerCredentialsDTO? Credentials { get; set; }
 }

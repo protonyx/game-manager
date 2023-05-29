@@ -1,5 +1,4 @@
 ﻿using GameManager.Application.Data;
-using GameManager.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GameManager.Server.Authentication;

@@ -1,4 +1,4 @@
-﻿using GameManager.Server.Models;
+﻿using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Data;
 
