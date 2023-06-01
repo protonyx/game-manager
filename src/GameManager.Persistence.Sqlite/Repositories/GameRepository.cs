@@ -23,13 +23,14 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     {
         game.Id = Guid.NewGuid();
         game.EntryCode = EntryCodeFactory.Create(EntryCodeLength);
+        game.CreatedDate = DateTime.Now;
 
         return await base.CreateAsync(game);
     }
 
     public override async Task<Game?> GetByIdAsync(Guid gameId)
     {
-        IQueryable<Game> queryable = _context.Games
+        IQueryable<Game> queryable = _context.Set<Game>()
             .AsQueryable()
             .AsNoTracking()
             .Include(t => t.Options)
@@ -41,28 +42,16 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         return game;
     }
 
-    public async Task<Game?> UpdateGameCurrentTurnAsync(Guid gameId, Guid playerId)
+    public override async Task UpdateAsync(Game entity)
     {
-        var game = await _context.Games.FindAsync(gameId);
-
-        if (game == null)
-        {
-            return null;
-        }
-
-        game.CurrentTurnPlayerId = playerId;
-        game.LastTurnStartTime = DateTime.Now;
-
-        await _context.SaveChangesAsync();
-
-        await _mediator.Publish(new GameUpdatedNotification(game));
-
-        return game;
+        await base.UpdateAsync(entity);
+        
+        await _mediator.Publish(new GameUpdatedNotification(entity));
     }
 
     public async Task<Game?> GetGameByEntryCodeAsync(string entryCode)
     {
-        var game = await _context.Games
+        var game = await _context.Set<Game>()
             .Where(t => t.EntryCode == entryCode.ToUpper())
             .FirstOrDefaultAsync();
 

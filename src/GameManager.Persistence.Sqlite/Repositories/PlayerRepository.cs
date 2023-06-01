@@ -19,25 +19,13 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public override async Task<Player> CreateAsync(Player newPlayer)
     {
-        var game = await _context.Games
+        var game = await _context.Set<Game>()
             .Include(t => t.Trackers)
-            .FirstOrDefaultAsync(t => t.Id == newPlayer.GameId);
-
-        if (game == null)
-        {
-            throw new ValidationException(new ValidationResult("Game does not exist",
-                new[] {nameof(Player.GameId)}), null, newPlayer.GameId);
-        }
+            .FirstAsync(t => t.Id == newPlayer.GameId);
 
         var existingPlayers = await GetPlayersByGameId(newPlayer.GameId);
 
-        if (existingPlayers.Any(p => p.Name.Equals(newPlayer.Name, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new ValidationException(new ValidationResult("Player already exists with that name",
-                new[] {nameof(Player.Name)}), null, newPlayer.Name);
-        }
-        
-        var totalPlayers = existingPlayers.Count();
+        //var totalPlayers = existingPlayers.Count();
         var maxOrder = existingPlayers.Any()
             ? existingPlayers.Max(t => t.Order)
             : 0;
@@ -87,7 +75,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public override async Task<Player?> GetByIdAsync(Guid playerId)
     {
-        var player = await _context.Players
+        var player = await _context.Set<Player>()
             .AsNoTracking()
             .Include(t => t.TrackerValues)
             .FirstOrDefaultAsync(t => t.Id == playerId);
@@ -97,7 +85,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public async Task<ICollection<Player>> GetPlayersByGameId(Guid gameId)
     {
-        var players = await _context.Players
+        var players = await _context.Set<Player>()
             .AsQueryable()
             .AsNoTracking()
             .Include(t => t.TrackerValues)
@@ -110,7 +98,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public override async Task<Player?> UpdateAsync(Player updates)
     {
-        var existing = await _context.Players
+        var existing = await _context.Set<Player>()
             .Include(t => t.TrackerValues)
             .FirstOrDefaultAsync(t => t.Id == updates.Id);
 
@@ -140,7 +128,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         // Update player orders, if changed
         if (existing.Order != updates.Order)
         {
-            var players = await _context.Players
+            var players = await _context.Set<Player>()
                 .Where(t => t.GameId == existing.GameId && t.Active)
                 .OrderBy(t => t.Order)
                 .ToListAsync();
@@ -174,10 +162,20 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
         return existing;
     }
+    
+    public async Task<bool> NameIsUnique(Guid gameId, string name)
+    {
+        var playersWithName = await _context.Set<Player>()
+            .AsQueryable()
+            .Where(p => p.GameId == gameId && p.Active && p.Name.ToLower().Equals(name.ToLower()))
+            .CountAsync();
+
+        return playersWithName == 0;
+    }
 
     public async Task UpdatePlayerHeartbeat(Guid playerId)
     {
-        var player = await _context.Players
+        var player = await _context.Set<Player>()
             .FirstOrDefaultAsync(t => t.Id == playerId);
 
         if (player == null)
@@ -198,7 +196,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         await _context.SaveChangesAsync();
             
         // Update player order for remaining players
-        var players = await _context.Players
+        var players = await _context.Set<Player>()
             .Where(t => t.GameId == player.GameId && t.Active)
             .OrderBy(t => t.Order)
             .ToListAsync();

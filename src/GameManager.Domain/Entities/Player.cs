@@ -17,4 +17,6 @@ public class Player
     public DateTime? LastHeartbeat { get; set; }
 
     public ICollection<TrackerValue> TrackerValues { get; set; } = new List<TrackerValue>();
+
+    public ICollection<Turn> Turns { get; set; } = new List<Turn>();
 }

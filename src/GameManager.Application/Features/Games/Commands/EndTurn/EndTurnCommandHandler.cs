@@ -1,4 +1,5 @@
 ﻿using GameManager.Application.Data;
+using GameManager.Domain.Entities;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
@@ -9,10 +10,16 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
 
     private readonly IPlayerRepository _playerRepository;
 
-    public EndTurnCommandHandler(IGameRepository gameRepository, IPlayerRepository playerRepository)
+    private readonly ITurnRepository _turnRepository;
+
+    public EndTurnCommandHandler(
+        IGameRepository gameRepository,
+        IPlayerRepository playerRepository,
+        ITurnRepository turnRepository)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
+        _turnRepository = turnRepository;
     }
 
     public async Task<EndTurnCommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
@@ -34,8 +41,8 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
         if (game.CurrentTurnPlayerId == null)
         {
             var firstPlayer = players.First();
-            
-            await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, firstPlayer.Id);
+
+            game.CurrentTurnPlayerId = firstPlayer.Id;
         }
         else
         {
@@ -50,9 +57,22 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
             }
             
             var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
-            
-            await _gameRepository.UpdateGameCurrentTurnAsync(game.Id, nextPlayer.Id);
+
+            var turn = new Turn()
+            {
+                PlayerId = currentPlayer.Id,
+                StartTime = game.LastTurnStartTime ?? DateTime.Now,
+                EndTime = DateTime.Now
+            };
+            turn.Duration = turn.EndTime - turn.StartTime;
+
+            await _turnRepository.CreateAsync(turn);
+
+            game.CurrentTurnPlayerId = nextPlayer.Id;
         }
+
+        game.LastTurnStartTime = DateTime.Now;
+        await _gameRepository.UpdateAsync(game);
 
         return ret;
     }

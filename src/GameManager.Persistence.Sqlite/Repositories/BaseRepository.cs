@@ -5,9 +5,9 @@ namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class BaseRepository<T> : IAsyncRepository<T> where T : class
 {
-    protected readonly GameContext _context;
+    protected readonly DbContext _context;
 
-    public BaseRepository(GameContext context)
+    public BaseRepository(DbContext context)
     {
         _context = context;
     }

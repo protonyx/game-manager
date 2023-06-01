@@ -15,4 +15,6 @@ public class Game
     public DateTime? LastTurnStartTime { get; set; }
 
     public ICollection<Tracker> Trackers { get; set; } = new List<Tracker>();
+
+    public DateTime CreatedDate { get; set; }
 }
