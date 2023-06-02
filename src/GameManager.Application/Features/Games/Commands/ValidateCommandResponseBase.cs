@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+﻿using FluentValidation.Results;
 
 namespace GameManager.Application.Features.Games.Commands;
 
 public class ValidateCommandResponseBase
 {
-    [JsonIgnore]
-    public ICollection<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
+    public ValidationResult? ValidationResult { get; set; }
 
 }

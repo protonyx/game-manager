@@ -3,6 +3,7 @@ using GameManager.Application.DTO;
 using GameManager.Application.Features.Games.Commands.DeletePlayer;
 using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.Queries.GetPlayer;
+using GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -55,11 +56,10 @@ public class PlayersController : ControllerBase
             return NotFound();
         }
         
-        ModelState.AddValidationResults(response.ValidationResults);
-
-        if (!ModelState.IsValid)
+        if (response.ValidationResult is {IsValid: false})
         {
-            return BadRequest(ModelState);
+            // TODO: Format response
+            return BadRequest(response.ValidationResult);
         }
 
         return Ok(response.Player);
@@ -91,12 +91,11 @@ public class PlayersController : ControllerBase
             PlayerId = id,
             Player = player
         });
-        
-        ModelState.AddValidationResults(updateResponse.ValidationResults);
 
-        if (!ModelState.IsValid)
+        if (updateResponse.ValidationResult is {IsValid: false})
         {
-            return BadRequest(ModelState);
+            // TODO: Format response
+            return BadRequest(updateResponse.ValidationResult);
         }
 
         return Ok(updateResponse.Player);
@@ -109,5 +108,14 @@ public class PlayersController : ControllerBase
         await _mediator.Send(new DeletePlayerCommand(id));
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/Turns")]
+    [ProducesResponseType(typeof(ICollection<TurnDTO>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPlayerTurns([FromRoute] Guid id)
+    {
+        var turns = await _mediator.Send(new GetPlayerTurnsQuery(id));
+
+        return Ok(turns);
     }
 }

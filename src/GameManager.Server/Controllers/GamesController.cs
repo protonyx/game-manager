@@ -30,11 +30,10 @@ public class GamesController : ControllerBase
     {
         var response = await _mediator.Send(game, cancellationToken);
         
-        ModelState.AddValidationResults(response.ValidationResults);
-
-        if (!ModelState.IsValid)
+        if (response.ValidationResult is {IsValid: false})
         {
-            return BadRequest(ModelState);
+            // TODO: Format response
+            return BadRequest(response.ValidationResult);
         }
 
         return CreatedAtAction(nameof(GetGame), 
@@ -77,11 +76,10 @@ public class GamesController : ControllerBase
     {
         var response = await _mediator.Send(player, cancellationToken);
 
-        ModelState.AddValidationResults(response.ValidationResults);
-
-        if (!ModelState.IsValid)
+        if (response.ValidationResult is {IsValid: false})
         {
-            return BadRequest(ModelState);
+            // TODO: Format response
+            return BadRequest(response.ValidationResult);
         }
 
         return Ok(response);
