@@ -117,6 +117,15 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
             if (trackerUpdate != null)
             {
+                _context.Set<TrackerHistory>().Add(new TrackerHistory()
+                {
+                    Id = Guid.NewGuid(),
+                    PlayerId = existing.Id,
+                    TrackerId = tracker.TrackerId,
+                    ChangedTime = DateTime.Now,
+                    NewValue = trackerUpdate.Value
+                });
+                
                 tracker.Value = trackerUpdate.Value;
             }
         }

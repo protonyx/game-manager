@@ -13,6 +13,8 @@ public class GameContext : DbContext
     
     public DbSet<TrackerValue> TrackerValues { get; set; }
     
+    public DbSet<TrackerHistory> TrackerHistories { get; set; }
+
     public DbSet<Turn> Turns { get; set; }
 
     public GameContext(DbContextOptions<GameContext> options)
