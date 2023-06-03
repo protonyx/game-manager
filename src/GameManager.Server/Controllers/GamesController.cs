@@ -23,7 +23,7 @@ public class GamesController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(GameDTO), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateGame(
         [FromBody] CreateGameCommand game,
         CancellationToken cancellationToken)
@@ -32,8 +32,9 @@ public class GamesController : ControllerBase
         
         if (response.ValidationResult is {IsValid: false})
         {
-            // TODO: Format response
-            return BadRequest(response.ValidationResult);
+            ModelState.AddValidationResults(response.ValidationResult);
+
+            return ValidationProblem(ModelState);
         }
 
         return CreatedAtAction(nameof(GetGame), 
@@ -69,7 +70,7 @@ public class GamesController : ControllerBase
 
     [HttpPost("Join")]
     [ProducesResponseType(typeof(JoinGameCommandResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinGame(
         [FromBody] JoinGameCommand player,
         CancellationToken cancellationToken)
@@ -78,8 +79,9 @@ public class GamesController : ControllerBase
 
         if (response.ValidationResult is {IsValid: false})
         {
-            // TODO: Format response
-            return BadRequest(response.ValidationResult);
+            ModelState.AddValidationResults(response.ValidationResult);
+
+            return ValidationProblem(ModelState);
         }
 
         return Ok(response);

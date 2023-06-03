@@ -41,6 +41,7 @@ public class PlayersController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(PlayerDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdatePlayer(
         [FromRoute] Guid id,
         [FromBody] PlayerDTO dto)
@@ -58,8 +59,9 @@ public class PlayersController : ControllerBase
         
         if (response.ValidationResult is {IsValid: false})
         {
-            // TODO: Format response
-            return BadRequest(response.ValidationResult);
+            ModelState.AddValidationResults(response.ValidationResult);
+
+            return ValidationProblem(ModelState);
         }
 
         return Ok(response.Player);
@@ -68,6 +70,7 @@ public class PlayersController : ControllerBase
     [HttpPatch("{id}")]
     [ProducesResponseType(typeof(PlayerDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PatchPlayer(
         [FromRoute] Guid id,
         [FromBody, Required] JsonPatchDocument<PlayerDTO> patchDoc)
@@ -83,7 +86,7 @@ public class PlayersController : ControllerBase
 
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return ValidationProblem(ModelState);
         }
 
         var updateResponse = await _mediator.Send(new UpdatePlayerCommand()
@@ -94,8 +97,9 @@ public class PlayersController : ControllerBase
 
         if (updateResponse.ValidationResult is {IsValid: false})
         {
-            // TODO: Format response
-            return BadRequest(updateResponse.ValidationResult);
+            ModelState.AddValidationResults(updateResponse.ValidationResult);
+
+            return ValidationProblem(ModelState);
         }
 
         return Ok(updateResponse.Player);
