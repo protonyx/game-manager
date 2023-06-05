@@ -25,7 +25,7 @@ export class GameEffects {
             .pipe(
                 map((player) => PlayersApiActions.playerUpdated({player: player}))
             ))
-    ))
+    ));
 
     $authenticationError = createEffect(() => this.actions$.pipe(
         ofType(GamesApiActions.authenticationError),
@@ -34,7 +34,7 @@ export class GameEffects {
 
             return GameActions.clearCredentials();
         })
-    ))
+    ));
 
     constructor(
         private actions$: Actions,

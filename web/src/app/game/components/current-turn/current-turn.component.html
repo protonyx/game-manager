@@ -6,7 +6,7 @@
     Up Next: {{ nextTurn!.name }}
 </p>
 
-<app-turn-timer [startTime]="game!.lastTurnStartTime"></app-turn-timer>
+<app-turn-timer *ngIf="game" [startTime]="game!.lastTurnStartTime"></app-turn-timer>
 
 <mat-action-row>
     <button mat-raised-button type="button" color="accent" (click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>

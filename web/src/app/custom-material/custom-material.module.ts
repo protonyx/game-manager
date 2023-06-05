@@ -15,6 +15,7 @@ import {MatBadgeModule} from "@angular/material/badge";
 import {DragDropModule} from "@angular/cdk/drag-drop";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatDialogModule} from "@angular/material/dialog";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 
 
 @NgModule({
@@ -35,6 +36,7 @@ import {MatDialogModule} from "@angular/material/dialog";
         MatToolbarModule,
         MatProgressBarModule,
         MatSidenavModule,
+        MatSnackBarModule,
         MatListModule
     ],
     exports: [
@@ -53,6 +55,7 @@ import {MatDialogModule} from "@angular/material/dialog";
         MatToolbarModule,
         MatProgressBarModule,
         MatSidenavModule,
+        MatSnackBarModule,
         MatListModule
     ]
 })

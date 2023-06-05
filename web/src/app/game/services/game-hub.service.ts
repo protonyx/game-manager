@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
+import {HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel} from '@microsoft/signalr';
 import {environment} from '../../../environments/environment';
 import {Store} from "@ngrx/store";
 import {GameHubActions} from "../state/game.actions";
@@ -9,6 +9,7 @@ import {
     PlayerLeftMessage,
     PlayerStateChangedMessage
 } from "../models/messages";
+import {Subject, Subscription, takeUntil, timer} from "rxjs";
 
 @Injectable({
     providedIn: 'root'
@@ -16,6 +17,10 @@ import {
 export class GameHubService {
 
     connection?: HubConnection
+
+    close$: Subject<void> = new Subject<void>();
+
+    heartbeat$: Subscription | undefined;
 
     constructor(private store: Store){}
 
@@ -29,51 +34,74 @@ export class GameHubService {
             .build();
 
         connection.on("GameStateChanged", (data: GameStateChangedMessage) => {
-            console.log("SignalR - GameStateChanged", data);
             this.store.dispatch(GameHubActions.gameUpdated(data))
         });
         connection.on("PlayerJoined", (data: PlayerJoinedMessage) => {
-            console.log("SignalR - PlayerJoined", data);
             this.store.dispatch(GameHubActions.playerJoined(data))
         });
         connection.on("PlayerStateChanged", (data: PlayerStateChangedMessage) => {
-            console.log("SignalR - PlayerStateChanged", data);
             this.store.dispatch(GameHubActions.playerUpdated(data))
         });
         connection.on("PlayerLeft", (data: PlayerLeftMessage) => {
-            console.log("SignalR - PlayerLeft", data);
             this.store.dispatch(GameHubActions.playerLeft(data))
-        })
+        });
         connection.onclose(async () => {
             console.log("SignalR disconnected");
+            this.store.dispatch(GameHubActions.hubDisconnected());
+            this.close$.next();
         });
+        connection.onreconnected(() => {
+            console.log("SignalR reconnected");
+            this.store.dispatch(GameHubActions.hubConnected());
+            this.setupHeartbeat();
+        })
 
         try {
             await connection.start();
             console.log("SignalR connected");
+            this.store.dispatch(GameHubActions.hubConnected());
+            this.setupHeartbeat();
 
             this.connection = connection
         } catch (err) {
-            console.log(err)
+            console.error(err)
+        }
+    }
+
+    public async reconnect() {
+        if (this.connection && this.connection.state == HubConnectionState.Disconnected) {
+            await this.connection.start();
+            this.store.dispatch(GameHubActions.hubConnected());
+            this.setupHeartbeat();
         }
     }
 
     public async disconnect() {
-        if (this.connection)
+        if (this.connection && this.connection.state == HubConnectionState.Connected)
         {
             await this.connection.stop();
+            this.close$.next();
 
             this.connection = undefined;
         }
     }
 
     public async heartbeat() {
-        if (this.connection)
+        if (this.connection && this.connection.state == HubConnectionState.Connected)
             await this.connection.invoke("Heartbeat")
     }
 
     public async endTurn() {
-        if (this.connection)
+        if (this.connection && this.connection.state == HubConnectionState.Connected)
             await this.connection.invoke("EndTurn")
+    }
+
+    private setupHeartbeat(): void {
+        this.heartbeat$ = timer(5000, 30000).pipe(
+            takeUntil(this.close$)
+        ).subscribe({
+            next: () => this.heartbeat(),
+            complete: () => console.log('Heartbeat stopped')
+        });
     }
 }
