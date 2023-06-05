@@ -20,6 +20,8 @@ export const GameActions = createActionGroup({
 export const GameHubActions = createActionGroup({
     source: 'GameHub',
     events: {
+        'Hub Connected': emptyProps(),
+        'Hub Disconnected': emptyProps(),
         'Game Updated': props<GameStateChangedMessage>(),
         'Player Joined': props<PlayerJoinedMessage>(),
         'Player Updated': props<PlayerStateChangedMessage>(),

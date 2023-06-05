@@ -1,14 +1,21 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
-import {catchError, combineLatest, map, Subject, Subscription, takeUntil, tap, timer} from "rxjs";
-import {selectCredentials, selectCurrentPlayer, selectGame, selectPlayers} from "../../state/game.reducer";
-import {GameHubService} from "../../services/game-hub.service";
-import {GameActions, GamesApiActions} from "../../state/game.actions";
-import {Player, PlayerCredentials, Tracker, TrackerValue} from "../../models/models";
-import {LayoutActions} from "../../../shared/state/layout.actions";
+import {Actions, ofType} from "@ngrx/effects";
 import {Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {combineLatest, map, Subject, takeUntil, tap} from "rxjs";
+import {
+    selectCredentials,
+    selectCurrentPlayer,
+    selectGame,
+    selectPlayers
+} from "../../state/game.reducer";
+import {GameActions, GameHubActions, GamesApiActions} from "../../state/game.actions";
+import {LayoutActions} from "../../../shared/state/layout.actions";
+import {GameHubService} from "../../services/game-hub.service";
+import {GameService} from "../../services/game.service";
+import {Player, PlayerCredentials, Tracker, TrackerValue} from "../../models/models";
 import {PlayerEditComponent} from "../../components/player-edit/player-edit.component";
 
 @Component({
@@ -30,8 +37,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     players$ = this.store.select(selectPlayers)
 
-    heartbeat$: Subscription | undefined;
-
     unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
     isAdmin: boolean = false;
@@ -44,8 +49,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameService: GameService,
         private signalr: GameHubService,
         private store: Store,
+        private actions$: Actions,
         private router: Router,
-        private dialog: MatDialog) {
+        private dialog: MatDialog,
+        private snackBar: MatSnackBar) {
         this.game$.pipe(
             tap(g => {
                 this.trackers = g?.trackers;
@@ -82,6 +89,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
             takeUntil(this.unsubscribe$)
         ).subscribe(data => {
             this.isMyTurn = data.game?.currentTurnPlayerId === data.currentPlayer?.id;
+        });
+
+        this.actions$.pipe(
+            ofType(GameHubActions.hubDisconnected),
+            takeUntil(this.unsubscribe$)
+        ).subscribe(connected => {
+            let snackBarRef = this.snackBar.open("Server Disconnected", "Reconnect")
+            snackBarRef.onAction().subscribe(() => {
+                this.signalr.reconnect();
+            })
         })
     }
 
@@ -134,7 +151,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     onTrackerUpdate(trackerValue: TrackerValue): void {
-        this.store.dispatch(GameActions.updateTracker({ tracker: trackerValue }))
+        this.store.dispatch(GameActions.updateTracker({tracker: trackerValue}))
     }
 
     onPlayerKick(player: Player): void {
@@ -143,12 +160,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private connect(credentials: PlayerCredentials) {
         this.signalr.connect(credentials!.gameId, credentials!.token);
-
-        this.heartbeat$ = timer(5000, 30000).pipe(
-            takeUntil(this.unsubscribe$)
-        ).subscribe(e => {
-            this.signalr.heartbeat()
-        })
     }
 
 }

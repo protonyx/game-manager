@@ -1,6 +1,7 @@
 import {Game, Player, PlayerCredentials} from "../models/models";
 
 export interface GameState {
+    hubConnected: boolean;
     credentials: PlayerCredentials | null;
     currentPlayer: Player | null;
     game: Game | null;
@@ -8,6 +9,7 @@ export interface GameState {
 }
 
 export const initialState: GameState = {
+    hubConnected: false,
     credentials: null,
     currentPlayer: null,
     game: null,

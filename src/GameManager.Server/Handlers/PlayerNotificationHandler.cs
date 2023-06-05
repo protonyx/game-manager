@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using GameManager.Server.DTO;
+using GameManager.Application.DTO;
+using GameManager.Application.Features.Games.Notifications;
 using GameManager.Server.Messages;
-using GameManager.Server.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 

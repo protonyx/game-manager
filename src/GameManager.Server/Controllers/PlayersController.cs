@@ -1,11 +1,13 @@
-using AutoMapper;
-using GameManager.Server.Data;
-using GameManager.Server.DTO;
-using GameManager.Server.Models;
+using System.ComponentModel.DataAnnotations;
+using GameManager.Application.DTO;
+using GameManager.Application.Features.Games.Commands.DeletePlayer;
+using GameManager.Application.Features.Games.Commands.UpdatePlayer;
+using GameManager.Application.Features.Games.Queries.GetPlayer;
+using GameManager.Application.Features.Games.Queries.GetPlayerTurns;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace GameManager.Server.Controllers;
 
@@ -14,99 +16,110 @@ namespace GameManager.Server.Controllers;
 [Authorize]
 public class PlayersController : ControllerBase
 {
-    private readonly PlayerRepository _playerRepository;
+    private readonly IMediator _mediator;
 
-    private readonly IMapper _mapper;
-
-    public PlayersController(
-        PlayerRepository playerRepository,
-        IMapper mapper)
+    public PlayersController(IMediator mediator)
     {
-        _playerRepository = playerRepository;
-        _mapper = mapper;
+        _mediator = mediator;
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(PlayerDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPlayer([FromRoute] Guid id)
     {
-        var player = await _playerRepository.GetPlayerById(id);
+        var player = await _mediator.Send(new GetPlayerQuery(id));
 
         if (player == null)
         {
             return NotFound();
         }
 
-        var dto = _mapper.Map<PlayerDTO>(player);
-
-        return Ok(dto);
+        return Ok(player);
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(PlayerDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdatePlayer(
         [FromRoute] Guid id,
         [FromBody] PlayerDTO dto)
     {
-        var playerUpdates = _mapper.Map<Player>(dto);
-
-        var player = await _playerRepository.UpdatePlayerAsync(id, playerUpdates);
-
-        if (player == null)
+        var response = await _mediator.Send(new UpdatePlayerCommand()
+        {
+            PlayerId = id,
+            Player = dto
+        });
+        
+        if (response.Player == null)
         {
             return NotFound();
         }
         
-        dto = _mapper.Map<PlayerDTO>(player);
+        if (response.ValidationResult is {IsValid: false})
+        {
+            ModelState.AddValidationResults(response.ValidationResult);
 
-        return Ok(dto);
+            return ValidationProblem(ModelState);
+        }
+
+        return Ok(response.Player);
     }
 
     [HttpPatch("{id}")]
+    [ProducesResponseType(typeof(PlayerDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PatchPlayer(
         [FromRoute] Guid id,
-        [FromBody] JsonPatchDocument<PlayerDTO> patchDoc)
+        [FromBody, Required] JsonPatchDocument<PlayerDTO> patchDoc)
     {
-        if (patchDoc == null)
-        {
-            return BadRequest(ModelState);
-        }
-
-        var player = await _playerRepository.GetPlayerById(id);
+        var player = await _mediator.Send(new GetPlayerQuery(id));
 
         if (player == null)
         {
             return NotFound();
         }
 
-        var dto = _mapper.Map<PlayerDTO>(player);
-        
-        patchDoc.ApplyTo(dto, ModelState);
+        patchDoc.ApplyTo(player, ModelState);
 
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return ValidationProblem(ModelState);
         }
 
-        _mapper.Map(dto, player);
+        var updateResponse = await _mediator.Send(new UpdatePlayerCommand()
+        {
+            PlayerId = id,
+            Player = player
+        });
 
-        await _playerRepository.UpdatePlayerAsync(id, player);
+        if (updateResponse.ValidationResult is {IsValid: false})
+        {
+            ModelState.AddValidationResults(updateResponse.ValidationResult);
 
-        _mapper.Map(player, dto);
+            return ValidationProblem(ModelState);
+        }
 
-        return Ok(dto);
+        return Ok(updateResponse.Player);
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeletePlayer([FromRoute] Guid id)
     {
-        var player = await _playerRepository.GetPlayerById(id);
-
-        if (player is not {Active: true})
-        {
-            return NotFound();
-        }
-        
-        await _playerRepository.RemovePlayer(id);
+        await _mediator.Send(new DeletePlayerCommand(id));
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/Turns")]
+    [ProducesResponseType(typeof(ICollection<TurnDTO>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPlayerTurns([FromRoute] Guid id)
+    {
+        var turns = await _mediator.Send(new GetPlayerTurnsQuery(id));
+
+        return Ok(turns);
     }
 }

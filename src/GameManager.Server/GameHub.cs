@@ -1,4 +1,7 @@
+using GameManager.Application.Features.Games.Commands.EndTurn;
+using GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 using GameManager.Server.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -7,11 +10,11 @@ namespace GameManager.Server;
 [Authorize]
 public class GameHub : Hub<IGameHubClient>
 {
-    private readonly GameStateService _gameStateService;
+    private readonly IMediator _mediator;
 
-    public GameHub(GameStateService gameStateService)
+    public GameHub(IMediator mediator)
     {
-        _gameStateService = gameStateService;
+        _mediator = mediator;
     }
 
     public override async Task OnConnectedAsync()
@@ -40,7 +43,10 @@ public class GameHub : Hub<IGameHubClient>
 
         if (playerId.HasValue)
         {
-            await _gameStateService.UpdatePlayerHeartbeat(playerId.Value);
+            await _mediator.Send(new UpdateHeartbeatCommand()
+            {
+                PlayerId = playerId.Value
+            });
         }
     }
     
@@ -54,15 +60,13 @@ public class GameHub : Hub<IGameHubClient>
         {
             return;
         }
-        
-        var currentPlayerTurn = await _gameStateService.GetCurrentTurn(gameId.Value);
 
-        if (currentPlayerTurn != playerId && !isAdmin)
+        var cmd = new EndTurnCommand()
         {
-            // Only the current player can end the turn
-            return;
-        }
+            GameId = gameId.Value,
+            PlayerId = playerId.Value
+        };
 
-        await _gameStateService.AdvanceTurn(gameId.Value);
+        var resp = await _mediator.Send(cmd);
     }
 }

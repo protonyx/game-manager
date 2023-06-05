@@ -1,9 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using AutoMapper;
-using GameManager.Server.Data;
-using GameManager.Server.DTO;
-using GameManager.Server.Models;
-using GameManager.Server.Services;
+using GameManager.Application.DTO;
+using GameManager.Application.Features.Games.Commands;
+using GameManager.Application.Features.Games.Commands.CreateGame;
+using GameManager.Application.Features.Games.Commands.JoinGame;
+using GameManager.Application.Features.Games.Queries.GetGame;
+using GameManager.Application.Features.Games.Queries.GetPlayerList;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,131 +14,77 @@ namespace GameManager.Server.Controllers;
 [ApiController]
 public class GamesController : ControllerBase
 {
-    private readonly GameRepository _gameRepository;
+    private readonly IMediator _mediator;
 
-    private readonly PlayerRepository _playerRepository;
-
-    private readonly IMapper _mapper;
-
-    private readonly TokenService _tokenService;
-
-    public GamesController(
-        GameRepository gameRepository, 
-        PlayerRepository playerRepository,
-        IMapper mapper,
-        TokenService tokenService)
+    public GamesController(IMediator mediator)
     {
-        _gameRepository = gameRepository;
-        _mapper = mapper;
-        _playerRepository = playerRepository;
-        _tokenService = tokenService;
+        _mediator = mediator;
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateGame([FromBody] NewGameDTO game)
+    [ProducesResponseType(typeof(GameDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateGame(
+        [FromBody] CreateGameCommand game,
+        CancellationToken cancellationToken)
     {
-        var model = _mapper.Map<Game>(game);
+        var response = await _mediator.Send(game, cancellationToken);
+        
+        if (response.ValidationResult is {IsValid: false})
+        {
+            ModelState.AddValidationResults(response.ValidationResult);
 
-        var newGame = await _gameRepository.CreateGameAsync(model);
+            return ValidationProblem(ModelState);
+        }
 
-        var ret = _mapper.Map<GameDTO>(newGame);
-
-        return Ok(ret);
+        return CreatedAtAction(nameof(GetGame), 
+            new {id = response.Game!.Id},
+            response.Game);
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(GameDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
     public async Task<IActionResult> GetGame([FromRoute] Guid id)
     {
-        var game = await _gameRepository.GetGameById(id);
+        var response = await _mediator.Send(new GetGameQuery(id));
 
-        if (game == null)
+        if (response == null)
         {
             return NotFound();
         }
-
-        if (!await VerifyActivePlayerAsync())
-        {
-            return Forbid();
-        }
-
-        var dto = _mapper.Map<GameDTO>(game);
-
-        return Ok(dto);
+        
+        return Ok(response);
     }
 
     [HttpGet("{id}/Players")]
+    [ProducesResponseType(typeof(ICollection<PlayerDTO>), StatusCodes.Status200OK)]
     [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
-        var game = await _gameRepository.GetGameById(id);
-
-        if (game == null)
-        {
-            return NotFound();
-        }
+        var response = await _mediator.Send(new GetPlayerListQuery(id));
         
-        if (!await VerifyActivePlayerAsync())
-        {
-            return Forbid();
-        }
-
-        var players = await _playerRepository.GetPlayersByGameId(id);
-
-        var ret = _mapper.Map<ICollection<PlayerDTO>>(players);
-        
-        return Ok(ret);
+        return Ok(response);
     }
 
     [HttpPost("Join")]
-    public async Task<IActionResult> JoinGame([FromBody] NewPlayerDTO player)
+    [ProducesResponseType(typeof(JoinGameCommandResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> JoinGame(
+        [FromBody] JoinGameCommand player,
+        CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetGameByEntryCode(player.EntryCode);
-        
-        if (game == null)
+        var response = await _mediator.Send(player, cancellationToken);
+
+        if (response.ValidationResult is {IsValid: false})
         {
-            return Problem(
-                title: "Invalid entry code",
-                detail: "The provided entry code is invalid.",
-                statusCode: StatusCodes.Status400BadRequest);
+            ModelState.AddValidationResults(response.ValidationResult);
+
+            return ValidationProblem(ModelState);
         }
 
-        var newPlayer = new Player()
-        {
-            Name = player.Name
-        };
-
-        try
-        {
-            newPlayer = await _playerRepository.CreatePlayerAsync(game.Id, newPlayer);
-
-            var dto = _mapper.Map<PlayerCredentialsDTO>(newPlayer);
-
-            // Generate token
-            dto.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
-
-            return Ok(dto);
-        }
-        catch (ValidationException e)
-        {
-            ModelState.AddModelError(e.ValidationResult.MemberNames.First(), e.ValidationResult.ErrorMessage);
-            return BadRequest(ModelState);
-        }
-    }
-
-    private async Task<bool> VerifyActivePlayerAsync()
-    {
-        // Check that the user represents an active player
-        var playerId = User.GetPlayerId();
-
-        if (!playerId.HasValue)
-        {
-            return false;
-        }
-
-        var player = await _playerRepository.GetPlayerById(playerId.Value);
-
-        return player is {Active: true};
+        return Ok(response);
     }
 
 }

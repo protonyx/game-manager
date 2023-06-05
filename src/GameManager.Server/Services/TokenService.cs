@@ -1,29 +1,46 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using GameManager.Application.Services;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GameManager.Server.Services;
 
-public class TokenService
+public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
 
+    private readonly SymmetricSecurityKey _signingKey;
+
     private readonly SigningCredentials _signingCredentials;
 
-    public static byte[] DefaultKey;
+    //public static byte[] DefaultKey;
 
     public TokenService(IConfiguration configuration)
     {
         _configuration = configuration;
         
         var key = configuration["Jwt:Key"];
-        var keyBytes = string.IsNullOrWhiteSpace(key)
-            ? DefaultKey
-            : Convert.FromBase64String(key);
+        byte[] keyBytes;
+
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            // Generate a random key
+            keyBytes = new byte[16];
+            Random.Shared.NextBytes(keyBytes);
+        }
+        else
+        {
+            keyBytes = Convert.FromBase64String(key);
+        }
         
-        var securityKey = new SymmetricSecurityKey(keyBytes);
-        _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        _signingKey = new SymmetricSecurityKey(keyBytes);
+        _signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+    }
+
+    public SecurityKey GetSigningKey()
+    {
+        return _signingKey;
     }
 
     public string GenerateToken(Guid gameId, Guid playerId, bool isAdmin)

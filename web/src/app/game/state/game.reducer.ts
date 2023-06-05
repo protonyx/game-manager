@@ -9,6 +9,12 @@ export const gameFeature = createFeature({
     name: 'game',
     reducer: createReducer(
         initialState,
+        on(GameHubActions.hubConnected, (state) => {
+           return {...state, hubConnected: true};
+        }),
+        on(GameHubActions.hubDisconnected, (state) => {
+            return {...state, hubConnected: false};
+        }),
         on(GameHubActions.gameUpdated, (state, {game}) => {
             return {...state, game: game}
         }),
@@ -65,6 +71,7 @@ export const {
     name, // feature name
     reducer, // feature reducer
     selectGameState, // feature selector
+    selectHubConnected,
     selectCredentials,
     selectCurrentPlayer,
     selectGame,
