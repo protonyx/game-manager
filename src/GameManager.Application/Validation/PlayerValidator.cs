@@ -22,10 +22,9 @@ public class PlayerValidator : AbstractValidator<Player>
             .NotNull()
             .Length(3, 20);
 
-        RuleFor(t => new {t.GameId, t.Name})
-            .MustAsync((p, cancellationToken) =>
-                playerRepository.NameIsUnique(p.GameId, p.Name))
-            .WithName(nameof(Player.Name))
+        RuleFor(t => t.Name)
+            .MustAsync((player, name, cancellationToken) =>
+                playerRepository.NameIsUnique(player.GameId, name))
             .WithMessage("{PropertyName} must be unique");
     }
 }
