@@ -1,8 +1,4 @@
-﻿using AutoFixture.AutoMoq;
-using FluentAssertions;
-using FluentValidation;
-using FluentValidation.Results;
-using GameManager.Application.Data;
+﻿using GameManager.Application.Data;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Domain.Entities;
 
@@ -11,16 +7,14 @@ namespace GameManager.Tests.Commands;
 public class CreateGameCommandTests
 {
     [Fact]
-    public async Task TestCreateGameCommand_Succeeds()
+    public async Task CreateGameCommandHandler_WithValidInput_ShouldCallRepositoryCreate()
     {
         // Arrange
-        var fixture = new Fixture();
-        fixture.Customize(new AutoMoqCustomization());
-        fixture.Freeze<ValidationResult>(f => f.OmitAutoProperties());
+        var fixture = TestUtils.GetTestFixture();
+        var validator = new InlineValidator<Game>();
+        fixture.Inject<IValidator<Game>>(validator);
+
         var repo = fixture.Freeze<Mock<IGameRepository>>();
-        var validator = fixture.Freeze<Mock<IValidator<Game>>>();
-        validator.Setup(t => t.ValidateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()))
-            .ReturnsUsingFixture(fixture);
 
         var sut = fixture.Create<CreateGameCommandHandler>();
         var cmd = fixture.Create<CreateGameCommand>();
@@ -30,23 +24,19 @@ public class CreateGameCommandTests
         
         // Assert
         response.Game.Should().NotBeNull();
-        validator.Verify(t => t.ValidateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()), Times.Once);
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Once);
     }
     
     [Fact]
-    public async Task TestCreateGameCommand_FailsValidation_ReturnsCorrectResult()
+    public async Task CreateGameCommandHandler_WithInvalidInput_ReturnsValidationError()
     {
         // Arrange
-        var fixture = new Fixture();
-        fixture.Customize(new AutoMoqCustomization());
-        fixture.Freeze<ValidationResult>(f =>
-            f.OmitAutoProperties()
-            .Do(t => t.Errors.Add(new ValidationFailure(fixture.Create<string>(), fixture.Create<string>()))));
+        var fixture = TestUtils.GetTestFixture();
+        var validator = new InlineValidator<Game>();
+        validator.RuleFor(t => t.Id).MustAsync((t, ct) => Task.FromResult(false));
+        fixture.Inject<IValidator<Game>>(validator);
+        
         var repo = fixture.Freeze<Mock<IGameRepository>>();
-        var validator = fixture.Freeze<Mock<IValidator<Game>>>();
-        validator.Setup(t => t.ValidateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()))
-            .ReturnsUsingFixture(fixture);
 
         var sut = fixture.Create<CreateGameCommandHandler>();
         var cmd = fixture.Create<CreateGameCommand>();
@@ -56,7 +46,6 @@ public class CreateGameCommandTests
         
         // Assert
         response.Game.Should().BeNull();
-        validator.Verify(t => t.ValidateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()), Times.Once);
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Never);
         response.ValidationResult.IsValid.Should().BeFalse();
     }

@@ -35,7 +35,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
 
         ret.ActionAllowed = true;
         
-        var players = await _playerRepository.GetPlayersByGameId(request.GameId);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
         var requestPlayer = players.First(t => t.Id == request.PlayerId);
 
         if (game.CurrentTurnPlayerId == null)

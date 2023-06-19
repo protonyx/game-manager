@@ -23,7 +23,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .Include(t => t.Trackers)
             .FirstAsync(t => t.Id == newPlayer.GameId);
 
-        var existingPlayers = await GetPlayersByGameId(newPlayer.GameId);
+        var existingPlayers = await GetPlayersByGameIdAsync(newPlayer.GameId);
 
         //var totalPlayers = existingPlayers.Count();
         var maxOrder = existingPlayers.Any()
@@ -83,7 +83,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return player;
     }
 
-    public async Task<ICollection<Player>> GetPlayersByGameId(Guid gameId)
+    public async Task<ICollection<Player>> GetPlayersByGameIdAsync(Guid gameId)
     {
         var players = await _context.Set<Player>()
             .AsQueryable()
@@ -172,7 +172,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return existing;
     }
     
-    public async Task<bool> NameIsUnique(Guid gameId, string name)
+    public async Task<bool> NameIsUniqueAsync(Guid gameId, string name)
     {
         var playersWithName = await _context.Set<Player>()
             .AsQueryable()
@@ -182,7 +182,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return playersWithName == 0;
     }
 
-    public async Task UpdatePlayerHeartbeat(Guid playerId)
+    public async Task UpdatePlayerHeartbeatAsync(Guid playerId)
     {
         var player = await _context.Set<Player>()
             .FirstOrDefaultAsync(t => t.Id == playerId);

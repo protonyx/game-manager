@@ -14,6 +14,6 @@ public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatComm
 
     public async Task Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
     {
-        await _playerRepository.UpdatePlayerHeartbeat(request.PlayerId);
+        await _playerRepository.UpdatePlayerHeartbeatAsync(request.PlayerId);
     }
 }

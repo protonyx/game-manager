@@ -2,6 +2,7 @@
 using FluentValidation;
 using GameManager.Application.Data;
 using GameManager.Application.DTO;
+using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;
 
@@ -14,6 +15,8 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Creat
     private readonly IValidator<Game> _gameValidator;
 
     private readonly IMapper _mapper;
+    
+    private const int EntryCodeLength = 4;
 
     public CreateGameCommandHandler(IGameRepository gameRepository, IValidator<Game> gameValidator, IMapper mapper)
     {
@@ -29,9 +32,16 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Creat
         var game = new Game()
         {
             Name = request.Name,
+            EntryCode = EntryCodeFactory.Create(EntryCodeLength),
             Options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions(),
             Trackers = request.Trackers.Select(_mapper.Map<Tracker>).ToList()
         };
+
+        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode))
+        {
+            // Generate a new entry code until we find a unique code
+            game.EntryCode = EntryCodeFactory.Create(EntryCodeLength);
+        }
         
         // Validate
         ret.ValidationResult = await _gameValidator.ValidateAsync(game, cancellationToken);

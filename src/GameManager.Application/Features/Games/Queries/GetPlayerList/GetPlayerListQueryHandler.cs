@@ -19,7 +19,7 @@ public class GetPlayerListQueryHandler : IRequestHandler<GetPlayerListQuery, ICo
 
     public async Task<ICollection<PlayerDTO>> Handle(GetPlayerListQuery request, CancellationToken cancellationToken)
     {
-        var players = await _playerRepository.GetPlayersByGameId(request.GameId);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
 
         var ret = _mapper.Map<ICollection<PlayerDTO>>(players);
 

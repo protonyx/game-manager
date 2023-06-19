@@ -1,6 +1,5 @@
 using GameManager.Application.Data;
 using GameManager.Application.Features.Games.Notifications;
-using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +9,6 @@ namespace GameManager.Persistence.Sqlite.Repositories;
 public class GameRepository : BaseRepository<Game>, IGameRepository
 {
     private readonly IMediator _mediator;
-    
-    private const int EntryCodeLength = 4;
 
     public GameRepository(GameContext context, IMediator mediator)
         : base(context)
@@ -22,7 +19,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     public override async Task<Game> CreateAsync(Game game)
     {
         game.Id = Guid.NewGuid();
-        game.EntryCode = EntryCodeFactory.Create(EntryCodeLength);
         game.CreatedDate = DateTime.Now;
 
         return await base.CreateAsync(game);
@@ -58,4 +54,9 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         return game;
     }
 
+    public Task<bool> EntryCodeExistsAsync(string entryCode)
+    {
+        return _context.Set<Game>()
+            .AnyAsync(t => t.EntryCode.Equals(entryCode));
+    }
 }
