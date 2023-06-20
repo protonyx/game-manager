@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from "@angular/router";
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from "@angular/router";
 import {map, Observable} from "rxjs";
 import {Store} from "@ngrx/store";
 import {selectCredentials} from "../state/game.reducer";
@@ -7,7 +7,7 @@ import {selectCredentials} from "../state/game.reducer";
 @Injectable({
     providedIn: 'root'
 })
-export class GameRouteGuard implements CanActivate {
+export class GameRouteGuard  {
 
     credentials$ = this.store.select(selectCredentials);
 
