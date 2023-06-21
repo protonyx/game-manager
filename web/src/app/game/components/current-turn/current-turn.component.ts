@@ -1,10 +1,16 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {Game, Player} from "../../models/models";
+import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { TurnTimerComponent } from '../turn-timer/turn-timer.component';
+import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-current-turn',
     templateUrl: './current-turn.component.html',
-    styleUrls: ['./current-turn.component.scss']
+    styleUrls: ['./current-turn.component.scss'],
+    standalone: true,
+    imports: [NgIf, TurnTimerComponent, MatExpansionModule, MatButtonModule]
 })
 export class CurrentTurnComponent implements OnChanges {
     @Input()

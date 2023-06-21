@@ -1,11 +1,17 @@
 import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges} from '@angular/core';
 import {Player, Tracker, TrackerValue} from "../../models/models";
-import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { NgFor } from '@angular/common';
 
 @Component({
     selector: 'app-tracker-editor',
     templateUrl: './tracker-editor.component.html',
-    styleUrls: ['./tracker-editor.component.scss']
+    styleUrls: ['./tracker-editor.component.scss'],
+    standalone: true,
+    imports: [FormsModule, ReactiveFormsModule, NgFor, MatButtonModule, MatFormFieldModule, MatInputModule]
 })
 export class TrackerEditorComponent implements OnChanges {
     @Input()

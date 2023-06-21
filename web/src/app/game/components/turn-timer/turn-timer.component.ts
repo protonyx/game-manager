@@ -1,11 +1,14 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {interval, Subject, takeUntil, Timestamp} from "rxjs";
+import { NgIf, DecimalPipe } from '@angular/common';
 
 @Component({
     selector: 'app-turn-timer',
     templateUrl: './turn-timer.component.html',
     styleUrls: ['./turn-timer.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgIf, DecimalPipe]
 })
 export class TurnTimerComponent implements OnInit, OnDestroy {
     @Input()

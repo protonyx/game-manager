@@ -1,12 +1,16 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {Game, Player, Tracker} from "../../models/models";
-import {MatTableDataSource, MatTableDataSourcePaginator} from "@angular/material/table";
-import {CdkDragDrop} from "@angular/cdk/drag-drop";
+import { MatTableDataSource, MatTableDataSourcePaginator, MatTableModule } from "@angular/material/table";
+import { CdkDragDrop, CdkDropList, CdkDragHandle, CdkDrag } from "@angular/cdk/drag-drop";
+import { NgIf, NgFor } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-player-list',
     templateUrl: './player-list.component.html',
-    styleUrls: ['./player-list.component.scss']
+    styleUrls: ['./player-list.component.scss'],
+    standalone: true,
+    imports: [MatTableModule, CdkDropList, MatIconModule, CdkDragHandle, NgIf, NgFor, CdkDrag]
 })
 export class PlayerListComponent implements OnChanges {
     @Input()

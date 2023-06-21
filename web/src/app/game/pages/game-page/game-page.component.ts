@@ -3,7 +3,7 @@ import {Store} from "@ngrx/store";
 import {Actions, ofType} from "@ngrx/effects";
 import {Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatSnackBar, MatSnackBarModule} from "@angular/material/snack-bar";
 import {combineLatest, map, Subject, takeUntil, tap} from "rxjs";
 import {
     selectCredentials,
@@ -17,11 +17,18 @@ import {GameHubService} from "../../services/game-hub.service";
 import {GameService} from "../../services/game.service";
 import {Player, PlayerCredentials, Tracker, TrackerValue} from "../../models/models";
 import {PlayerEditComponent} from "../../components/player-edit/player-edit.component";
+import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
+import { NgIf, AsyncPipe } from '@angular/common';
+import { CurrentTurnComponent } from '../../components/current-turn/current-turn.component';
+import { PlayerListComponent } from '../../components/player-list/player-list.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
-    styleUrls: ['./game-page.component.scss']
+    styleUrls: ['./game-page.component.scss'],
+    standalone: true,
+    imports: [MatExpansionModule, PlayerListComponent, CurrentTurnComponent, NgIf, TrackerEditorComponent, AsyncPipe, MatSnackBarModule]
 })
 export class GamePageComponent implements OnInit, OnDestroy {
 

@@ -1,12 +1,18 @@
 import {Component, Inject} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {Player, Tracker} from "../../models/models";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from "@angular/material/dialog";
+import { MatButtonModule } from '@angular/material/button';
+import { NgIf, NgFor } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
-  selector: 'app-player-edit',
-  templateUrl: './player-edit.component.html',
-  styleUrls: ['./player-edit.component.scss']
+    selector: 'app-player-edit',
+    templateUrl: './player-edit.component.html',
+    styleUrls: ['./player-edit.component.scss'],
+    standalone: true,
+    imports: [MatDialogModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, NgIf, NgFor, MatButtonModule]
 })
 export class PlayerEditComponent {
 

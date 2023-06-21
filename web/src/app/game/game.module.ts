@@ -7,7 +7,7 @@ import {CurrentTurnComponent} from "./components/current-turn/current-turn.compo
 import {NewGameComponent} from "./components/new-game/new-game.component";
 import {NewGamePageComponent} from "./pages/new-game-page/new-game-page.component";
 import {GameRoutingModule} from "./game-routing.module";
-import {SharedModule} from "../shared/shared.module";
+
 import {PlayerListComponent} from './components/player-list/player-list.component';
 import {TurnTimerComponent} from './components/turn-timer/turn-timer.component';
 import { PlayerEditComponent } from './components/player-edit/player-edit.component';
@@ -15,23 +15,20 @@ import { TrackerEditorComponent } from './components/tracker-editor/tracker-edit
 
 
 @NgModule({
-    declarations: [
-        JoinGameComponent,
-        JoinGamePageComponent,
-        GamePageComponent,
-        CurrentTurnComponent,
-        NewGameComponent,
-        NewGamePageComponent,
-        PlayerListComponent,
-        TurnTimerComponent,
-        PlayerEditComponent,
-        TrackerEditorComponent,
-    ],
     imports: [
-        CommonModule,
-        SharedModule,
-        GameRoutingModule
-    ]
+    CommonModule,
+    GameRoutingModule,
+    JoinGameComponent,
+    JoinGamePageComponent,
+    GamePageComponent,
+    CurrentTurnComponent,
+    NewGameComponent,
+    NewGamePageComponent,
+    PlayerListComponent,
+    TurnTimerComponent,
+    PlayerEditComponent,
+    TrackerEditorComponent
+]
 })
 export class GameModule {
 }

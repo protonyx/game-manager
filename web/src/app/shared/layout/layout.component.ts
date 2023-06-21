@@ -5,12 +5,20 @@ import {selectGame} from "../../game/state/game.reducer";
 import {map} from "rxjs";
 import {MediaMatcher} from "@angular/cdk/layout";
 import {GameActions} from "../../game/state/game.actions";
-import {Router} from "@angular/router";
+import { Router, RouterLinkActive, RouterLink, RouterOutlet } from "@angular/router";
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
-  selector: 'app-layout',
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss']
+    selector: 'app-layout',
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss'],
+    standalone: true,
+    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgIf, MatSidenavModule, MatListModule, RouterLinkActive, RouterLink, RouterOutlet]
 })
 export class LayoutComponent {
 

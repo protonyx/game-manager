@@ -5,11 +5,15 @@ import {map} from "rxjs";
 import {Store} from "@ngrx/store";
 import {Router} from "@angular/router";
 import {GameActions} from "./game/state/game.actions";
+import { AsyncPipe } from '@angular/common';
+import {LayoutComponent} from "./shared/layout/layout.component";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [AsyncPipe, LayoutComponent]
 })
 export class AppComponent {
   title = 'GameManager';

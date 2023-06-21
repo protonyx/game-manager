@@ -8,8 +8,8 @@ describe('JoinGameComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ JoinGameComponent ]
-    })
+    imports: [JoinGameComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(JoinGameComponent);

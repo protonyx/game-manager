@@ -5,11 +5,14 @@ import {Store} from "@ngrx/store";
 import {GameActions, GamesApiActions} from "../../state/game.actions";
 import {Router} from "@angular/router";
 import {catchError} from "rxjs";
+import { JoinGameComponent } from '../../components/join-game/join-game.component';
 
 @Component({
     selector: 'app-join-game-page',
     templateUrl: './join-game-page.component.html',
-    styleUrls: ['./join-game-page.component.scss']
+    styleUrls: ['./join-game-page.component.scss'],
+    standalone: true,
+    imports: [JoinGameComponent]
 })
 export class JoinGamePageComponent {
 

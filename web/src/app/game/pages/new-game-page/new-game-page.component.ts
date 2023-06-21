@@ -4,11 +4,15 @@ import {JoinGame, NewGame} from "../../models/models";
 import {GameService} from "../../services/game.service";
 import {Store} from "@ngrx/store";
 import {GamesApiActions} from "../../state/game.actions";
+import { NewGameComponent } from '../../components/new-game/new-game.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-new-game-page',
-  templateUrl: './new-game-page.component.html',
-  styleUrls: ['./new-game-page.component.scss']
+    selector: 'app-new-game-page',
+    templateUrl: './new-game-page.component.html',
+    styleUrls: ['./new-game-page.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, NewGameComponent]
 })
 export class NewGamePageComponent {
 
