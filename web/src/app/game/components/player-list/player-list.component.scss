@@ -1,7 +1,7 @@
 @import "@angular/material/theming";
-@import '../../../variables.scss';
+@import "../../../variables.scss";
 
-tr.player-is-active .mdc-data-table__cell{
+tr.player-is-active .mdc-data-table__cell {
   font-weight: bold !important;
   background: mat-color($primaryPalette) !important;
 }

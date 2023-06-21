@@ -1,32 +1,68 @@
 <form [formGroup]="trackerForm">
-    <table>
-        <ng-container *ngFor="let tracker of trackers">
-            <tr>
-                <td>
-                    <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -10)">-10</button>
-                </td>
-                <td>
-                    <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -5)">-5</button>
-                </td>
-                <td>
-                    <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -1)">-1</button>
-                </td>
-                <td>
-                    <mat-form-field class="full-width">
-                        <mat-label>{{ tracker.name }}</mat-label>
-                        <input matInput [formControlName]="tracker.id">
-                    </mat-form-field>
-                </td>
-                <td>
-                    <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 1)">+1</button>
-                </td>
-                <td>
-                    <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 5)">+5</button>
-                </td>
-                <td>
-                    <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 10)">+10</button>
-                </td>
-            </tr>
-        </ng-container>
-    </table>
+  <table>
+    <ng-container *ngFor="let tracker of trackers">
+      <tr>
+        <td>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="updateTracker(tracker.id, -10)"
+          >
+            -10
+          </button>
+        </td>
+        <td>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="updateTracker(tracker.id, -5)"
+          >
+            -5
+          </button>
+        </td>
+        <td>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="updateTracker(tracker.id, -1)"
+          >
+            -1
+          </button>
+        </td>
+        <td>
+          <mat-form-field class="full-width">
+            <mat-label>{{ tracker.name }}</mat-label>
+            <input matInput [formControlName]="tracker.id" />
+          </mat-form-field>
+        </td>
+        <td>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="updateTracker(tracker.id, 1)"
+          >
+            +1
+          </button>
+        </td>
+        <td>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="updateTracker(tracker.id, 5)"
+          >
+            +5
+          </button>
+        </td>
+        <td>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="updateTracker(tracker.id, 10)"
+          >
+            +10
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
 </form>

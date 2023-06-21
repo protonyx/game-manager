@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { GameHubService } from './game-hub.service';
+import { GameHubService } from "./game-hub.service";
 
-describe('GameHubService', () => {
+describe("GameHubService", () => {
   let service: GameHubService;
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('GameHubService', () => {
     service = TestBed.inject(GameHubService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 });

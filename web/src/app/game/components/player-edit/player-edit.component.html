@@ -1,24 +1,27 @@
 <h2 mat-dialog-title>Edit Player</h2>
 <mat-dialog-content>
-    <form class="player-form" [formGroup]="playerForm">
-        <mat-form-field appearance="outline">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name">
-        </mat-form-field>
+  <form class="player-form" [formGroup]="playerForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
 
-        <div class="trackers" *ngIf="trackers && trackers.length > 0" formGroupName="trackers">
-            <h3>Trackers</h3>
-            <ng-container *ngFor="let tracker of trackers">
-                <mat-form-field appearance="outline">
-                    <mat-label>{{tracker.name}}</mat-label>
-                    <input matInput
-                           [formControlName]="tracker.id">
-                </mat-form-field>
-            </ng-container>
-        </div>
-    </form>
+    <div
+      class="trackers"
+      *ngIf="trackers && trackers.length > 0"
+      formGroupName="trackers"
+    >
+      <h3>Trackers</h3>
+      <ng-container *ngFor="let tracker of trackers">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ tracker.name }}</mat-label>
+          <input matInput [formControlName]="tracker.id" />
+        </mat-form-field>
+      </ng-container>
+    </div>
+  </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close="">Cancel</button>
-    <button mat-button [mat-dialog-close]="playerForm.value">Update</button>
+  <button mat-button mat-dialog-close="">Cancel</button>
+  <button mat-button [mat-dialog-close]="playerForm.value">Update</button>
 </mat-dialog-actions>

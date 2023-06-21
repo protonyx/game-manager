@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { CurrentTurnComponent } from './current-turn.component';
+import { CurrentTurnComponent } from "./current-turn.component";
 
-describe('CurrentTurnComponent', () => {
+describe("CurrentTurnComponent", () => {
   let component: CurrentTurnComponent;
   let fixture: ComponentFixture<CurrentTurnComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [CurrentTurnComponent]
-})
-    .compileComponents();
+      imports: [CurrentTurnComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CurrentTurnComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

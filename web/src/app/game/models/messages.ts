@@ -1,21 +1,21 @@
-import {Game, Player} from "./models";
+import { Game, Player } from "./models";
 
 export interface GameStateChangedMessage {
-    gameId: string
-    game: Game
+  gameId: string;
+  game: Game;
 }
 
 export interface PlayerJoinedMessage {
-    gameId: string
-    player: Player
+  gameId: string;
+  player: Player;
 }
 
 export interface PlayerStateChangedMessage {
-    gameId: string
-    player: Player
+  gameId: string;
+  player: Player;
 }
 
 export interface PlayerLeftMessage {
-    gameId: string
-    playerId: string
+  gameId: string;
+  playerId: string;
 }

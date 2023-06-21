@@ -1,57 +1,63 @@
-<table mat-table #table [dataSource]="dataSource"
-       cdkDropList
-       [cdkDropListData]="dataSource"
-       (cdkDropListDropped)="dropTable($event)"
-       [cdkDropListDisabled]="!isAdmin">
-    <ng-container matColumnDef="position">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
-            <mat-icon cdkDragHandle>reorder</mat-icon>
-        </td>
-    </ng-container>
+<table
+  mat-table
+  #table
+  [dataSource]="dataSource"
+  cdkDropList
+  [cdkDropListData]="dataSource"
+  (cdkDropListDropped)="dropTable($event)"
+  [cdkDropListDisabled]="!isAdmin"
+>
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <mat-icon cdkDragHandle>reorder</mat-icon>
+    </td>
+  </ng-container>
 
-    <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions</th>
-        <td mat-cell *matCellDef="let element">
-            <mat-icon (click)="handleEditPlayer(element)">
-                edit
-            </mat-icon>
-            <mat-icon (click)="handleRemovePlayer(element)">
-                delete_forever
-            </mat-icon>
-        </td>
-    </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-icon (click)="handleEditPlayer(element)"> edit </mat-icon>
+      <mat-icon (click)="handleRemovePlayer(element)">
+        delete_forever
+      </mat-icon>
+    </td>
+  </ng-container>
 
-    <ng-container matColumnDef="order">
-        <th mat-header-cell *matHeaderCellDef> Order</th>
-        <td mat-cell *matCellDef="let element">
-            <!--
+  <ng-container matColumnDef="order">
+    <th mat-header-cell *matHeaderCellDef>Order</th>
+    <td mat-cell *matCellDef="let element">
+      <!--
             <ng-container *ngIf="checkIsPlayerTurn(element)">
                 <span matBadge="*" matBadgeOverlap="false">{{ element.order }}</span>
             </ng-container>
             -->
-            <ng-container>
-                {{ element.order }}
-            </ng-container>
-        </td>
-    </ng-container>
+      <ng-container>
+        {{ element.order }}
+      </ng-container>
+    </td>
+  </ng-container>
 
-    <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name</th>
-        <td mat-cell *matCellDef="let element"> {{ element.name }} <span *ngIf="checkIsMe(element)">(me)</span>
-        </td>
-    </ng-container>
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.name }} <span *ngIf="checkIsMe(element)">(me)</span>
+    </td>
+  </ng-container>
 
-    <ng-container *ngFor="let tracker of trackers" [matColumnDef]="tracker.id">
-        <th mat-header-cell *matHeaderCellDef> {{ tracker.name }} </th>
-        <td mat-cell *matCellDef="let element"> {{ getTrackerValue(element, tracker.id)}}</td>
-    </ng-container>
+  <ng-container *ngFor="let tracker of trackers" [matColumnDef]="tracker.id">
+    <th mat-header-cell *matHeaderCellDef>{{ tracker.name }}</th>
+    <td mat-cell *matCellDef="let element">
+      {{ getTrackerValue(element, tracker.id) }}
+    </td>
+  </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-    <tr mat-row
-        [class.player-is-active]="checkIsPlayerTurn(row)"
-        *matRowDef="let row; columns: columnsToDisplay;"
-        cdkDrag
-        [cdkDragData]="row"
-    ></tr>
+  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+  <tr
+    mat-row
+    [class.player-is-active]="checkIsPlayerTurn(row)"
+    *matRowDef="let row; columns: columnsToDisplay"
+    cdkDrag
+    [cdkDragData]="row"
+  ></tr>
 </table>
