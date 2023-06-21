@@ -1,7 +1,7 @@
 export interface LayoutState {
-    title: string;
+  title: string;
 }
 
 export const initialState: LayoutState = {
-    title: 'Game Manager'
-}
+  title: 'Game Manager',
+};

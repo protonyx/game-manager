@@ -1,16 +1,26 @@
 <h1 *ngIf="isMyTurn">Your Turn!</h1>
-<h2 *ngIf="!isMyTurn">
-    {{ currentTurn?.name }} is currently playing.
-</h2>
-<p *ngIf="nextTurn">
-    Up Next: {{ nextTurn!.name }}
-</p>
+<h2 *ngIf="!isMyTurn">{{ currentTurn?.name }} is currently playing.</h2>
+<p *ngIf="nextTurn">Up Next: {{ nextTurn!.name }}</p>
 
-<app-turn-timer *ngIf="game" [startTime]="game!.lastTurnStartTime"></app-turn-timer>
+<app-turn-timer
+  *ngIf="game"
+  [startTime]="game!.lastTurnStartTime"></app-turn-timer>
 
 <mat-action-row>
-    <button mat-raised-button type="button" color="accent" (click)="onEndTurn()" *ngIf="isMyTurn">End Turn</button>
-    <button mat-raised-button type="button" color="warn" (click)="onEndTurn()" *ngIf="!isMyTurn && isAdmin">
-        Force End Turn
-    </button>
+  <button
+    mat-raised-button
+    type="button"
+    color="accent"
+    (click)="onEndTurn()"
+    *ngIf="isMyTurn">
+    End Turn
+  </button>
+  <button
+    mat-raised-button
+    type="button"
+    color="warn"
+    (click)="onEndTurn()"
+    *ngIf="!isMyTurn && isAdmin">
+    Force End Turn
+  </button>
 </mat-action-row>

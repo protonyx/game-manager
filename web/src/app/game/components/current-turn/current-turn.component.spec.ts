@@ -8,9 +8,8 @@ describe('CurrentTurnComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CurrentTurnComponent ]
-    })
-    .compileComponents();
+      imports: [CurrentTurnComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CurrentTurnComponent);
     component = fixture.componentInstance;

@@ -8,9 +8,8 @@ describe('TurnTimerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TurnTimerComponent ]
-    })
-    .compileComponents();
+      imports: [TurnTimerComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TurnTimerComponent);
     component = fixture.componentInstance;
