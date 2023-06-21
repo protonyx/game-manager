@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewGamePageComponent } from "./new-game-page.component";
+import { NewGamePageComponent } from './new-game-page.component';
 
-describe("NewGamePageComponent", () => {
+describe('NewGamePageComponent', () => {
   let component: NewGamePageComponent;
   let fixture: ComponentFixture<NewGamePageComponent>;
 
@@ -16,7 +16,7 @@ describe("NewGamePageComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

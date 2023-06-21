@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -6,12 +6,12 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpResponse,
-} from "@angular/common/http";
-import { Observable, tap } from "rxjs";
-import { Store } from "@ngrx/store";
-import { selectCredentials } from "../state/game.reducer";
-import { PlayerCredentials } from "../models/models";
-import { GamesApiActions } from "../state/game.actions";
+} from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectCredentials } from '../state/game.reducer';
+import { PlayerCredentials } from '../models/models';
+import { GamesApiActions } from '../state/game.actions';
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {

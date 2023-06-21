@@ -1,17 +1,17 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Game,
   JoinGame,
   NewGame,
   Player,
   PlayerCredentials,
-} from "../models/models";
-import { Observable } from "rxjs";
-import { environment } from "../../../environments/environment";
+} from '../models/models';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class GameService {
   constructor(private http: HttpClient) {}
@@ -54,7 +54,7 @@ export class GameService {
     const url = `${environment.baseUrl}/api/Players/${playerId}`;
 
     const headers = new HttpHeaders({
-      "Content-Type": "application/json-patch+json",
+      'Content-Type': 'application/json-patch+json',
     });
 
     return this.http.patch<Player>(url, ops, {
@@ -66,13 +66,13 @@ export class GameService {
     playerId: string,
     newOrder: number
   ): Observable<Player> {
-    const ops = [{ op: "replace", path: "/order", value: newOrder }];
+    const ops = [{ op: 'replace', path: '/order', value: newOrder }];
 
     return this.patchPlayer(playerId, ops);
   }
 
   public setPlayerName(playerId: string, newName: string): Observable<Player> {
-    const ops = [{ op: "replace", path: "/name", value: newName }];
+    const ops = [{ op: 'replace', path: '/name', value: newName }];
 
     return this.patchPlayer(playerId, ops);
   }
@@ -82,7 +82,7 @@ export class GameService {
     trackerId: string,
     value: number
   ): Observable<Player> {
-    const ops = [{ op: "replace", path: `/trackerValues/${trackerId}`, value }];
+    const ops = [{ op: 'replace', path: `/trackerValues/${trackerId}`, value }];
 
     return this.patchPlayer(playerId, ops);
   }

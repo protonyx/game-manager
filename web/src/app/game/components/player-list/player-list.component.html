@@ -5,8 +5,7 @@
   cdkDropList
   [cdkDropListData]="dataSource"
   (cdkDropListDropped)="dropTable($event)"
-  [cdkDropListDisabled]="!isAdmin"
->
+  [cdkDropListDisabled]="!isAdmin">
   <ng-container matColumnDef="position">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
@@ -58,6 +57,5 @@
     [class.player-is-active]="checkIsPlayerTurn(row)"
     *matRowDef="let row; columns: columnsToDisplay"
     cdkDrag
-    [cdkDragData]="row"
-  ></tr>
+    [cdkDragData]="row"></tr>
 </table>

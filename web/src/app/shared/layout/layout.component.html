@@ -20,15 +20,13 @@
       fixedTopGap="56"
       [mode]="mobileQuery.matches ? 'over' : 'side'"
       [fixedInViewport]="mobileQuery.matches"
-      class="sidenav"
-    >
+      class="sidenav">
       <mat-nav-list>
         <a
           mat-list-item
           [routerLink]="['/game/new']"
           routerLinkActive="active"
-          *ngIf="!entryCode"
-        >
+          *ngIf="!entryCode">
           <button mat-icon-button>
             <mat-icon> add </mat-icon>
           </button>
@@ -40,8 +38,7 @@
           mat-list-item
           [routerLink]="['/game/join']"
           routerLinkActive="active"
-          *ngIf="!entryCode"
-        >
+          *ngIf="!entryCode">
           <button mat-icon-button>
             <mat-icon> login </mat-icon>
           </button>
@@ -53,8 +50,7 @@
           mat-list-item
           [routerLink]="['/game']"
           routerLinkActive="active"
-          *ngIf="entryCode"
-        >
+          *ngIf="entryCode">
           <button mat-icon-button>
             <mat-icon> home </mat-icon>
           </button>

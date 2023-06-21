@@ -1,16 +1,16 @@
-import { createFeature, createReducer, on } from "@ngrx/store";
+import { createFeature, createReducer, on } from '@ngrx/store';
 
 import {
   GameActions,
   GameHubActions,
   GamesApiActions,
   PlayersApiActions,
-} from "./game.actions";
-import { GameState, initialState } from "./game.state";
-import { Player } from "../models/models";
+} from './game.actions';
+import { GameState, initialState } from './game.state';
+import { Player } from '../models/models';
 
 export const gameFeature = createFeature({
-  name: "game",
+  name: 'game',
   reducer: createReducer(
     initialState,
     on(GameHubActions.hubConnected, (state) => {

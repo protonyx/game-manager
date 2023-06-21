@@ -5,14 +5,14 @@ import {
   Input,
   OnDestroy,
   OnInit,
-} from "@angular/core";
-import { interval, Subject, takeUntil, Timestamp } from "rxjs";
-import { NgIf, DecimalPipe } from "@angular/common";
+} from '@angular/core';
+import { interval, Subject, takeUntil, Timestamp } from 'rxjs';
+import { NgIf, DecimalPipe } from '@angular/common';
 
 @Component({
-  selector: "app-turn-timer",
-  templateUrl: "./turn-timer.component.html",
-  styleUrls: ["./turn-timer.component.scss"],
+  selector: 'app-turn-timer',
+  templateUrl: './turn-timer.component.html',
+  styleUrls: ['./turn-timer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [NgIf, DecimalPipe],

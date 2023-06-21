@@ -1,8 +1,8 @@
-import { TestBed } from "@angular/core/testing";
+import { TestBed } from '@angular/core/testing';
 
-import { GameRouteGuard } from "./game-route-guard.service";
+import { GameRouteGuard } from './game-route-guard.service';
 
-describe("GameRouteGuardService", () => {
+describe('GameRouteGuardService', () => {
   let service: GameRouteGuard;
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe("GameRouteGuardService", () => {
     service = TestBed.inject(GameRouteGuard);
   });
 
-  it("should be created", () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 });

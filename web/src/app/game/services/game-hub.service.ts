@@ -1,23 +1,23 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   HubConnection,
   HubConnectionBuilder,
   HubConnectionState,
   LogLevel,
-} from "@microsoft/signalr";
-import { environment } from "../../../environments/environment";
-import { Store } from "@ngrx/store";
-import { GameHubActions } from "../state/game.actions";
+} from '@microsoft/signalr';
+import { environment } from '../../../environments/environment';
+import { Store } from '@ngrx/store';
+import { GameHubActions } from '../state/game.actions';
 import {
   GameStateChangedMessage,
   PlayerJoinedMessage,
   PlayerLeftMessage,
   PlayerStateChangedMessage,
-} from "../models/messages";
-import { Subject, Subscription, takeUntil, timer } from "rxjs";
+} from '../models/messages';
+import { Subject, Subscription, takeUntil, timer } from 'rxjs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class GameHubService {
   connection?: HubConnection;
@@ -32,37 +32,37 @@ export class GameHubService {
     const connection = new HubConnectionBuilder()
       .configureLogging(LogLevel.Information)
       .withAutomaticReconnect()
-      .withUrl(environment.baseUrl + "/hubs/game", {
+      .withUrl(environment.baseUrl + '/hubs/game', {
         accessTokenFactory: () => accessToken,
       })
       .build();
 
-    connection.on("GameStateChanged", (data: GameStateChangedMessage) => {
+    connection.on('GameStateChanged', (data: GameStateChangedMessage) => {
       this.store.dispatch(GameHubActions.gameUpdated(data));
     });
-    connection.on("PlayerJoined", (data: PlayerJoinedMessage) => {
+    connection.on('PlayerJoined', (data: PlayerJoinedMessage) => {
       this.store.dispatch(GameHubActions.playerJoined(data));
     });
-    connection.on("PlayerStateChanged", (data: PlayerStateChangedMessage) => {
+    connection.on('PlayerStateChanged', (data: PlayerStateChangedMessage) => {
       this.store.dispatch(GameHubActions.playerUpdated(data));
     });
-    connection.on("PlayerLeft", (data: PlayerLeftMessage) => {
+    connection.on('PlayerLeft', (data: PlayerLeftMessage) => {
       this.store.dispatch(GameHubActions.playerLeft(data));
     });
     connection.onclose(async () => {
-      console.log("SignalR disconnected");
+      console.log('SignalR disconnected');
       this.store.dispatch(GameHubActions.hubDisconnected());
       this.close$.next();
     });
     connection.onreconnected(() => {
-      console.log("SignalR reconnected");
+      console.log('SignalR reconnected');
       this.store.dispatch(GameHubActions.hubConnected());
       this.setupHeartbeat();
     });
 
     try {
       await connection.start();
-      console.log("SignalR connected");
+      console.log('SignalR connected');
       this.store.dispatch(GameHubActions.hubConnected());
       this.setupHeartbeat();
 
@@ -100,7 +100,7 @@ export class GameHubService {
       this.connection &&
       this.connection.state == HubConnectionState.Connected
     )
-      await this.connection.invoke("Heartbeat");
+      await this.connection.invoke('Heartbeat');
   }
 
   public async endTurn() {
@@ -108,7 +108,7 @@ export class GameHubService {
       this.connection &&
       this.connection.state == HubConnectionState.Connected
     )
-      await this.connection.invoke("EndTurn");
+      await this.connection.invoke('EndTurn');
   }
 
   private setupHeartbeat(): void {
@@ -116,7 +116,7 @@ export class GameHubService {
       .pipe(takeUntil(this.close$))
       .subscribe({
         next: () => this.heartbeat(),
-        complete: () => console.log("Heartbeat stopped"),
+        complete: () => console.log('Heartbeat stopped'),
       });
   }
 }

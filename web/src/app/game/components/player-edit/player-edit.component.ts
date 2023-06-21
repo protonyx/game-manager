@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component, Inject } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -6,22 +6,22 @@ import {
   Validators,
   FormsModule,
   ReactiveFormsModule,
-} from "@angular/forms";
-import { Player, Tracker } from "../../models/models";
+} from '@angular/forms';
+import { Player, Tracker } from '../../models/models';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialogModule,
-} from "@angular/material/dialog";
-import { MatButtonModule } from "@angular/material/button";
-import { NgIf, NgFor } from "@angular/common";
-import { MatInputModule } from "@angular/material/input";
-import { MatFormFieldModule } from "@angular/material/form-field";
+} from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { NgIf, NgFor } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
-  selector: "app-player-edit",
-  templateUrl: "./player-edit.component.html",
-  styleUrls: ["./player-edit.component.scss"],
+  selector: 'app-player-edit',
+  templateUrl: './player-edit.component.html',
+  styleUrls: ['./player-edit.component.scss'],
   standalone: true,
   imports: [
     MatDialogModule,
@@ -40,7 +40,7 @@ export class PlayerEditComponent {
   public trackers: Tracker[] | null | undefined;
 
   playerForm = this.fb.group({
-    name: ["", Validators.required],
+    name: ['', Validators.required],
     trackers: this.fb.group({}),
   });
 
@@ -63,7 +63,7 @@ export class PlayerEditComponent {
     const group: any = {};
 
     trackers.forEach((t) => {
-      group[t.id] = new FormControl("", Validators.pattern(/-?[0-9]*/));
+      group[t.id] = new FormControl('', Validators.pattern(/-?[0-9]*/));
     });
 
     return new FormGroup(group);
@@ -76,7 +76,7 @@ export class PlayerEditComponent {
 
     const trackerGroup = this.createTrackerFormGroup(trackers);
 
-    this.playerForm.setControl("trackers", trackerGroup);
+    this.playerForm.setControl('trackers', trackerGroup);
   }
 
   handleUpdate(): void {

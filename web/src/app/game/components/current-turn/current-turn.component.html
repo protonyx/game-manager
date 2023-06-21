@@ -4,8 +4,7 @@
 
 <app-turn-timer
   *ngIf="game"
-  [startTime]="game!.lastTurnStartTime"
-></app-turn-timer>
+  [startTime]="game!.lastTurnStartTime"></app-turn-timer>
 
 <mat-action-row>
   <button
@@ -13,8 +12,7 @@
     type="button"
     color="accent"
     (click)="onEndTurn()"
-    *ngIf="isMyTurn"
-  >
+    *ngIf="isMyTurn">
     End Turn
   </button>
   <button
@@ -22,8 +20,7 @@
     type="button"
     color="warn"
     (click)="onEndTurn()"
-    *ngIf="!isMyTurn && isAdmin"
-  >
+    *ngIf="!isMyTurn && isAdmin">
     Force End Turn
   </button>
 </mat-action-row>

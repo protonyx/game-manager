@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TurnTimerComponent } from "./turn-timer.component";
+import { TurnTimerComponent } from './turn-timer.component';
 
-describe("TurnTimerComponent", () => {
+describe('TurnTimerComponent', () => {
   let component: TurnTimerComponent;
   let fixture: ComponentFixture<TurnTimerComponent>;
 
@@ -16,7 +16,7 @@ describe("TurnTimerComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,15 +1,15 @@
-import { Injectable } from "@angular/core";
-import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
-import { GameService } from "../services/game.service";
+import { Injectable } from '@angular/core';
+import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { GameService } from '../services/game.service';
 import {
   GameActions,
   GamesApiActions,
   PlayersApiActions,
-} from "./game.actions";
-import { exhaustMap, map } from "rxjs";
-import { Store } from "@ngrx/store";
-import * as fromGames from "./game.reducer";
-import { Router } from "@angular/router";
+} from './game.actions';
+import { exhaustMap, map } from 'rxjs';
+import { Store } from '@ngrx/store';
+import * as fromGames from './game.reducer';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class GameEffects {
@@ -53,7 +53,7 @@ export class GameEffects {
     this.actions$.pipe(
       ofType(GamesApiActions.authenticationError),
       map(() => {
-        this.router.navigate(["game", "join"]);
+        this.router.navigate(['game', 'join']);
 
         return GameActions.clearCredentials();
       })

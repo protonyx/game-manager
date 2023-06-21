@@ -1,4 +1,4 @@
-import { Game, Player, PlayerCredentials } from "../models/models";
+import { Game, Player, PlayerCredentials } from '../models/models';
 
 export interface GameState {
   hubConnected: boolean;

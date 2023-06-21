@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TrackerEditorComponent } from "./tracker-editor.component";
+import { TrackerEditorComponent } from './tracker-editor.component';
 
-describe("TrackerEditorComponent", () => {
+describe('TrackerEditorComponent', () => {
   let component: TrackerEditorComponent;
   let fixture: ComponentFixture<TrackerEditorComponent>;
 
@@ -16,7 +16,7 @@ describe("TrackerEditorComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

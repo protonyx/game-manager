@@ -1,4 +1,4 @@
-import { Game, Player } from "./models";
+import { Game, Player } from './models';
 
 export interface GameStateChangedMessage {
   gameId: string;

@@ -5,26 +5,26 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
-} from "@angular/core";
-import { Game, Player, Tracker } from "../../models/models";
+} from '@angular/core';
+import { Game, Player, Tracker } from '../../models/models';
 import {
   MatTableDataSource,
   MatTableDataSourcePaginator,
   MatTableModule,
-} from "@angular/material/table";
+} from '@angular/material/table';
 import {
   CdkDragDrop,
   CdkDropList,
   CdkDragHandle,
   CdkDrag,
-} from "@angular/cdk/drag-drop";
-import { NgIf, NgFor } from "@angular/common";
-import { MatIconModule } from "@angular/material/icon";
+} from '@angular/cdk/drag-drop';
+import { NgIf, NgFor } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: "app-player-list",
-  templateUrl: "./player-list.component.html",
-  styleUrls: ["./player-list.component.scss"],
+  selector: 'app-player-list',
+  templateUrl: './player-list.component.html',
+  styleUrls: ['./player-list.component.scss'],
   standalone: true,
   imports: [
     MatTableModule,
@@ -60,7 +60,7 @@ export class PlayerListComponent implements OnChanges {
 
   dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
-  columnsToDisplay = ["order", "name"];
+  columnsToDisplay = ['order', 'name'];
 
   get trackers(): Tracker[] {
     return this.game?.trackers || [];
@@ -68,7 +68,7 @@ export class PlayerListComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      (changes["game"] || changes["players"]) &&
+      (changes['game'] || changes['players']) &&
       !!this.game &&
       !!this.players &&
       !!this.currentPlayer
@@ -78,10 +78,10 @@ export class PlayerListComponent implements OnChanges {
       this.columnsToDisplay = [];
 
       if (this.isAdmin) {
-        this.columnsToDisplay.push("position", "actions");
+        this.columnsToDisplay.push('position', 'actions');
       }
 
-      this.columnsToDisplay.push("order", "name");
+      this.columnsToDisplay.push('order', 'name');
       for (const tracker of this.game.trackers) {
         this.columnsToDisplay.push(tracker.id);
       }
@@ -96,7 +96,7 @@ export class PlayerListComponent implements OnChanges {
     if (trackerId && Object.hasOwn(player.trackerValues, trackerId)) {
       return player.trackerValues[trackerId] as string;
     } else {
-      return "???";
+      return '???';
     }
   }
 

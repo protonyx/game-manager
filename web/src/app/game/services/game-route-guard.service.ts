@@ -1,15 +1,15 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   Router,
   RouterStateSnapshot,
-} from "@angular/router";
-import { map, Observable } from "rxjs";
-import { Store } from "@ngrx/store";
-import { selectCredentials } from "../state/game.reducer";
+} from '@angular/router';
+import { map, Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectCredentials } from '../state/game.reducer';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class GameRouteGuard {
   credentials$ = this.store.select(selectCredentials);
@@ -25,7 +25,7 @@ export class GameRouteGuard {
         if (ev) {
           return true;
         } else {
-          this.router.navigate(["game", "join"]);
+          this.router.navigate(['game', 'join']);
           return false;
         }
       })

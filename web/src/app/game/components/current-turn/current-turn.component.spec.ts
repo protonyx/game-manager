@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CurrentTurnComponent } from "./current-turn.component";
+import { CurrentTurnComponent } from './current-turn.component';
 
-describe("CurrentTurnComponent", () => {
+describe('CurrentTurnComponent', () => {
   let component: CurrentTurnComponent;
   let fixture: ComponentFixture<CurrentTurnComponent>;
 
@@ -16,7 +16,7 @@ describe("CurrentTurnComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

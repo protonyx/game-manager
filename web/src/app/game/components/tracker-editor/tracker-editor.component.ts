@@ -5,8 +5,8 @@ import {
   Output,
   OnChanges,
   SimpleChanges,
-} from "@angular/core";
-import { Player, Tracker, TrackerValue } from "../../models/models";
+} from '@angular/core';
+import { Player, Tracker, TrackerValue } from '../../models/models';
 import {
   FormArray,
   FormBuilder,
@@ -14,16 +14,16 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-} from "@angular/forms";
-import { MatInputModule } from "@angular/material/input";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatButtonModule } from "@angular/material/button";
-import { NgFor } from "@angular/common";
+} from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { NgFor } from '@angular/common';
 
 @Component({
-  selector: "app-tracker-editor",
-  templateUrl: "./tracker-editor.component.html",
-  styleUrls: ["./tracker-editor.component.scss"],
+  selector: 'app-tracker-editor',
+  templateUrl: './tracker-editor.component.html',
+  styleUrls: ['./tracker-editor.component.scss'],
   standalone: true,
   imports: [
     FormsModule,
@@ -66,7 +66,7 @@ export class TrackerEditorComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["player"] || changes["trackers"]) {
+    if (changes['player'] || changes['trackers']) {
       if (this.player && this.trackers) {
         this.trackerForm = this.fb.group({});
 
