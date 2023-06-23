@@ -1,10 +1,11 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application.Commands;
+using GameManager.Application.Data;
 using GameManager.Domain.Entities;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
 
-public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnCommandResponse>
+public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandResponse>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -22,18 +23,14 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
         _turnRepository = turnRepository;
     }
 
-    public async Task<EndTurnCommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
+    public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
     {
-        var ret = new EndTurnCommandResponse();
-        
         var game = await _gameRepository.GetByIdAsync(request.GameId);
 
         if (game == null)
         {
-            return ret;
+            return CommandResponses.NotFound();
         }
-
-        ret.ActionAllowed = true;
         
         var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
         var requestPlayer = players.First(t => t.Id == request.PlayerId);
@@ -51,9 +48,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
             if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
             {
                 // Only the current player can end the turn
-                ret.ActionAllowed = false;
-
-                return ret;
+                return CommandResponses.AuthorizationError();
             }
             
             var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
@@ -74,6 +69,6 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, EndTurnComm
         game.LastTurnStartTime = DateTime.Now;
         await _gameRepository.UpdateAsync(game);
 
-        return ret;
+        return CommandResponses.Success();
     }
 }

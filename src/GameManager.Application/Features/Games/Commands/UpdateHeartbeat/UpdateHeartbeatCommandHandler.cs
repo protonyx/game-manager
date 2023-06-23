@@ -1,9 +1,10 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application.Commands;
+using GameManager.Application.Data;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 
-public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatCommand>
+public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatCommand, ICommandResponse>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -12,8 +13,10 @@ public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatComm
         _playerRepository = playerRepository;
     }
 
-    public async Task Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
+    public async Task<ICommandResponse> Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
     {
         await _playerRepository.UpdatePlayerHeartbeatAsync(request.PlayerId);
+        
+        return CommandResponses.Success();
     }
 }

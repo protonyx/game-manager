@@ -1,14 +1,14 @@
-﻿using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation;
+using GameManager.Application.Commands;
 using GameManager.Application.Data;
+using GameManager.Application.DTO;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameCommandResponse>
+public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandResponse>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -30,20 +30,13 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameC
         _playerValidator = playerValidator;
     }
 
-    public async Task<JoinGameCommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+    public async Task<ICommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
-        var ret = new JoinGameCommandResponse();
-        
         var game = await _gameRepository.GetGameByEntryCodeAsync(request.EntryCode);
         
         if (game == null)
         {
-            ret.ValidationResult = new FluentValidation.Results.ValidationResult(new[]
-            {
-                new ValidationFailure(nameof(JoinGameCommand.EntryCode), "The entry code is invalid.")
-            });
-
-            return ret;
+            return CommandResponses.Failure("The entry code is invalid.");
         }
 
         var newPlayer = new Player()
@@ -53,20 +46,23 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, JoinGameC
         };
         
         // Validate
-        ret.ValidationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
+        var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
 
-        if (!ret.ValidationResult.IsValid)
+        if (!validationResult.IsValid)
         {
-            return ret;
+            return CommandResponses.ValidationError(validationResult);
         }
 
         newPlayer = await _playerRepository.CreateAsync(newPlayer);
-        
-        ret.GameId = game.Id;
-        ret.PlayerId = newPlayer.Id;
-        ret.Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin);
-        ret.IsAdmin = newPlayer.IsAdmin;
 
-        return ret;
+        var dto = new PlayerCredentialsDTO
+        {
+            GameId = game.Id,
+            PlayerId = newPlayer.Id,
+            Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin),
+            IsAdmin = newPlayer.IsAdmin
+        };
+
+        return CommandResponses.Data(game.Id, dto);
     }
 }

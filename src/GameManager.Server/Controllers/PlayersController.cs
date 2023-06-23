@@ -51,20 +51,8 @@ public class PlayersController : ControllerBase
             PlayerId = id,
             Player = dto
         });
-        
-        if (response.Player == null)
-        {
-            return NotFound();
-        }
-        
-        if (response.ValidationResult is {IsValid: false})
-        {
-            ModelState.AddValidationResults(response.ValidationResult);
 
-            return ValidationProblem(ModelState);
-        }
-
-        return Ok(response.Player);
+        return this.GetActionResult(response);
     }
 
     [HttpPatch("{id}")]
@@ -95,23 +83,16 @@ public class PlayersController : ControllerBase
             Player = player
         });
 
-        if (updateResponse.ValidationResult is {IsValid: false})
-        {
-            ModelState.AddValidationResults(updateResponse.ValidationResult);
-
-            return ValidationProblem(ModelState);
-        }
-
-        return Ok(updateResponse.Player);
+        return this.GetActionResult(updateResponse);
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeletePlayer([FromRoute] Guid id)
     {
-        await _mediator.Send(new DeletePlayerCommand(id));
+        var response = await _mediator.Send(new DeletePlayerCommand(id));
 
-        return NoContent();
+        return this.GetActionResult(response);
     }
 
     [HttpGet("{id}/Turns")]

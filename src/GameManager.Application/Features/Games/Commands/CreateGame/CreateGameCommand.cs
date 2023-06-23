@@ -1,9 +1,10 @@
-﻿using GameManager.Application.DTO;
+﻿using GameManager.Application.Commands;
+using GameManager.Application.DTO;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommand : IRequest<CreateGameCommandResponse>
+public class CreateGameCommand : IRequest<ICommandResponse>
 {
     public string Name { get; set; } = String.Empty;
     

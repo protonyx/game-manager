@@ -1,5 +1,5 @@
+using GameManager.Application.Commands;
 using GameManager.Application.DTO;
-using GameManager.Application.Features.Games.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.Queries.GetGame;
@@ -29,17 +29,15 @@ public class GamesController : ControllerBase
         CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(game, cancellationToken);
-        
-        if (response.ValidationResult is {IsValid: false})
-        {
-            ModelState.AddValidationResults(response.ValidationResult);
 
-            return ValidationProblem(ModelState);
+        if (response is EntityCommandResponse entity)
+        {
+            return CreatedAtAction(nameof(GetGame), 
+                new {id = entity.Id},
+                entity.Value);
         }
 
-        return CreatedAtAction(nameof(GetGame), 
-            new {id = response.Game!.Id},
-            response.Game);
+        return this.GetActionResult(response);
     }
 
     [HttpGet("{id}")]
@@ -69,7 +67,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("Join")]
-    [ProducesResponseType(typeof(JoinGameCommandResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PlayerCredentialsDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinGame(
         [FromBody] JoinGameCommand player,
@@ -77,14 +75,7 @@ public class GamesController : ControllerBase
     {
         var response = await _mediator.Send(player, cancellationToken);
 
-        if (response.ValidationResult is {IsValid: false})
-        {
-            ModelState.AddValidationResults(response.ValidationResult);
-
-            return ValidationProblem(ModelState);
-        }
-
-        return Ok(response);
+        return this.GetActionResult(response);
     }
 
 }

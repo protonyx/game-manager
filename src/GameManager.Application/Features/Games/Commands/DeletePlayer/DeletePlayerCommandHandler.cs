@@ -1,9 +1,10 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application.Commands;
+using GameManager.Application.Data;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand>
+public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, ICommandResponse>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -12,8 +13,10 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand>
         _playerRepository = playerRepository;
     }
 
-    public Task Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<ICommandResponse> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
     {
-        return _playerRepository.DeleteByIdAsync(request.PlayerId);
+        await _playerRepository.DeleteByIdAsync(request.PlayerId);
+
+        return CommandResponses.Success();
     }
 }
