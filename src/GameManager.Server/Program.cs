@@ -4,6 +4,7 @@ using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
 using GameManager.Server.Filters;
+using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +74,8 @@ builder.Services.AddSingleton<ITokenService>(tokenService);
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();
+
+builder.Services.AddHostedService<GamePruningService>();
 
 var app = builder.Build();
 

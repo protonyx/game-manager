@@ -15,6 +15,22 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     {
         _mediator = mediator;
     }
+    
+    public async Task<ICollection<Game>> FindAsync(DateTime? olderThan = null)
+    {
+        IQueryable<Game> query = _context.Set<Game>()
+            .AsQueryable()
+            .AsNoTracking();
+
+        if (olderThan.HasValue)
+        {
+            query = query.Where(t => t.CreatedDate < olderThan);
+        }
+
+        var games = await query.ToListAsync();
+
+        return games;
+    }
 
     public override async Task<Game> CreateAsync(Game game)
     {
