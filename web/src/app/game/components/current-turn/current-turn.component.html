@@ -3,7 +3,7 @@
 <p *ngIf="nextTurn">Up Next: {{ nextTurn!.name }}</p>
 
 <app-turn-timer
-  *ngIf="game"
+  *ngIf="game && game.lastTurnStartTime"
   [startTime]="game!.lastTurnStartTime"></app-turn-timer>
 
 <mat-action-row>

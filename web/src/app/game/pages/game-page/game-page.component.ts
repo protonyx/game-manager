@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { combineLatest, map, Subject, takeUntil, tap } from 'rxjs';
 import {
@@ -20,6 +20,7 @@ import { LayoutActions } from '../../../shared/state/layout.actions';
 import { GameHubService } from '../../services/game-hub.service';
 import { GameService } from '../../services/game.service';
 import {
+  Game,
   Player,
   PlayerCredentials,
   Tracker,
@@ -31,6 +32,7 @@ import { NgIf, AsyncPipe } from '@angular/common';
 import { CurrentTurnComponent } from '../../components/current-turn/current-turn.component';
 import { PlayerListComponent } from '../../components/player-list/player-list.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { GameControlComponent } from '../../components/game-control/game-control.component';
 
 @Component({
   selector: 'app-game-page',
@@ -38,13 +40,15 @@ import { MatExpansionModule } from '@angular/material/expansion';
   styleUrls: ['./game-page.component.scss'],
   standalone: true,
   imports: [
+    MatDialogModule,
     MatExpansionModule,
+    MatSnackBarModule,
+    GameControlComponent,
     PlayerListComponent,
     CurrentTurnComponent,
     NgIf,
     TrackerEditorComponent,
     AsyncPipe,
-    MatSnackBarModule,
   ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
@@ -52,7 +56,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   currentPlayer$ = this.store.select(selectCurrentPlayer);
 
-  game$ = this.store.select(selectGame);
+  game$ = this.store.select(selectGame).pipe(tap((g) => (this.game = g)));
 
   trackers$ = this.game$.pipe(map((g) => g?.trackers));
 
@@ -61,6 +65,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
   isAdmin: boolean = false;
+
+  game: Game | null | undefined;
 
   trackers: Tracker[] | null | undefined;
 
@@ -148,6 +154,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onEndTurn(): void {
+    this.signalr.endTurn();
+  }
+
+  onStartGame(): void {
     this.signalr.endTurn();
   }
 

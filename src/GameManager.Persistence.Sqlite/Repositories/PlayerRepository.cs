@@ -172,12 +172,18 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return existing;
     }
     
-    public async Task<bool> NameIsUniqueAsync(Guid gameId, string name)
+    public async Task<bool> NameIsUniqueAsync(Guid gameId, string name, Guid? playerId = null)
     {
-        var playersWithName = await _context.Set<Player>()
+        var query = _context.Set<Player>()
             .AsQueryable()
-            .Where(p => p.GameId == gameId && p.Active && p.Name.ToLower().Equals(name.ToLower()))
-            .CountAsync();
+            .Where(p => p.GameId == gameId && p.Active && p.Name.ToLower().Equals(name.ToLower()));
+
+        if (playerId.HasValue)
+        {
+            query = query.Where(p => p.Id != playerId);
+        }
+        
+        var playersWithName = await query.CountAsync();
 
         return playersWithName == 0;
     }

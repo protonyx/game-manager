@@ -17,7 +17,7 @@ public class PlayerValidatorTests
         gameRepo.Setup(t => t.GetByIdAsync(It.IsAny<Guid>()))
             .ReturnsUsingFixture(fixture);
         var repo = fixture.Freeze<Mock<IPlayerRepository>>();
-        repo.Setup(t => t.NameIsUniqueAsync(It.IsAny<Guid>(), It.IsAny<string>()))
+        repo.Setup(t => t.NameIsUniqueAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>()))
             .ReturnsAsync(false);
 
         var sut = fixture.Create<PlayerValidator>();
