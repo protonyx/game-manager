@@ -65,7 +65,7 @@ public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
         var playerResponse = await client.PostAsJsonAsync("api/Games/Join", newPlayer);
 
         playerResponse.EnsureSuccessStatusCode();
-        var player = JsonConvert.DeserializeObject<JoinGameCommandResponse>(await playerResponse.Content.ReadAsStringAsync());
+        var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync());
 
         Assert.True(player != null);
         Assert.True(!string.IsNullOrWhiteSpace(player!.Token));

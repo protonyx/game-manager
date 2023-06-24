@@ -1,8 +1,7 @@
-﻿namespace GameManager.Application.Features.Games.Commands.JoinGame;
+﻿namespace GameManager.Application.DTO;
 
-public class JoinGameCommandResponse : ValidateCommandResponseBase
+public class PlayerCredentialsDTO
 {
-    
     public Guid GameId { get; set; }
     
     public Guid PlayerId { get; set; }

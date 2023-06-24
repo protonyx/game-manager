@@ -1,4 +1,5 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application.Commands;
+using GameManager.Application.Data;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Entities;
 
@@ -15,11 +16,13 @@ public class EndTurnCommandTests
         var game = fixture.Create<Game>();
         var player1 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 1)
             .With(t => t.IsAdmin, false)
             .With(t => t.Active, true)
             .Create();
         var player2 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 2)
             .With(t => t.IsAdmin, false)
             .With(t => t.Active, true)
             .Create();
@@ -44,7 +47,7 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.ActionAllowed.Should().BeTrue();
+        result.Should().BeOfType<SuccessfulCommandResponse>();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurnPlayerId == player2.Id)), Times.Once);
     }
     
@@ -57,11 +60,13 @@ public class EndTurnCommandTests
         var game = fixture.Create<Game>();
         var player1 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 1)
             .With(t => t.IsAdmin, true)
             .With(t => t.Active, true)
             .Create();
         var player2 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 2)
             .With(t => t.IsAdmin, false)
             .With(t => t.Active, true)
             .Create();
@@ -86,7 +91,7 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.ActionAllowed.Should().BeTrue();
+        result.Should().BeOfType<SuccessfulCommandResponse>();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurnPlayerId == player1.Id)), Times.Once);
     }
     
@@ -99,11 +104,13 @@ public class EndTurnCommandTests
         var game = fixture.Create<Game>();
         var player1 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 1)
             .With(t => t.IsAdmin, false)
             .With(t => t.Active, true)
             .Create();
         var player2 = fixture.Build<Player>()
             .With(t => t.GameId, game.Id)
+            .With(t => t.Order, 2)
             .With(t => t.IsAdmin, false)
             .With(t => t.Active, true)
             .Create();
@@ -126,7 +133,7 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.ActionAllowed.Should().BeFalse();
+        result.Should().BeOfType<AuthorizationErrorCommandResponse>();
         gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>()), Times.Never());
     }
 }

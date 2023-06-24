@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using GameManager.Application.Commands;
+using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommand : IRequest
+public class DeletePlayerCommand : IRequest<ICommandResponse>
 {
     public Guid PlayerId { get; set; }
 

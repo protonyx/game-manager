@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using GameManager.Application.Commands;
 using GameManager.Application.Data;
 using GameManager.Application.DTO;
 using GameManager.Application.Services;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, CreateGameCommandResponse>
+public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, ICommandResponse>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -25,10 +26,8 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Creat
         _mapper = mapper;
     }
 
-    public async Task<CreateGameCommandResponse> Handle(CreateGameCommand request, CancellationToken cancellationToken)
+    public async Task<ICommandResponse> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
-        var ret = new CreateGameCommandResponse();
-        
         var game = new Game()
         {
             Name = request.Name,
@@ -44,17 +43,17 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Creat
         }
         
         // Validate
-        ret.ValidationResult = await _gameValidator.ValidateAsync(game, cancellationToken);
+        var validationResult = await _gameValidator.ValidateAsync(game, cancellationToken);
 
-        if (!ret.ValidationResult.IsValid)
+        if (!validationResult.IsValid)
         {
-            return ret;
+            return CommandResponses.ValidationError(validationResult);
         }
 
         game = await _gameRepository.CreateAsync(game);
 
-        ret.Game = _mapper.Map<GameDTO>(game);
+        var dto = _mapper.Map<GameDTO>(game);
 
-        return ret;
+        return CommandResponses.Data(game.Id, dto);
     }
 }
