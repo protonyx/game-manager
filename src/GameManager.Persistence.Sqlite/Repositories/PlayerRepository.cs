@@ -207,6 +207,8 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
     {
         player.Active = false;
         player.Order = 0;
+
+        _context.Entry(player).State = EntityState.Modified;
             
         await _context.SaveChangesAsync();
             
