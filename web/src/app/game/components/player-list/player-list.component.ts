@@ -47,7 +47,7 @@ export class PlayerListComponent implements OnChanges {
   public currentPlayer: Player | null = null;
 
   @Input()
-  public isAdmin: boolean = false;
+  public isAdmin: boolean | null = false;
 
   @Output()
   public playerOrderUpdated: EventEmitter<Player> = new EventEmitter<Player>();

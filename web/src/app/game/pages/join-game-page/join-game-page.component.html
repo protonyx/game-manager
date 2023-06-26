@@ -1,6 +1,6 @@
 <div class="container login-container">
   <app-join-game
     [loading]="loading"
-    [errorMessage]="errorMessage"
+    [errorMessage]="error$ | async"
     (joinGame)="onJoinGame($event)"></app-join-game>
 </div>

@@ -9,8 +9,10 @@ import {
 import { GameState, initialState } from './game.state';
 import { Player } from '../models/models';
 
+export const gameFeatureKey = 'game';
+
 export const gameFeature = createFeature({
-  name: 'game',
+  name: gameFeatureKey,
   reducer: createReducer(
     initialState,
     on(GameHubActions.hubConnected, (state) => {
@@ -58,7 +60,7 @@ export const gameFeature = createFeature({
       return { ...state, currentPlayer: player };
     }),
     on(GameActions.clearCredentials, (state) => {
-      // Game or Player is no longer valid, remove game state
+      // Game or Player is no longer valid, reset game state
       return {
         ...state,
         currentPlayer: null,
@@ -78,17 +80,8 @@ export const gameFeature = createFeature({
       return { ...state, currentPlayer: player };
     }),
     on(PlayersApiActions.playerRemoved, (state, { playerId }) => {
-      if (state.currentPlayer?.id === playerId) {
-        return {
-          ...state,
-          currentPlayer: null,
-          credentials: null,
-          game: null,
-          players: [],
-        };
-      } else {
-        return { ...state };
-      }
+      let newPlayers = state.players.filter((item) => item.id !== playerId);
+      return { ...state, players: newPlayers };
     })
   ),
 });

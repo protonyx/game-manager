@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { selectTitle } from './shared/state/layout.reducer';
-import { selectGame } from './game/state/game.reducer';
-import { map } from 'rxjs';
+import { selectEntryCode, selectTitle } from './shared/state/layout.reducer';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { GameActions } from './game/state/game.actions';
@@ -16,22 +14,12 @@ import { LayoutComponent } from './shared/layout/layout.component';
   imports: [AsyncPipe, LayoutComponent],
 })
 export class AppComponent {
-  title = 'GameManager';
-
   title$ = this.store.select(selectTitle);
 
-  game$ = this.store.select(selectGame);
-
-  entryCode$ = this.game$.pipe(map((g) => g?.entryCode));
+  entryCode$ = this.store.select(selectEntryCode);
 
   constructor(private store: Store, private router: Router) {
-    this.game$.subscribe((game) => {
-      if (game) {
-        router.navigate(['game']);
-      } else {
-        router.navigate(['game', 'join']);
-      }
-    });
+    router.navigate(['game']);
   }
 
   onLeaveGame(): void {

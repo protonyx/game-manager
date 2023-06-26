@@ -33,7 +33,7 @@ export class CurrentTurnComponent implements OnChanges {
   public endTurn: EventEmitter<any> = new EventEmitter();
 
   @Input()
-  public isAdmin: boolean = false;
+  public isAdmin: boolean | null = false;
 
   public isMyTurn: boolean = false;
 

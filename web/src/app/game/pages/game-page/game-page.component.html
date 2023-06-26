@@ -1,5 +1,5 @@
 <mat-accordion multi="true">
-    <mat-expansion-panel *ngIf="isAdmin" [expanded]="false">
+    <mat-expansion-panel *ngIf="isAdmin$ | async" [expanded]="false">
         <mat-expansion-panel-header>
             <mat-panel-title> Game Control</mat-panel-title>
         </mat-expansion-panel-header>
@@ -18,13 +18,13 @@
                 [game]="game$ | async"
                 [players]="players$ | async"
                 [currentPlayer]="currentPlayer$ | async"
-                [isAdmin]="isAdmin"
+                [isAdmin]="isAdmin$ | async"
                 (playerOrderUpdated)="onPlayerOrderUpdated($event)"
                 (editPlayer)="onPlayerEdit($event)"
                 (kickPlayer)="onPlayerKick($event)"></app-player-list>
     </mat-expansion-panel>
 
-    <mat-expansion-panel *ngIf="game && game.currentTurnPlayerId" [expanded]="true" [class.is-active]="isMyTurn">
+    <mat-expansion-panel *ngIf="game && game.currentTurnPlayerId" [expanded]="true" [class.is-active]="isMyTurn$ | async">
         <mat-expansion-panel-header>
             <mat-panel-title> Current Turn</mat-panel-title>
         </mat-expansion-panel-header>
@@ -32,7 +32,7 @@
                 [game]="game$ | async"
                 [players]="players$ | async"
                 [currentPlayer]="currentPlayer$ | async"
-                [isAdmin]="isAdmin"
+                [isAdmin]="isAdmin$ | async"
                 (endTurn)="onEndTurn()">
         </app-current-turn>
     </mat-expansion-panel>

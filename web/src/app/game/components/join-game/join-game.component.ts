@@ -35,7 +35,7 @@ export class JoinGameComponent {
   public loading: boolean | undefined;
 
   @Input()
-  public errorMessage: string | undefined;
+  public errorMessage: string | null = null;
 
   @Output()
   public joinGame: EventEmitter<JoinGame> = new EventEmitter<JoinGame>();

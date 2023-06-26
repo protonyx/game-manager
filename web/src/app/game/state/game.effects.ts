@@ -3,16 +3,88 @@ import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { GameService } from '../services/game.service';
 import {
   GameActions,
+  GameHubActions,
   GamesApiActions,
   PlayersApiActions,
 } from './game.actions';
-import { exhaustMap, map } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, map, of, switchMap, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
 import { Router } from '@angular/router';
+import { LayoutActions } from '../../shared/state/layout.actions';
+import { JoinGame } from '../models/models';
 
 @Injectable()
 export class GameEffects {
+  $createGame = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.createGame),
+      exhaustMap((action) =>
+        this.gameService.createGame(action.game).pipe(
+          map((game) => GamesApiActions.createdGame({ game })),
+          catchError((error) => {
+            if (error.status === 400) {
+              return of(
+                GamesApiActions.createdGameError({ error: error.error.title })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
+  $createdGame = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GamesApiActions.createdGame),
+      exhaustMap((action) => {
+        const joinGame: JoinGame = {
+          entryCode: action.game.entryCode,
+          name: 'Player 1',
+        };
+
+        return of(GameActions.joinGame({ joinGame }));
+      })
+    )
+  );
+
+  $joinGame = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.joinGame),
+      exhaustMap((action) =>
+        this.gameService.joinGame(action.joinGame).pipe(
+          map((data) =>
+            GamesApiActions.joinedGame({
+              credentials: data,
+              entryCode: action.joinGame.entryCode,
+            })
+          ),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                GamesApiActions.joinedGameError({ error: error.error.title })
+              );
+            }
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
+  $joinedGame = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(GamesApiActions.joinedGame),
+        tap((action) => {
+          this.router.navigate(['game']);
+        })
+      ),
+    { dispatch: false }
+  );
+
   $leaveGame = createEffect(() =>
     this.actions$.pipe(
       ofType(GameActions.leaveGame),
@@ -22,9 +94,102 @@ export class GameEffects {
       exhaustMap(([action, player]) =>
         this.gameService
           .removePlayer(player!.id)
-          .pipe(
-            map(() => PlayersApiActions.playerRemoved({ playerId: player!.id }))
-          )
+          .pipe(map(() => GamesApiActions.leftGame()))
+      )
+    )
+  );
+
+  $clearCredentialsOnLeave = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GamesApiActions.leftGame),
+      map(() => GameActions.clearCredentials())
+    )
+  );
+
+  $loadGame = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.loadGame),
+      exhaustMap((action) =>
+        this.gameService.getGame(action.gameId).pipe(
+          map((game) => GamesApiActions.retrievedGame({ game })),
+          catchError((error) => {
+            if (error.status === 400) {
+              return of(
+                GamesApiActions.retrievedGameError({ error: error.error.title })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
+  $loadCurrentPlayer = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.loadCurrentPlayer),
+      exhaustMap((action) =>
+        this.gameService.getPlayer(action.playerId).pipe(
+          map((player) => GamesApiActions.retrievedCurrentPlayer({ player })),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                GamesApiActions.retrievedPlayerError({
+                  error: error.error.title,
+                })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
+  $loadPlayers = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.loadPlayers),
+      exhaustMap((action) =>
+        this.gameService.getPlayers(action.gameId).pipe(
+          map((players) => GamesApiActions.retrievedPlayers({ players })),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                GamesApiActions.retrievedPlayersError({
+                  error: error.error.title,
+                })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
+  $removePlayer = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.removePlayer),
+      exhaustMap((action) =>
+        this.gameService.removePlayer(action.playerId).pipe(
+          map(() =>
+            PlayersApiActions.playerRemoved({ playerId: action.playerId })
+          ),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                PlayersApiActions.playerRemovedError({
+                  error: error.error.title,
+                })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
       )
     )
   );
@@ -49,14 +214,41 @@ export class GameEffects {
     )
   );
 
+  $updatePlayerOrder = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.updatePlayerOrder),
+      exhaustMap((action) =>
+        this.gameService.setPlayerOrder(action.playerId, action.order).pipe(
+          map((player) => PlayersApiActions.playerUpdated({ player })),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                PlayersApiActions.playerUpdatedError({
+                  error: error.error.title,
+                })
+              );
+            }
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
   $authenticationError = createEffect(() =>
     this.actions$.pipe(
       ofType(GamesApiActions.authenticationError),
-      map(() => {
+      tap(() => {
         this.router.navigate(['game', 'join']);
+      }),
+      map(() => GameActions.clearCredentials())
+    )
+  );
 
-        return GameActions.clearCredentials();
-      })
+  $clearCredentials = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.clearCredentials),
+      map(() => LayoutActions.resetLayout())
     )
   );
 

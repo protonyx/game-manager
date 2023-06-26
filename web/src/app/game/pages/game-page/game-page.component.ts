@@ -4,7 +4,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { combineLatest, map, Subject, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Subject, takeUntil, tap } from 'rxjs';
 import {
   selectCredentials,
   selectCurrentPlayer,
@@ -64,13 +64,23 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
-  isAdmin: boolean = false;
+  isAdmin$ = this.store
+    .select(selectCredentials)
+    .pipe(map((c) => c?.isAdmin || false));
+
+  isMyTurn$ = combineLatest({
+    game: this.game$,
+    currentPlayer: this.currentPlayer$,
+  }).pipe(
+    map(
+      ({ game, currentPlayer }) =>
+        game?.currentTurnPlayerId === currentPlayer?.id
+    )
+  );
 
   game: Game | null | undefined;
 
   trackers: Tracker[] | null | undefined;
-
-  isMyTurn: boolean = false;
 
   constructor(
     private gameService: GameService,
@@ -81,55 +91,41 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
-    this.game$
-      .pipe(
-        tap((g) => {
-          this.trackers = g?.trackers;
-        }),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe();
+    this.trackers$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.trackers = data;
+    });
   }
 
   ngOnInit(): void {
     this.credentials$
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((credentials) => credentials != null)
+      )
       .subscribe((credentials) => {
-        if (credentials) {
-          this.isAdmin = credentials.isAdmin;
-
-          this.gameService.getGame(credentials!.gameId).subscribe((game) => {
-            this.store.dispatch(GamesApiActions.retrievedGame({ game: game }));
-            this.store.dispatch(LayoutActions.setTitle({ title: game.name }));
-            this.connect(credentials);
-          });
-          this.gameService
-            .getPlayer(credentials!.playerId)
-            .subscribe((player) => {
-              this.store.dispatch(
-                GamesApiActions.retrievedCurrentPlayer({ player: player })
-              );
-            });
-          this.gameService
-            .getPlayers(credentials!.gameId)
-            .subscribe((players) => {
-              this.store.dispatch(
-                GamesApiActions.retrievedPlayers({ players: players })
-              );
-            });
-        }
+        this.store.dispatch(
+          GameActions.loadGame({ gameId: credentials!.gameId })
+        );
+        this.store.dispatch(
+          GameActions.loadCurrentPlayer({ playerId: credentials!.playerId })
+        );
+        this.store.dispatch(
+          GameActions.loadPlayers({ gameId: credentials!.gameId })
+        );
+        this.connect(credentials!);
       });
 
-    combineLatest({
-      game: this.game$,
-      currentPlayer: this.currentPlayer$,
-    })
-      .pipe(takeUntil(this.unsubscribe$))
+    // Update title and entry code when game is loaded
+    this.actions$
+      .pipe(ofType(GamesApiActions.retrievedGame), takeUntil(this.unsubscribe$))
       .subscribe((data) => {
-        this.isMyTurn =
-          data.game?.currentTurnPlayerId === data.currentPlayer?.id;
+        this.store.dispatch(LayoutActions.setTitle({ title: data.game.name }));
+        this.store.dispatch(
+          LayoutActions.setEntryCode({ entryCode: data.game.entryCode })
+        );
       });
 
+    // Handle SignalR disconnects
     this.actions$
       .pipe(
         ofType(GameHubActions.hubDisconnected),
@@ -169,11 +165,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onPlayerOrderUpdated(player: Player): void {
-    this.gameService
-      .setPlayerOrder(player.id, player.order)
-      .subscribe((data) => {
-        // TODO: Update player state in store
-      });
+    this.store.dispatch(
+      GameActions.updatePlayerOrder({
+        playerId: player.id,
+        order: player.order,
+      })
+    );
   }
 
   onPlayerEdit(player: Player): void {
@@ -206,7 +203,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onPlayerKick(player: Player): void {
-    this.gameService.removePlayer(player.id).subscribe();
+    this.store.dispatch(GameActions.removePlayer({ playerId: player.id }));
   }
 
   private connect(credentials: PlayerCredentials) {
