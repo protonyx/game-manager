@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using GameManager.Application.Data;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications;
 using GameManager.Domain.Entities;
 using MediatR;

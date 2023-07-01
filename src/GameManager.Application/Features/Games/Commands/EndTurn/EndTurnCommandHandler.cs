@@ -1,5 +1,8 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Data;
+﻿using GameManager.Application.Authorization;
+using GameManager.Application.Commands;
+using GameManager.Application.Contracts;
+using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Domain.Entities;
 using MediatR;
 
@@ -13,28 +16,44 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
     private readonly ITurnRepository _turnRepository;
 
+    private readonly IUserContext _userContext;
+
     public EndTurnCommandHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
-        ITurnRepository turnRepository)
+        ITurnRepository turnRepository,
+        IUserContext userContext)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
         _turnRepository = turnRepository;
+        _userContext = userContext;
     }
 
     public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var gameId = _userContext.User?.GetGameId();
+
+        if (!gameId.HasValue)
+        {
+            return CommandResponses.AuthorizationError();
+        }
+        
+        var game = await _gameRepository.GetByIdAsync(gameId.Value);
 
         if (game == null)
         {
             return CommandResponses.NotFound();
         }
         
-        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
-        var requestPlayer = players.First(t => t.Id == request.PlayerId);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
+        var requestPlayerId = _userContext.User?.GetPlayerId();
+        var requestPlayer = players.FirstOrDefault(t => t.Id == requestPlayerId);
 
+        if (requestPlayer == null)
+        {
+            return CommandResponses.NotFound();
+        }
         if (game.CurrentTurnPlayerId == null)
         {
             var firstPlayer = players.First();
@@ -47,8 +66,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
             if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
             {
-                // Only the current player can end the turn
-                return CommandResponses.AuthorizationError();
+                return CommandResponses.AuthorizationError("Only the current player can end the turn");
             }
             
             var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();

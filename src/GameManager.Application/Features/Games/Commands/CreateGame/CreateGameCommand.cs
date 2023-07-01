@@ -1,5 +1,6 @@
 ﻿using GameManager.Application.Commands;
-using GameManager.Application.DTO;
+using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Features.Games.DTO;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;

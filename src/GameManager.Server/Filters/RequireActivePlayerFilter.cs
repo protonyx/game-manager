@@ -1,4 +1,6 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application;
+using GameManager.Application.Authorization;
+using GameManager.Application.Contracts.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

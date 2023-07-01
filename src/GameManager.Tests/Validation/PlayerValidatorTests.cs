@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
-using GameManager.Application.Data;
-using GameManager.Application.Validation;
+using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games.Validation;
 using GameManager.Domain.Entities;
 
 namespace GameManager.Tests.Validation;

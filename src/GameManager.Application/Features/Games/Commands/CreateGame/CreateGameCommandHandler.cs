@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using GameManager.Application.Commands;
-using GameManager.Application.Data;
-using GameManager.Application.DTO;
+using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;

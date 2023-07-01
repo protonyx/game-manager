@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using GameManager.Application.Data;
-using GameManager.Application.DTO;
+using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games.DTO;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayerTurns;

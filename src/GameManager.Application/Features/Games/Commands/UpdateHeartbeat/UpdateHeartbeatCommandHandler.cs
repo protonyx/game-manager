@@ -1,5 +1,6 @@
 ﻿using GameManager.Application.Commands;
-using GameManager.Application.Data;
+using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Contracts.Persistence;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;

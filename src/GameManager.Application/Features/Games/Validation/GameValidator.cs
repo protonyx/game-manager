@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using GameManager.Domain.Entities;
 
-namespace GameManager.Application.Validation;
+namespace GameManager.Application.Features.Games.Validation;
 
 public class GameValidator : AbstractValidator<Game>
 {

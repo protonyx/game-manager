@@ -1,4 +1,4 @@
-﻿using GameManager.Application.DTO;
+﻿using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Server.Messages;
 

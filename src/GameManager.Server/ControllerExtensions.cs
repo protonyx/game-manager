@@ -1,4 +1,5 @@
 ﻿using GameManager.Application.Commands;
+using GameManager.Application.Contracts.Commands;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameManager.Server;

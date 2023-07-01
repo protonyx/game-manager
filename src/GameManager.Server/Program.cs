@@ -1,4 +1,5 @@
 using GameManager.Application;
+using GameManager.Application.Contracts;
 using GameManager.Application.Services;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
@@ -8,6 +9,7 @@ using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +73,8 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 
 builder.Services.AddSingleton<ITokenService>(tokenService);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();

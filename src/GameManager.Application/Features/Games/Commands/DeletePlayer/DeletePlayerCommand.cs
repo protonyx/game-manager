@@ -1,4 +1,5 @@
 ﻿using GameManager.Application.Commands;
+using GameManager.Application.Contracts.Commands;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;

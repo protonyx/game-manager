@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using GameManager.Application.Contracts;
 using GameManager.Application.Services;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,8 +14,6 @@ public class TokenService : ITokenService
     private readonly SymmetricSecurityKey _signingKey;
 
     private readonly SigningCredentials _signingCredentials;
-
-    //public static byte[] DefaultKey;
 
     public TokenService(IConfiguration configuration)
     {
@@ -43,22 +42,11 @@ public class TokenService : ITokenService
         return _signingKey;
     }
 
-    public string GenerateToken(Guid gameId, Guid playerId, bool isAdmin)
+    public string GenerateToken(ClaimsIdentity identity)
     {
-        var claims = new List<Claim>()
-        {
-            new Claim("name", playerId.ToString()),
-            new Claim("sid", gameId.ToString())
-        };
-
-        if (isAdmin)
-        {
-            claims.Add(new Claim("role", "admin"));
-        }
-        
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
             _configuration["Jwt:Audience"],
-            claims,
+            identity.Claims,
             expires: DateTime.Now.AddDays(30),
             signingCredentials: _signingCredentials);
         

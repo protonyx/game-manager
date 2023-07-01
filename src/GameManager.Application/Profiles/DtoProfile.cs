@@ -1,5 +1,5 @@
 using AutoMapper;
-using GameManager.Application.DTO;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Profiles;

@@ -1,5 +1,5 @@
 ﻿using GameManager.Application.Commands;
-using GameManager.Application.Data;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Domain.Entities;
 

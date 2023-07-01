@@ -1,7 +1,7 @@
 using GameManager.Application.Commands;
-using GameManager.Application.DTO;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.JoinGame;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
 using MediatR;

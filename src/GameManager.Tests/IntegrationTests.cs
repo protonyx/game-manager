@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using GameManager.Application.DTO;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.JoinGame;
+using GameManager.Application.Features.Games.DTO;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using GameManager.Server;

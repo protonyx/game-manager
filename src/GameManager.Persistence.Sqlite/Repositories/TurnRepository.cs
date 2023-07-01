@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Data;
+﻿using GameManager.Application.Contracts.Persistence;
 using GameManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

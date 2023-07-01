@@ -1,6 +1,6 @@
 ﻿using GameManager.Domain.Entities;
 
-namespace GameManager.Application.Data;
+namespace GameManager.Application.Contracts.Persistence;
 
 public interface IGameRepository : IAsyncRepository<Game>
 {

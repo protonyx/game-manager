@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using GameManager.Application.DTO;
 using GameManager.Application.Features.Games.Commands.DeletePlayer;
 using GameManager.Application.Features.Games.Commands.UpdatePlayer;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayer;
 using GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 using MediatR;

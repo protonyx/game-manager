@@ -1,5 +1,5 @@
 ﻿using GameManager.Application.Commands;
-using GameManager.Application.Data;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Entities;
 
@@ -36,12 +36,14 @@ public class EndTurnCommandTests
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
+        fixture.SetUser(user =>
+        {
+            user.AddGameId(game.Id)
+                .AddPlayerId(player1.Id);
+        });
 
         var sut = fixture.Create<EndTurnCommandHandler>();
-        var cmd = fixture.Build<EndTurnCommand>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.PlayerId, player1.Id)
-            .Create();
+        var cmd = fixture.Create<EndTurnCommand>();
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -80,12 +82,14 @@ public class EndTurnCommandTests
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
+        fixture.SetUser(user =>
+        {
+            user.AddGameId(game.Id)
+                .AddPlayerId(player1.Id);
+        });
 
         var sut = fixture.Create<EndTurnCommandHandler>();
-        var cmd = fixture.Build<EndTurnCommand>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.PlayerId, player1.Id)
-            .Create();
+        var cmd = fixture.Create<EndTurnCommand>();
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -122,12 +126,14 @@ public class EndTurnCommandTests
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
+        fixture.SetUser(user =>
+        {
+            user.AddGameId(game.Id)
+                .AddPlayerId(player2.Id);
+        });
 
         var sut = fixture.Create<EndTurnCommandHandler>();
-        var cmd = fixture.Build<EndTurnCommand>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.PlayerId, player2.Id)
-            .Create();
+        var cmd = fixture.Create<EndTurnCommand>();
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);

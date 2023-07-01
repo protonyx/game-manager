@@ -1,4 +1,4 @@
-﻿namespace GameManager.Application.DTO;
+﻿namespace GameManager.Application.Features.Games.DTO;
 
 public class TurnDTO
 {

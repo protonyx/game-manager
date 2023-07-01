@@ -1,7 +1,10 @@
 ﻿using FluentValidation;
+using GameManager.Application.Authorization;
 using GameManager.Application.Commands;
-using GameManager.Application.Data;
-using GameManager.Application.DTO;
+using GameManager.Application.Contracts;
+using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;
@@ -55,11 +58,19 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
 
         newPlayer = await _playerRepository.CreateAsync(newPlayer);
 
+        var identityBuilder = new PlayerIdentityBuilder();
+        identityBuilder.AddGameId(game.Id)
+            .AddPlayerId(newPlayer.Id);
+        if (newPlayer.IsAdmin)
+        {
+            identityBuilder.AddAdminRole();
+        }
+
         var dto = new PlayerCredentialsDTO
         {
             GameId = game.Id,
             PlayerId = newPlayer.Id,
-            Token = _tokenService.GenerateToken(game.Id, newPlayer.Id, newPlayer.IsAdmin),
+            Token = _tokenService.GenerateToken(identityBuilder.Build()),
             IsAdmin = newPlayer.IsAdmin
         };
 

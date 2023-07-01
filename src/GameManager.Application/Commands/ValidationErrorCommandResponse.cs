@@ -1,4 +1,5 @@
 ﻿using FluentValidation.Results;
+using GameManager.Application.Contracts.Commands;
 
 namespace GameManager.Application.Commands;
 

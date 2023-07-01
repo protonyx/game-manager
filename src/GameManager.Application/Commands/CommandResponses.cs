@@ -24,9 +24,9 @@ public static class CommandResponses
         return new ValidationErrorCommandResponse(result);
     }
 
-    public static AuthorizationErrorCommandResponse AuthorizationError()
+    public static AuthorizationErrorCommandResponse AuthorizationError(string reason = "")
     {
-        return new AuthorizationErrorCommandResponse();
+        return new AuthorizationErrorCommandResponse(reason);
     }
 
     public static NotFoundCommandResponse NotFound()

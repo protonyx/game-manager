@@ -1,6 +1,6 @@
+using GameManager.Application.Authorization;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
-using GameManager.Server.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -52,20 +52,7 @@ public class GameHub : Hub<IGameHubClient>
     
     public async Task EndTurn()
     {
-        var gameId = Context.User?.GetGameId();
-        var playerId = Context.User?.GetPlayerId();
-        var isAdmin = Context.User?.IsInRole("admin") ?? false;
-
-        if (!gameId.HasValue || !playerId.HasValue)
-        {
-            return;
-        }
-
-        var cmd = new EndTurnCommand()
-        {
-            GameId = gameId.Value,
-            PlayerId = playerId.Value
-        };
+        var cmd = new EndTurnCommand();
 
         var resp = await _mediator.Send(cmd);
     }

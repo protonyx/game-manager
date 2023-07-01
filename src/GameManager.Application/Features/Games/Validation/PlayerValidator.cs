@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using GameManager.Application.Data;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Domain.Entities;
 
-namespace GameManager.Application.Validation;
+namespace GameManager.Application.Features.Games.Validation;
 
 public class PlayerValidator : AbstractValidator<Player>
 {
