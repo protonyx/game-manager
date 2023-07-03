@@ -1,7 +1,7 @@
 ﻿using GameManager.Domain.Entities;
 using MediatR;
 
-namespace GameManager.Application.Features.Games.Notifications;
+namespace GameManager.Application.Features.Games.Notifications.PlayerCreated;
 
 public class PlayerCreatedNotification : INotification
 {

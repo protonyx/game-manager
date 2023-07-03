@@ -33,6 +33,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
     public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
     {
         var gameId = _userContext.User?.GetGameId();
+        var utcNow = DateTime.UtcNow;
 
         if (!gameId.HasValue)
         {
@@ -74,8 +75,8 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
             var turn = new Turn()
             {
                 PlayerId = currentPlayer.Id,
-                StartTime = game.LastTurnStartTime ?? DateTime.Now,
-                EndTime = DateTime.Now
+                StartTime = game.LastTurnStartTime ?? utcNow,
+                EndTime = utcNow
             };
             turn.Duration = turn.EndTime - turn.StartTime;
 
@@ -84,7 +85,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
             game.CurrentTurnPlayerId = nextPlayer.Id;
         }
 
-        game.LastTurnStartTime = DateTime.Now;
+        game.LastTurnStartTime = utcNow;
         await _gameRepository.UpdateAsync(game);
 
         return CommandResponses.Success();

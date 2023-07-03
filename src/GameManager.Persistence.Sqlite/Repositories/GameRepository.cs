@@ -1,5 +1,6 @@
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications;
+using GameManager.Application.Features.Games.Notifications.GameUpdated;
 using GameManager.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     public override async Task<Game> CreateAsync(Game game)
     {
         game.Id = Guid.NewGuid();
-        game.CreatedDate = DateTime.Now;
+        game.CreatedDate = DateTime.UtcNow;
 
         return await base.CreateAsync(game);
     }

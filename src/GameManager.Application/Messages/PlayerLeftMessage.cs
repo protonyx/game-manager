@@ -1,4 +1,4 @@
-namespace GameManager.Server.Messages;
+namespace GameManager.Application.Messages;
 
 public class PlayerLeftMessage
 {

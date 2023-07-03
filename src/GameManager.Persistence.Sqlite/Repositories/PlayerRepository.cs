@@ -1,6 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications;
+using GameManager.Application.Features.Games.Notifications.GameUpdated;
+using GameManager.Application.Features.Games.Notifications.PlayerCreated;
+using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
+using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
 using GameManager.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -122,7 +126,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
                     Id = Guid.NewGuid(),
                     PlayerId = existing.Id,
                     TrackerId = tracker.TrackerId,
-                    ChangedTime = DateTime.Now,
+                    ChangedTime = DateTime.UtcNow,
                     NewValue = trackerUpdate.Value
                 });
                 

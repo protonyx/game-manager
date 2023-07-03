@@ -1,6 +1,6 @@
 ﻿using GameManager.Application.Features.Games.DTO;
 
-namespace GameManager.Server.Messages;
+namespace GameManager.Application.Messages;
 
 public class PlayerStateChangedMessage
 {

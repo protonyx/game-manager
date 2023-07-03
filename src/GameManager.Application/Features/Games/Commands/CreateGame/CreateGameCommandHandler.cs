@@ -32,7 +32,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, IComm
         var game = new Game()
         {
             Name = request.Name,
-            EntryCode = EntryCodeFactory.Create(EntryCodeLength),
+            EntryCode = EntryCodeGenerator.Create(EntryCodeLength),
             Options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions(),
             Trackers = request.Trackers.Select(_mapper.Map<Tracker>).ToList()
         };
@@ -40,7 +40,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, IComm
         while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode))
         {
             // Generate a new entry code until we find a unique code
-            game.EntryCode = EntryCodeFactory.Create(EntryCodeLength);
+            game.EntryCode = EntryCodeGenerator.Create(EntryCodeLength);
         }
         
         // Validate

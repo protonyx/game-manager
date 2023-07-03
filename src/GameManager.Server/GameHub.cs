@@ -1,6 +1,7 @@
 using GameManager.Application.Authorization;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
+using GameManager.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace GameManager.Server;
 
 [Authorize]
-public class GameHub : Hub<IGameHubClient>
+public class GameHub : Hub<IGameClientNotificationService>
 {
     private readonly IMediator _mediator;
 

@@ -14,7 +14,7 @@ public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand>
 
     public async Task Handle(PruneGamesCommand request, CancellationToken cancellationToken)
     {
-        var olderThan = DateTime.Now.Subtract(request.RetentionPeriod);
+        var olderThan = DateTime.UtcNow.Subtract(request.RetentionPeriod);
 
         var games = await _gameRepository.FindAsync(olderThan);
 
