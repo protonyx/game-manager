@@ -78,6 +78,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     )
   );
 
+  credentials: PlayerCredentials | undefined;
+
   game: Game | null | undefined;
 
   trackers: Tracker[] | null | undefined;
@@ -103,15 +105,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
         filter((credentials) => credentials != null)
       )
       .subscribe((credentials) => {
-        this.store.dispatch(
-          GameActions.loadGame({ gameId: credentials!.gameId })
-        );
-        this.store.dispatch(
-          GameActions.loadCurrentPlayer({ playerId: credentials!.playerId })
-        );
-        this.store.dispatch(
-          GameActions.loadPlayers({ gameId: credentials!.gameId })
-        );
+        this.credentials = credentials ? credentials : undefined;
+
+        this.onRefresh();
         this.connect(credentials!);
       });
 
@@ -138,6 +134,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         );
         snackBarRef.onAction().subscribe(() => {
           this.signalr.reconnect();
+          this.onRefresh();
         });
       });
   }
@@ -155,6 +152,20 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   onStartGame(): void {
     this.signalr.endTurn();
+  }
+
+  onRefresh(): void {
+    if (this.credentials) {
+      this.store.dispatch(
+        GameActions.loadGame({ gameId: this.credentials.gameId })
+      );
+      this.store.dispatch(
+        GameActions.loadCurrentPlayer({ playerId: this.credentials.playerId })
+      );
+      this.store.dispatch(
+        GameActions.loadPlayers({ gameId: this.credentials.gameId })
+      );
+    }
   }
 
   async onLeave(): Promise<void> {

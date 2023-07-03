@@ -14,8 +14,8 @@ export interface Game {
   name: string;
   entryCode: string;
   options: GameOptions;
-  currentTurnPlayerId: string;
-  lastTurnStartTime: string;
+  currentTurnPlayerId?: string;
+  lastTurnStartTime?: string;
   trackers: Tracker[];
 }
 
