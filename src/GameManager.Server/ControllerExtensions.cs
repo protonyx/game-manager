@@ -24,7 +24,9 @@ public static class ControllerExtensions
         }
         else if (commandResponse is AuthorizationErrorCommandResponse authorizationError)
         {
-            return controller.Forbid();
+            return controller.Problem(
+                detail: authorizationError.Reason,
+                statusCode: StatusCodes.Status403Forbidden);
         }
         else if (commandResponse is ValidationErrorCommandResponse {Result.IsValid: false} validationError)
         {

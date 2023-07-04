@@ -154,11 +154,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onEndTurn(): void {
-    this.signalr.endTurn();
+    this.store.dispatch(GameActions.endTurn({ gameId: this.game!.id }));
   }
 
   onStartGame(): void {
-    this.signalr.endTurn();
+    this.store.dispatch(GameActions.endTurn({ gameId: this.game!.id }));
   }
 
   onRefresh(): void {

@@ -1,5 +1,6 @@
 using GameManager.Application.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
+using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.Commands.ReorderPlayers;
 using GameManager.Application.Features.Games.DTO;
@@ -78,6 +79,20 @@ public class GamesController : ControllerBase
         await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpPost("{id}/Actions/EndTurn")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [Authorize]
+    public async Task<IActionResult> EndTurn(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new EndTurnCommand(id), cancellationToken);
+
+        return this.GetActionResult(response);
     }
 
     [HttpPost("Join")]

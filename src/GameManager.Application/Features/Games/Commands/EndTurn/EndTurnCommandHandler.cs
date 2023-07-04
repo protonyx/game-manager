@@ -37,15 +37,9 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
     public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
     {
-        var gameId = _userContext.User?.GetGameId();
         var utcNow = DateTime.UtcNow;
 
-        if (!gameId.HasValue)
-        {
-            return CommandResponses.AuthorizationError();
-        }
-        
-        var game = await _gameRepository.GetByIdAsync(gameId.Value);
+        var game = await _gameRepository.GetByIdAsync(request.GameId);
 
         if (game == null)
         {

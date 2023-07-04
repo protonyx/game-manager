@@ -234,6 +234,28 @@ export class GameEffects {
     { dispatch: false }
   );
 
+  $endTurn = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.endTurn),
+      exhaustMap((action: { gameId: string }) =>
+        this.gameService.endTurn(action.gameId).pipe(
+          map(() => GamesApiActions.endTurnSucceeded()),
+          catchError((error) => {
+            if (error.status == 400) {
+              return of(
+                GamesApiActions.endTurnError({
+                  error: error.error.title,
+                })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
   $authenticationError = createEffect(() =>
     this.actions$.pipe(
       ofType(GamesApiActions.authenticationError),

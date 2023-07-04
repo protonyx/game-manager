@@ -32,6 +32,7 @@ export const GameActions = createActionGroup({
     'Remove Player': props<{ playerId: string }>(),
     'Update Tracker': props<{ tracker: TrackerValue }>(),
     'Update Player Order': props<{ gameId: string; players: Player[] }>(),
+    'End Turn': props<{ gameId: string }>(),
   },
 });
 
@@ -64,6 +65,8 @@ export const GamesApiActions = createActionGroup({
     'Retrieved Players Error': props<{ error: string }>(),
     'Retrieved Current Player': props<{ player: Player }>(),
     'Retrieved Player Error': props<{ error: string }>(),
+    'End Turn Succeeded': emptyProps(),
+    'End Turn Error': props<{ error: string }>(),
     'Authentication Error': emptyProps(),
   },
 });

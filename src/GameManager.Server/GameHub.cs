@@ -12,10 +12,13 @@ namespace GameManager.Server;
 public class GameHub : Hub<IGameClientNotificationService>
 {
     private readonly IMediator _mediator;
+    
+    private readonly ILogger<GameHub> _logger;
 
-    public GameHub(IMediator mediator)
+    public GameHub(IMediator mediator, ILogger<GameHub> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     public override async Task OnConnectedAsync()
@@ -50,11 +53,11 @@ public class GameHub : Hub<IGameClientNotificationService>
             });
         }
     }
-    
-    public async Task EndTurn()
-    {
-        var cmd = new EndTurnCommand();
 
-        var resp = await _mediator.Send(cmd);
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        _logger.LogWarning(exception, "Player disconnected");
+        
+        return base.OnDisconnectedAsync(exception);
     }
 }

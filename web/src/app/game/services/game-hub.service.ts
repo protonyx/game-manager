@@ -103,14 +103,6 @@ export class GameHubService {
       await this.connection.invoke('Heartbeat');
   }
 
-  public async endTurn() {
-    if (
-      this.connection &&
-      this.connection.state == HubConnectionState.Connected
-    )
-      await this.connection.invoke('EndTurn');
-  }
-
   private setupHeartbeat(): void {
     this.heartbeat$ = timer(5000, 30000)
       .pipe(takeUntil(this.close$))

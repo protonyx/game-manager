@@ -87,6 +87,12 @@ export class GameService {
     return this.patchPlayer(playerId, ops);
   }
 
+  public endTurn(gameId: string): Observable<any> {
+    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/EndTurn`;
+
+    return this.http.post<any>(url, null);
+  }
+
   public reorderPlayers(gameId: string, players: Player[]): Observable<any> {
     const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Reorder`;
     const body = {
