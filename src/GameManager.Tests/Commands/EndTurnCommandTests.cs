@@ -32,7 +32,9 @@ public class EndTurnCommandTests
         gameRepo.Setup(t => t.GetByIdAsync(game.Id))
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurnPlayerId == player2.Id)))
-            .Returns(Task.CompletedTask);
+            .ReturnsUsingFixture(fixture.Build<Game>()
+                .With(g => g.Id, game.Id)
+                .With(g => g.CurrentTurnPlayerId, player2.Id));
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
@@ -78,7 +80,9 @@ public class EndTurnCommandTests
         gameRepo.Setup(t => t.GetByIdAsync(game.Id))
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurnPlayerId == player1.Id)))
-            .Returns(Task.CompletedTask);
+            .ReturnsUsingFixture(fixture.Build<Game>()
+                .With(g => g.Id, game.Id)
+                .With(g => g.CurrentTurnPlayerId, player1.Id));
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});

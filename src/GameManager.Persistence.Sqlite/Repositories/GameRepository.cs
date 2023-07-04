@@ -9,12 +9,9 @@ namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class GameRepository : BaseRepository<Game>, IGameRepository
 {
-    private readonly IMediator _mediator;
-
-    public GameRepository(GameContext context, IMediator mediator)
+    public GameRepository(GameContext context)
         : base(context)
     {
-        _mediator = mediator;
     }
     
     public async Task<ICollection<Game>> FindAsync(DateTime? olderThan = null)
@@ -53,13 +50,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
             .FirstOrDefaultAsync();
 
         return game;
-    }
-
-    public override async Task UpdateAsync(Game entity)
-    {
-        await base.UpdateAsync(entity);
-        
-        await _mediator.Publish(new GameUpdatedNotification(entity));
     }
 
     public async Task<Game?> GetGameByEntryCodeAsync(string entryCode)

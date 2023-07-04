@@ -3,6 +3,7 @@ using GameManager.Application.Commands;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games.Notifications.GameUpdated;
 using GameManager.Domain.Entities;
 using MediatR;
 
@@ -17,17 +18,21 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
     private readonly ITurnRepository _turnRepository;
 
     private readonly IUserContext _userContext;
+    
+    private readonly IMediator _mediator;
 
     public EndTurnCommandHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
         ITurnRepository turnRepository,
-        IUserContext userContext)
+        IUserContext userContext,
+        IMediator mediator)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
         _turnRepository = turnRepository;
         _userContext = userContext;
+        _mediator = mediator;
     }
 
     public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
@@ -86,7 +91,9 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
         }
 
         game.LastTurnStartTime = utcNow;
-        await _gameRepository.UpdateAsync(game);
+        var updatedGame = await _gameRepository.UpdateAsync(game);
+        
+        await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
         return CommandResponses.Success();
     }

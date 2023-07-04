@@ -5,10 +5,18 @@ namespace GameManager.Application.Features.Games.Notifications.PlayerDeleted;
 
 public class PlayerDeletedNotification : INotification
 {
-    public Player Player { get; }
+    public Guid GameId { get; }
+
+    public Guid PlayerId { get; }
 
     public PlayerDeletedNotification(Player player)
+    : this(player.GameId, player.Id)
     {
-        Player = player;
+    }
+
+    public PlayerDeletedNotification(Guid gameId, Guid playerId)
+    {
+        GameId = gameId;
+        PlayerId = playerId;
     }
 }

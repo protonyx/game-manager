@@ -9,22 +9,17 @@ public class PlayerDeletedNotificationHandler : INotificationHandler<PlayerDelet
 {
     private readonly IGameClientNotificationService _gameClientNotificationService;
 
-    private readonly IMapper _mapper;
-
-    public PlayerDeletedNotificationHandler(IGameClientNotificationService gameClientNotificationService, IMapper mapper)
+    public PlayerDeletedNotificationHandler(IGameClientNotificationService gameClientNotificationService)
     {
         _gameClientNotificationService = gameClientNotificationService;
-        _mapper = mapper;
     }
 
     public Task Handle(PlayerDeletedNotification notification, CancellationToken cancellationToken)
     {
-        var player = notification.Player;
-        
         var message = new PlayerLeftMessage()
         {
-            GameId = player.GameId,
-            PlayerId = player.Id
+            GameId = notification.GameId,
+            PlayerId = notification.PlayerId
         };
 
         return _gameClientNotificationService.PlayerLeft(message, cancellationToken);

@@ -1,6 +1,7 @@
 using GameManager.Application.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.JoinGame;
+using GameManager.Application.Features.Games.Commands.ReorderPlayers;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
@@ -64,6 +65,19 @@ public class GamesController : ControllerBase
         var response = await _mediator.Send(new GetPlayerListQuery(id));
         
         return Ok(response);
+    }
+
+    [HttpPost("{id}/Actions/Reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [Authorize]
+    public async Task<IActionResult> ReorderPlayers(
+        [FromRoute] Guid id,
+        [FromBody] PlayerIdListDTO playerIdList,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
+
+        return NoContent();
     }
 
     [HttpPost("Join")]

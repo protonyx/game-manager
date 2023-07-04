@@ -1,24 +1,14 @@
-using System.ComponentModel.DataAnnotations;
 using GameManager.Application.Contracts.Persistence;
-using GameManager.Application.Features.Games.Notifications;
-using GameManager.Application.Features.Games.Notifications.GameUpdated;
-using GameManager.Application.Features.Games.Notifications.PlayerCreated;
-using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
-using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
 using GameManager.Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Persistence.Sqlite.Repositories;
 
 public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 {
-    private readonly IMediator _mediator;
-
-    public PlayerRepository(GameContext context, IMediator mediator)
+    public PlayerRepository(GameContext context)
         : base(context)
     {
-        _mediator = mediator;
     }
 
     public override async Task<Player> CreateAsync(Player newPlayer)
@@ -61,19 +51,6 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         
         await _context.SaveChangesAsync();
 
-        await _mediator.Publish(new PlayerCreatedNotification(newPlayer));
-
-        // Update game state if no current turn
-        if (!game.CurrentTurnPlayerId.HasValue)
-        {
-            var startPlayer = existingPlayers.MinBy(t => t.Order);
-            game.CurrentTurnPlayerId ??= startPlayer?.Id;
-            
-            await _context.SaveChangesAsync();
-
-            await _mediator.Publish(new GameUpdatedNotification(game));
-        }
-
         return newPlayer;
     }
 
@@ -100,15 +77,16 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return players;
     }
 
-    public override async Task<Player?> UpdateAsync(Player updates)
+    public override async Task<Player> UpdateAsync(Player updates)
     {
         var existing = await _context.Set<Player>()
             .Include(t => t.TrackerValues)
             .FirstOrDefaultAsync(t => t.Id == updates.Id);
 
         if (existing == null)
-            return null;
+            throw new InvalidOperationException("Player not found");
 
+        // Update name
         if (!string.IsNullOrWhiteSpace(updates.Name))
         {
             existing.Name = updates.Name;
@@ -134,46 +112,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             }
         }
 
-        await base.UpdateAsync(existing);
-
-        await _mediator.Publish(new PlayerUpdatedNotification(existing));
-        
-        // Update player orders, if changed
-        if (existing.Order != updates.Order)
-        {
-            var players = await _context.Set<Player>()
-                .Where(t => t.GameId == existing.GameId && t.Active)
-                .OrderBy(t => t.Order)
-                .ToListAsync();
-
-            var fromIndex = players.FindIndex(p => p.Id == updates.Id);
-            var toIndex = updates.Order - 1;
-
-            var target = players[fromIndex];
-            var delta = toIndex < fromIndex ? -1 : 1;
-
-            for (int i = fromIndex; i != toIndex; i += delta)
-            {
-                players[i] = players[i + delta];
-            }
-
-            players[toIndex] = target;
-
-            // Reindex order starting at 1
-            for (int i = 0; i < players.Count; i++)
-            {
-                players[i].Order = i + 1;
-            }
-
-            await _context.SaveChangesAsync();
-
-            foreach (var player in players)
-            {
-                await _mediator.Publish(new PlayerUpdatedNotification(player));
-            }
-        }
-
-        return existing;
+        return await base.UpdateAsync(existing);
     }
     
     public async Task<bool> NameIsUniqueAsync(Guid gameId, string name, Guid? playerId = null)
@@ -207,6 +146,36 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         await _context.SaveChangesAsync();
     }
 
+    public Task UpdatePlayersAsync(IEnumerable<Player> players)
+    {
+        foreach (var player in players)
+        {
+            _context.Entry(player).State = EntityState.Modified;
+        }
+        
+        return _context.SaveChangesAsync();
+    }
+
+    public async Task<ICollection<Player>> ReorderPlayersAsync(Guid gameId, IList<Guid> playerIds)
+    {
+        var players = await _context.Set<Player>()
+            .Where(t => t.GameId == gameId && t.Active)
+            .OrderBy(t => t.Order)
+            .ToListAsync();
+
+        
+
+        // Reindex order starting at 1
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].Order = i + 1;
+        }
+
+        await _context.SaveChangesAsync();
+        
+        return players;
+    }
+
     public override async Task DeleteAsync(Player player)
     {
         player.Active = false;
@@ -228,7 +197,5 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         }
 
         await _context.SaveChangesAsync();
-
-        await this._mediator.Publish(new PlayerDeletedNotification(player));
     }
 }

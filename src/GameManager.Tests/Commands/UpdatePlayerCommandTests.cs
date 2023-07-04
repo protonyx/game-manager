@@ -13,23 +13,31 @@ public class UpdatePlayerCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
+        var player = fixture.Create<Player>();
         var playerRepository = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(fixture.Create<Player>());
-        playerRepository.Setup(x => x.UpdateAsync(It.IsAny<Player>()))
-            .Returns(Task.CompletedTask);
+        playerRepository.Setup(x => x.GetByIdAsync(player.Id))
+            .ReturnsAsync(player);
+        playerRepository.Setup(x => x.UpdateAsync(It.Is<Player>(p => p.Id == player.Id)))
+            .ReturnsAsync((Player p) => p);
         var playerValidator = new InlineValidator<Player>();
         fixture.Inject<IValidator<Player>>(playerValidator);
+        fixture.SetUser(user =>
+        {
+            user.AddGameId(player.GameId)
+                .AddPlayerId(player.Id);
+        });
 
-        var handler = fixture.Create<UpdatePlayerCommandHandler>();
+        var sut = fixture.Create<UpdatePlayerCommandHandler>();
         var command = new UpdatePlayerCommand()
         {
-            PlayerId = fixture.Create<Guid>(),
-            Player = fixture.Create<PlayerDTO>()
+            PlayerId = player.Id,
+            Player = fixture.Build<PlayerDTO>()
+                .With(p => p.Id, player.Id)
+                .Create()
         };
         
         // Act
-        var result = await handler.Handle(command, CancellationToken.None);
+        var result = await sut.Handle(command, CancellationToken.None);
         
         // Assert
         result.Should().BeOfType<EntityCommandResponse>();

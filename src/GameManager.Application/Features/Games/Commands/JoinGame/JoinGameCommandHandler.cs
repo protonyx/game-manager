@@ -5,6 +5,7 @@ using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.Notifications.PlayerCreated;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
 using MediatR;
@@ -21,16 +22,20 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
 
     private readonly IValidator<Player> _playerValidator;
 
+    private readonly IMediator _mediator;
+
     public JoinGameCommandHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
         ITokenService tokenService,
-        IValidator<Player> playerValidator)
+        IValidator<Player> playerValidator,
+        IMediator mediator)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
         _tokenService = tokenService;
         _playerValidator = playerValidator;
+        _mediator = mediator;
     }
 
     public async Task<ICommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
@@ -57,7 +62,10 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
         }
 
         newPlayer = await _playerRepository.CreateAsync(newPlayer);
+        
+        await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
 
+        // Generate player token
         var identityBuilder = new PlayerIdentityBuilder();
         identityBuilder.AddGameId(game.Id)
             .AddPlayerId(newPlayer.Id);
@@ -65,12 +73,13 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
         {
             identityBuilder.AddAdminRole();
         }
+        var token = _tokenService.GenerateToken(identityBuilder.Build());
 
         var dto = new PlayerCredentialsDTO
         {
             GameId = game.Id,
             PlayerId = newPlayer.Id,
-            Token = _tokenService.GenerateToken(identityBuilder.Build()),
+            Token = token,
             IsAdmin = newPlayer.IsAdmin
         };
 
