@@ -13,5 +13,5 @@ export const initialState: GameState = {
   credentials: null,
   currentPlayer: null,
   game: null,
-  players: []
+  players: [],
 };

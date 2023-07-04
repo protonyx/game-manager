@@ -50,9 +50,6 @@ export class PlayerListComponent implements OnChanges {
   public isAdmin: boolean | null = false;
 
   @Output()
-  public playerOrderUpdated: EventEmitter<Player> = new EventEmitter<Player>();
-
-  @Output()
   public editPlayer: EventEmitter<Player> = new EventEmitter<Player>();
 
   @Output()
@@ -78,7 +75,7 @@ export class PlayerListComponent implements OnChanges {
       this.columnsToDisplay = [];
 
       if (this.isAdmin) {
-        this.columnsToDisplay.push('position', 'actions');
+        this.columnsToDisplay.push('actions');
       }
 
       this.columnsToDisplay.push('order', 'name');
@@ -102,17 +99,6 @@ export class PlayerListComponent implements OnChanges {
 
   checkIsPlayerTurn(player: Player): boolean {
     return player.id === this.game?.currentTurnPlayerId;
-  }
-
-  dropTable(
-    event: CdkDragDrop<MatTableDataSource<Player, MatTableDataSourcePaginator>>
-  ): void {
-    console.log(event);
-    const player = this.players?.find((p) => p === event.item.data);
-    const newIndex = event.currentIndex;
-    const newPlayer = { ...player, order: newIndex + 1 };
-    // @ts-ignore
-    this.playerOrderUpdated.emit(newPlayer);
   }
 
   handleEditPlayer(player: Player): void {

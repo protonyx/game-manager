@@ -33,6 +33,8 @@ import { CurrentTurnComponent } from '../../components/current-turn/current-turn
 import { PlayerListComponent } from '../../components/player-list/player-list.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { GameControlComponent } from '../../components/game-control/game-control.component';
+import { MatButtonModule } from '@angular/material/button';
+import { PlayerReorderModalComponent } from '../../components/player-reorder-modal/player-reorder-modal.component';
 
 @Component({
   selector: 'app-game-page',
@@ -40,6 +42,7 @@ import { GameControlComponent } from '../../components/game-control/game-control
   styleUrls: ['./game-page.component.scss'],
   standalone: true,
   imports: [
+    MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
     MatSnackBarModule,
@@ -82,6 +85,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   game: Game | null | undefined;
 
+  players: Player[] | null | undefined;
+
   trackers: Tracker[] | null | undefined;
 
   constructor(
@@ -95,6 +100,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
   ) {
     this.trackers$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.trackers = data;
+    });
+    this.players$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.players = data;
     });
   }
 
@@ -168,20 +176,31 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
   }
 
+  onReorder(): void {
+    const dialogRef = this.dialog.open(PlayerReorderModalComponent, {
+      data: {
+        players: this.players,
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((data: Player[]) => {
+      if (data) {
+        this.store.dispatch(
+          GameActions.updatePlayerOrder({
+            gameId: this.game!.id,
+            players: data,
+          })
+        );
+      }
+    });
+  }
+
   async onLeave(): Promise<void> {
     await this.signalr.disconnect();
     this.store.dispatch(GameActions.leaveGame());
 
     await this.router.navigate(['./join']);
-  }
-
-  onPlayerOrderUpdated(player: Player): void {
-    this.store.dispatch(
-      GameActions.updatePlayerOrder({
-        playerId: player.id,
-        order: player.order,
-      })
-    );
   }
 
   onPlayerEdit(player: Player): void {

@@ -7,7 +7,7 @@ import {
   GamesApiActions,
   PlayersApiActions,
 } from './game.actions';
-import { catchError, EMPTY, exhaustMap, map, of, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, map, of, mergeMap, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
 import { Router } from '@angular/router';
@@ -214,25 +214,15 @@ export class GameEffects {
     )
   );
 
-  $updatePlayerOrder = createEffect(() =>
-    this.actions$.pipe(
-      ofType(GameActions.updatePlayerOrder),
-      exhaustMap((action) =>
-        this.gameService.setPlayerOrder(action.playerId, action.order).pipe(
-          map((player) => PlayersApiActions.playerUpdated({ player })),
-          catchError((error) => {
-            if (error.status == 400) {
-              return of(
-                PlayersApiActions.playerUpdatedError({
-                  error: error.error.title,
-                })
-              );
-            }
-            return EMPTY;
-          })
+  $updatePlayerOrder = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(GameActions.updatePlayerOrder),
+        exhaustMap((action) =>
+          this.gameService.reorderPlayers(action.gameId, action.players)
         )
-      )
-    )
+      ),
+    { dispatch: false }
   );
 
   $authenticationError = createEffect(() =>

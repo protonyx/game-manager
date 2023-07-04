@@ -15,10 +15,20 @@ export class GameControlComponent {
   @Input()
   public game: Game | null = null;
 
+  @Input()
+  public isAdmin: boolean | null = false;
+
   @Output()
   public startGame: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output()
+  public advanceTurn: EventEmitter<void> = new EventEmitter<void>();
+
   onStartGame(): void {
     this.startGame.emit();
+  }
+
+  onAdvanceTurn(): void {
+    this.advanceTurn.emit();
   }
 }

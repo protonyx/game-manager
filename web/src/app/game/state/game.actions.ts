@@ -31,7 +31,7 @@ export const GameActions = createActionGroup({
     'Load Players': props<{ gameId: string }>(),
     'Remove Player': props<{ playerId: string }>(),
     'Update Tracker': props<{ tracker: TrackerValue }>(),
-    'Update Player Order': props<{ playerId: string; order: number }>(),
+    'Update Player Order': props<{ gameId: string; players: Player[] }>(),
   },
 });
 

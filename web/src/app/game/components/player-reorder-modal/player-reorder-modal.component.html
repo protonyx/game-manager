@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>Reorder Players</h2>
+<mat-dialog-content>
+  <table
+    mat-table
+    #table
+    [dataSource]="players"
+    cdkDropList
+    [cdkDropListData]="players"
+    (cdkDropListDropped)="dropTable($event)"
+    [cdkDropListDisabled]="dragDisabled">
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <mat-icon
+          class="dragCursor"
+          (mousedown)="dragDisabled = false"
+          cdkDragHandle
+          >reorder
+        </mat-icon>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="order">
+      <th mat-header-cell *matHeaderCellDef>Order</th>
+      <td mat-cell *matCellDef="let element">
+        <ng-container>
+          {{ element.order }}
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.name }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: columnsToDisplay"
+      cdkDrag
+      [cdkDragData]="row"></tr>
+  </table>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close="">Cancel</button>
+  <button mat-button [mat-dialog-close]="players">Save</button>
+</mat-dialog-actions>

@@ -1,52 +1,60 @@
 <mat-accordion multi="true">
-    <mat-expansion-panel *ngIf="isAdmin$ | async" [expanded]="false">
-        <mat-expansion-panel-header>
-            <mat-panel-title> Game Control</mat-panel-title>
-        </mat-expansion-panel-header>
+  <mat-expansion-panel *ngIf="isAdmin$ | async" [expanded]="false">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Game Control</mat-panel-title>
+    </mat-expansion-panel-header>
 
-        <app-game-control
-                [game]="game$ | async"
-                (startGame)="onStartGame()"></app-game-control>
-    </mat-expansion-panel>
+    <app-game-control
+      [game]="game$ | async"
+      [isAdmin]="isAdmin$ | async"
+      (startGame)="onStartGame()"
+    (advanceTurn)="onEndTurn()"></app-game-control>
+  </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>
-            <mat-panel-title> Player List</mat-panel-title>
-        </mat-expansion-panel-header>
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Player List</mat-panel-title>
+    </mat-expansion-panel-header>
 
-        <app-player-list
-                [game]="game$ | async"
-                [players]="players$ | async"
-                [currentPlayer]="currentPlayer$ | async"
-                [isAdmin]="isAdmin$ | async"
-                (playerOrderUpdated)="onPlayerOrderUpdated($event)"
-                (editPlayer)="onPlayerEdit($event)"
-                (kickPlayer)="onPlayerKick($event)"></app-player-list>
-    </mat-expansion-panel>
+    <app-player-list
+      [game]="game$ | async"
+      [players]="players$ | async"
+      [currentPlayer]="currentPlayer$ | async"
+      [isAdmin]="isAdmin$ | async"
+      (editPlayer)="onPlayerEdit($event)"
+      (kickPlayer)="onPlayerKick($event)"></app-player-list>
 
-    <mat-expansion-panel *ngIf="game && game.currentTurnPlayerId" [expanded]="true" [class.is-active]="isMyTurn$ | async">
-        <mat-expansion-panel-header>
-            <mat-panel-title> Current Turn</mat-panel-title>
-        </mat-expansion-panel-header>
-        <app-current-turn
-                [game]="game$ | async"
-                [players]="players$ | async"
-                [currentPlayer]="currentPlayer$ | async"
-                [isAdmin]="isAdmin$ | async"
-                (endTurn)="onEndTurn()">
-        </app-current-turn>
-    </mat-expansion-panel>
+    <mat-action-row *ngIf="isAdmin$ | async">
+      <button mat-button color="primary" (click)="onReorder()">Reorder</button>
+    </mat-action-row>
+  </mat-expansion-panel>
 
-    <mat-expansion-panel
-            [expanded]="true"
-            *ngIf="trackers && trackers.length > 0">
-        <mat-expansion-panel-header>
-            <mat-panel-title> Trackers</mat-panel-title>
-        </mat-expansion-panel-header>
-        <app-tracker-editor
-                [trackers]="trackers$ | async"
-                [player]="currentPlayer$ | async"
-                (updateTrackers)="onTrackerUpdate($event)">
-        </app-tracker-editor>
-    </mat-expansion-panel>
+  <mat-expansion-panel
+    *ngIf="game && game.currentTurnPlayerId"
+    [expanded]="true"
+    [class.is-active]="isMyTurn$ | async">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Current Turn</mat-panel-title>
+    </mat-expansion-panel-header>
+    <app-current-turn
+      [game]="game$ | async"
+      [players]="players$ | async"
+      [currentPlayer]="currentPlayer$ | async"
+      [isAdmin]="isAdmin$ | async"
+      (endTurn)="onEndTurn()">
+    </app-current-turn>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel
+    [expanded]="true"
+    *ngIf="trackers && trackers.length > 0">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Trackers</mat-panel-title>
+    </mat-expansion-panel-header>
+    <app-tracker-editor
+      [trackers]="trackers$ | async"
+      [player]="currentPlayer$ | async"
+      (updateTrackers)="onTrackerUpdate($event)">
+    </app-tracker-editor>
+  </mat-expansion-panel>
 </mat-accordion>

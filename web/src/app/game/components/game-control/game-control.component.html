@@ -1,10 +1,18 @@
 <mat-action-row>
+  <button
+    mat-raised-button
+    type="button"
+    color="accent"
+    (click)="onStartGame()"
+    *ngIf="!game?.currentTurnPlayerId">
+    Start Game
+  </button>
     <button
-            mat-raised-button
-            type="button"
-            color="accent"
-            (click)="onStartGame()"
-            *ngIf="!game?.lastTurnStartTime">
-        Start Game
-    </button>
+    mat-raised-button
+    type="button"
+    color="warn"
+    (click)="onAdvanceTurn()"
+    *ngIf="isAdmin && game?.currentTurnPlayerId">
+    Force End Turn
+  </button>
 </mat-action-row>
