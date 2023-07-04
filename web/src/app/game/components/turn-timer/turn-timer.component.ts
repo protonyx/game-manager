@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { interval, Subject, takeUntil, Timestamp } from 'rxjs';
-import { NgIf, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-turn-timer',
@@ -15,7 +15,7 @@ import { NgIf, DecimalPipe } from '@angular/common';
   styleUrls: ['./turn-timer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NgIf, DecimalPipe],
+  imports: [CommonModule],
 })
 export class TurnTimerComponent implements OnInit, OnDestroy {
   @Input()

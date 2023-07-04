@@ -1,19 +1,10 @@
-import {
-  Component,
-  Inject,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import {
-  CdkDrag,
   CdkDragDrop,
-  CdkDragHandle,
-  CdkDropList,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { MatTable, MatTableModule } from '@angular/material/table';
@@ -29,9 +20,7 @@ import { Player } from '../../models/models';
     MatButtonModule,
     MatTableModule,
     MatIconModule,
-    CdkDrag,
-    CdkDragHandle,
-    CdkDropList,
+    DragDropModule,
   ],
   templateUrl: './player-reorder-modal.component.html',
   styleUrls: ['./player-reorder-modal.component.scss'],

@@ -7,18 +7,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Game, Player, Tracker } from '../../models/models';
-import {
-  MatTableDataSource,
-  MatTableDataSourcePaginator,
-  MatTableModule,
-} from '@angular/material/table';
-import {
-  CdkDragDrop,
-  CdkDropList,
-  CdkDragHandle,
-  CdkDrag,
-} from '@angular/cdk/drag-drop';
-import { NgIf, NgFor } from '@angular/common';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -26,15 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './player-list.component.html',
   styleUrls: ['./player-list.component.scss'],
   standalone: true,
-  imports: [
-    MatTableModule,
-    CdkDropList,
-    MatIconModule,
-    CdkDragHandle,
-    NgIf,
-    NgFor,
-    CdkDrag,
-  ],
+  imports: [CommonModule, MatTableModule, MatIconModule],
 })
 export class PlayerListComponent implements OnChanges {
   @Input()
@@ -51,9 +33,6 @@ export class PlayerListComponent implements OnChanges {
 
   @Output()
   public editPlayer: EventEmitter<Player> = new EventEmitter<Player>();
-
-  @Output()
-  public kickPlayer: EventEmitter<Player> = new EventEmitter<Player>();
 
   dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
@@ -103,9 +82,5 @@ export class PlayerListComponent implements OnChanges {
 
   handleEditPlayer(player: Player): void {
     this.editPlayer.emit(player);
-  }
-
-  handleRemovePlayer(player: Player): void {
-    this.kickPlayer.emit(player);
   }
 }

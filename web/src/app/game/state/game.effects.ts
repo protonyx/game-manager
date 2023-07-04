@@ -7,7 +7,16 @@ import {
   GamesApiActions,
   PlayersApiActions,
 } from './game.actions';
-import { catchError, EMPTY, exhaustMap, map, of, mergeMap, tap } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  exhaustMap,
+  map,
+  of,
+  mergeMap,
+  tap,
+  filter,
+} from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
 import { Router } from '@angular/router';
@@ -231,14 +240,28 @@ export class GameEffects {
       tap(() => {
         this.router.navigate(['game', 'join']);
       }),
-      map(() => GameActions.clearCredentials())
+      exhaustMap((action) => of(GameActions.clearCredentials()))
+    )
+  );
+
+  $playerKicked = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameHubActions.playerLeft),
+      concatLatestFrom((action) =>
+        this.store.select(fromGames.selectCurrentPlayer)
+      ),
+      filter(([action, player]) => !!player && player.id === action.playerId),
+      mergeMap(([action, player]) => of(GameActions.clearCredentials()))
     )
   );
 
   $clearCredentials = createEffect(() =>
     this.actions$.pipe(
       ofType(GameActions.clearCredentials),
-      map(() => LayoutActions.resetLayout())
+      tap(() => {
+        this.router.navigate(['game', 'join']);
+      }),
+      exhaustMap(() => of(LayoutActions.resetLayout()))
     )
   );
 

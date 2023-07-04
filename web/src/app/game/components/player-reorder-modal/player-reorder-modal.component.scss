@@ -1,4 +1,5 @@
-@import '@angular/material/theming';
+@use '@angular/material' as mat;
+@import '../../../variables.scss';
 
 .dragCursor {
   margin-right: 16px;
@@ -10,11 +11,12 @@
   border-radius: 4px;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
     0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  background: mat-color($mat-light-theme-background, background);
+  background: mat.get-color-from-palette(mat.$gray-palette, 50);
+
 }
 
 .cdk-drag-placeholder {
-  background: map_get($mat-grey, 300);
+  background: mat.get-color-from-palette(mat.$gray-palette, 300);
 }
 
 .cdk-drag-animating {

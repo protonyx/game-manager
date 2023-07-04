@@ -1,6 +1,11 @@
-@import '@angular/material/theming';
+@use '@angular/material' as mat;
 @import '../../../variables.scss';
 
-.is-active {
-  background: mat-color($primaryPalette) !important;
+mat-expansion-panel.is-active {
+  border-left: 5px solid mat.get-color-from-palette($primary-palette);
+  background: mat.get-color-from-palette($primary-palette, 'lighter') !important;
+
+  .mat-expansion-panel-header {
+    //border-left: 5px solid mat-color($primary-palette);
+  }
 }

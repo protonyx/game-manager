@@ -28,7 +28,7 @@ import {
 } from '../../models/models';
 import { PlayerEditComponent } from '../../components/player-edit/player-edit.component';
 import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
-import { NgIf, AsyncPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { CurrentTurnComponent } from '../../components/current-turn/current-turn.component';
 import { PlayerListComponent } from '../../components/player-list/player-list.component';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -42,6 +42,7 @@ import { PlayerReorderModalComponent } from '../../components/player-reorder-mod
   styleUrls: ['./game-page.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
@@ -49,9 +50,7 @@ import { PlayerReorderModalComponent } from '../../components/player-reorder-mod
     GameControlComponent,
     PlayerListComponent,
     CurrentTurnComponent,
-    NgIf,
     TrackerEditorComponent,
-    AsyncPipe,
   ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
@@ -208,11 +207,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
       data: {
         player: player,
         trackers: this.trackers,
+        isAdmin: this.credentials?.isAdmin,
       },
+      width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((data) => {
-      if (data) {
+      if (data === 'kick') {
+        this.store.dispatch(GameActions.removePlayer({ playerId: player.id }));
+      } else if (data) {
         const ops = [{ op: 'replace', path: '/name', value: data.name }];
         if (this.trackers && this.trackers.length > 0) {
           this.trackers.forEach((t) => {
@@ -230,10 +233,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   onTrackerUpdate(trackerValue: TrackerValue): void {
     this.store.dispatch(GameActions.updateTracker({ tracker: trackerValue }));
-  }
-
-  onPlayerKick(player: Player): void {
-    this.store.dispatch(GameActions.removePlayer({ playerId: player.id }));
   }
 
   private connect(credentials: PlayerCredentials) {

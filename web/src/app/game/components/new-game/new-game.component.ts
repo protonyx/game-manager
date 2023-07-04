@@ -8,10 +8,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { NewGame } from '../../models/models';
-import { NewGamePageComponent } from '../../pages/new-game-page/new-game-page.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,12 +21,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   styleUrls: ['./new-game.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
-    NgFor,
     MatButtonModule,
     MatIconModule,
   ],

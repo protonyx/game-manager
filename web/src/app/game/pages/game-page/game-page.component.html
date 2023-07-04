@@ -21,8 +21,7 @@
       [players]="players$ | async"
       [currentPlayer]="currentPlayer$ | async"
       [isAdmin]="isAdmin$ | async"
-      (editPlayer)="onPlayerEdit($event)"
-      (kickPlayer)="onPlayerKick($event)"></app-player-list>
+      (editPlayer)="onPlayerEdit($event)"></app-player-list>
 
     <mat-action-row *ngIf="isAdmin$ | async">
       <button mat-button color="primary" (click)="onReorder()">Reorder</button>

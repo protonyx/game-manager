@@ -21,6 +21,7 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close="">Cancel</button>
-  <button mat-button [mat-dialog-close]="playerForm.value">Update</button>
+  <button mat-stroked-button mat-dialog-close="">Cancel</button>
+  <button mat-stroked-button color="warn" *ngIf="isAdmin" mat-dialog-close="kick">Kick</button>
+  <button mat-stroked-button color="primary" [mat-dialog-close]="playerForm.value">Update</button>
 </mat-dialog-actions>

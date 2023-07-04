@@ -8,9 +8,7 @@ import {
 } from '@angular/core';
 import { Player, Tracker, TrackerValue } from '../../models/models';
 import {
-  FormArray,
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -18,7 +16,7 @@ import {
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tracker-editor',
@@ -26,9 +24,9 @@ import { NgFor } from '@angular/common';
   styleUrls: ['./tracker-editor.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgFor,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,

@@ -14,7 +14,7 @@ import {
   MatDialogModule,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { NgIf, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
@@ -24,13 +24,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   styleUrls: ['./player-edit.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    NgIf,
-    NgFor,
     MatButtonModule,
   ],
 })
@@ -38,6 +37,8 @@ export class PlayerEditComponent {
   public player: Player | null | undefined;
 
   public trackers: Tracker[] | null | undefined;
+
+  public isAdmin: boolean | undefined = false;
 
   playerForm = this.fb.group({
     name: ['', Validators.required],
@@ -51,6 +52,7 @@ export class PlayerEditComponent {
   ) {
     this.player = data.player;
     this.trackers = data.trackers;
+    this.isAdmin = data.isAdmin;
 
     this.updateTrackers(this.trackers);
     this.playerForm.reset({

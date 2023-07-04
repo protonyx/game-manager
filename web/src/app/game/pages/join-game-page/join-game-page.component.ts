@@ -6,7 +6,7 @@ import { GameActions, GamesApiActions } from '../../state/game.actions';
 import { Router } from '@angular/router';
 import { map, Subject, takeUntil, BehaviorSubject, tap } from 'rxjs';
 import { JoinGameComponent } from '../../components/join-game/join-game.component';
-import { AsyncPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
@@ -14,7 +14,7 @@ import { Actions, ofType } from '@ngrx/effects';
   templateUrl: './join-game-page.component.html',
   styleUrls: ['./join-game-page.component.scss'],
   standalone: true,
-  imports: [JoinGameComponent, AsyncPipe],
+  imports: [CommonModule, JoinGameComponent],
 })
 export class JoinGamePageComponent implements OnDestroy {
   loading: boolean = false;
