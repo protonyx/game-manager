@@ -29,7 +29,7 @@
   </mat-expansion-panel>
 
   <mat-expansion-panel
-    *ngIf="game && game.currentTurnPlayerId"
+    *ngIf="game && game.currentTurnPlayerId && currentPlayer"
     [expanded]="true"
     [class.is-active]="isMyTurn$ | async">
     <mat-expansion-panel-header>

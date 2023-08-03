@@ -92,6 +92,8 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             existing.Name = updates.Name;
         }
 
+        existing.IsAdmin = updates.IsAdmin;
+
         // Update trackers
         foreach (var tracker in existing.TrackerValues)
         {

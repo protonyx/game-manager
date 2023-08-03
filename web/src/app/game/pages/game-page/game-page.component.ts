@@ -9,7 +9,7 @@ import {
   selectCredentials,
   selectCurrentPlayer,
   selectGame,
-  selectPlayers,
+  selectAllPlayers,
 } from '../../state/game.reducer';
 import {
   GameActions,
@@ -62,7 +62,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   trackers$ = this.game$.pipe(map((g) => g?.trackers));
 
-  players$ = this.store.select(selectPlayers);
+  players$ = this.store.select(selectAllPlayers);
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
@@ -86,6 +86,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   players: Player[] | null | undefined;
 
+  currentPlayer: Player | null | undefined;
+
   trackers: Tracker[] | null | undefined;
 
   constructor(
@@ -102,6 +104,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
     });
     this.players$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.players = data;
+    });
+    this.currentPlayer$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.currentPlayer = data;
     });
   }
 
@@ -135,7 +140,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((connected) => {
-        let snackBarRef = this.snackBar.open(
+        const snackBarRef = this.snackBar.open(
           'Server Disconnected',
           'Reconnect'
         );
@@ -165,9 +170,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
     if (this.credentials) {
       this.store.dispatch(
         GameActions.loadGame({ gameId: this.credentials.gameId })
-      );
-      this.store.dispatch(
-        GameActions.loadCurrentPlayer({ playerId: this.credentials.playerId })
       );
       this.store.dispatch(
         GameActions.loadPlayers({ gameId: this.credentials.gameId })
@@ -232,7 +234,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onTrackerUpdate(trackerValue: TrackerValue): void {
-    this.store.dispatch(GameActions.updateTracker({ tracker: trackerValue }));
+    if (this.currentPlayer) {
+      this.store.dispatch(
+        GameActions.updateTracker({
+          playerId: this.currentPlayer.id,
+          tracker: trackerValue,
+        })
+      );
+    }
   }
 
   private connect(credentials: PlayerCredentials) {

@@ -43,8 +43,6 @@ export class TrackerEditorComponent implements OnChanges {
   public updateTrackers: EventEmitter<TrackerValue> =
     new EventEmitter<TrackerValue>();
 
-  trackerValues: TrackerValue[] = [];
-
   trackerForm: FormGroup = this.fb.group({});
 
   constructor(private fb: FormBuilder) {}
@@ -53,7 +51,6 @@ export class TrackerEditorComponent implements OnChanges {
     const control = this.trackerForm.controls[trackerId];
 
     let val = control.value;
-    //let val = this.player?.trackerValues[trackerId];
     val += delta;
     control.setValue(val);
 

@@ -135,16 +135,16 @@ export class GameEffects {
     )
   );
 
-  $loadCurrentPlayer = createEffect(() =>
+  $loadPlayers = createEffect(() =>
     this.actions$.pipe(
-      ofType(GameActions.loadCurrentPlayer),
+      ofType(GameActions.loadPlayers),
       exhaustMap((action) =>
-        this.gameService.getPlayer(action.playerId).pipe(
-          map((player) => GamesApiActions.retrievedCurrentPlayer({ player })),
+        this.gameService.getPlayers(action.gameId).pipe(
+          map((players) => GamesApiActions.retrievedPlayers({ players })),
           catchError((error) => {
             if (error.status == 400) {
               return of(
-                GamesApiActions.retrievedPlayerError({
+                GamesApiActions.retrievedPlayersError({
                   error: error.error.title,
                 })
               );
@@ -157,16 +157,16 @@ export class GameEffects {
     )
   );
 
-  $loadPlayers = createEffect(() =>
+  $loadPlayer = createEffect(() =>
     this.actions$.pipe(
-      ofType(GameActions.loadPlayers),
+      ofType(GameActions.loadPlayer),
       exhaustMap((action) =>
-        this.gameService.getPlayers(action.gameId).pipe(
-          map((players) => GamesApiActions.retrievedPlayers({ players })),
+        this.gameService.getPlayer(action.playerId).pipe(
+          map((player) => GamesApiActions.retrievedPlayer({ player })),
           catchError((error) => {
             if (error.status == 400) {
               return of(
-                GamesApiActions.retrievedPlayersError({
+                GamesApiActions.retrievedPlayerError({
                   error: error.error.title,
                 })
               );

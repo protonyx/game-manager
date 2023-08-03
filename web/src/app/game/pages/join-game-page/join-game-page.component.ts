@@ -17,7 +17,7 @@ import { Actions, ofType } from '@ngrx/effects';
   imports: [CommonModule, JoinGameComponent],
 })
 export class JoinGamePageComponent implements OnDestroy {
-  loading: boolean = false;
+  loading = false;
 
   error$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 

@@ -15,6 +15,7 @@ import {
   PlayerStateChangedMessage,
 } from '../models/messages';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { PlayerCredentials } from '../models/models';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +30,10 @@ export class GameHubService {
   constructor(private store: Store) {}
 
   public async connect(gameId: string, accessToken: string) {
+    if (this.connection) {
+      await this.disconnect();
+    }
+
     const connection = new HubConnectionBuilder()
       .configureLogging(LogLevel.Information)
       .withAutomaticReconnect()
@@ -48,6 +53,11 @@ export class GameHubService {
     });
     connection.on('PlayerLeft', (data: PlayerLeftMessage) => {
       this.store.dispatch(GameHubActions.playerLeft(data));
+    });
+    connection.on('UpdateCredentials', (data: PlayerCredentials) => {
+      this.store.dispatch(
+        GameHubActions.credentialsUpdated({ credentials: data })
+      );
     });
     connection.onclose(async () => {
       console.log('SignalR disconnected');

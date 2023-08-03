@@ -1,3 +1,4 @@
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Messages;
 
 namespace GameManager.Application.Services;
@@ -14,4 +15,6 @@ public interface IGameClientNotificationService
     Task PlayerStateChanged(PlayerStateChangedMessage message, CancellationToken cancellationToken);
 
     Task PlayerLeft(PlayerLeftMessage message, CancellationToken cancellationToken);
+    
+    Task UpdateCredentials(PlayerCredentialsDTO message, CancellationToken cancellationToken);
 }

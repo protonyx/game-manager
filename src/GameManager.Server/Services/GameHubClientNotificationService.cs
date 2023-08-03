@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Messages;
 using GameManager.Application.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -42,6 +43,14 @@ public class GameHubClientNotificationService : IGameClientNotificationService
     {
         return _hubContext.Clients.Group(message.GameId.ToString())
             .SendAsync(nameof(IGameClientNotificationService.PlayerLeft),
+                message,
+                cancellationToken: cancellationToken);
+    }
+
+    public Task UpdateCredentials(PlayerCredentialsDTO message, CancellationToken cancellationToken)
+    {
+        return _hubContext.Clients.Group(message.PlayerId.ToString())
+            .SendAsync(nameof(IGameClientNotificationService.UpdateCredentials),
                 message,
                 cancellationToken: cancellationToken);
     }

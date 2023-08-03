@@ -1,4 +1,4 @@
-import { createFeature, createReducer, on } from '@ngrx/store';
+import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 
 import {
   GameActions,
@@ -6,8 +6,7 @@ import {
   GamesApiActions,
   PlayersApiActions,
 } from './game.actions';
-import { GameState, initialState } from './game.state';
-import { Player } from '../models/models';
+import { GameState, initialState, playerAdapter } from './game.state';
 
 export const gameFeatureKey = 'game';
 
@@ -25,26 +24,28 @@ export const gameFeature = createFeature({
       return { ...state, game: game };
     }),
     on(GameHubActions.playerJoined, (state, message) => {
-      let newPlayers = [...state.players, message.player].sort(
-        (a, b) => a.order - b.order
-      );
-      return { ...state, players: newPlayers };
+      return {
+        ...state,
+        players: playerAdapter.addOne(message.player, state.players),
+      };
     }),
     on(GameHubActions.playerUpdated, (state, message) => {
-      let filteredPlayers = state.players.filter(
-        (item) => item.id !== message.player.id
-      );
-      let newPlayers = [...filteredPlayers, message.player].sort(
-        (a, b) => a.order - b.order
-      );
-      return { ...state, players: newPlayers };
+      return {
+        ...state,
+        players: playerAdapter.setOne(message.player, state.players),
+      };
     }),
     on(GameHubActions.playerLeft, (state, message) => {
-      let newPlayers = state.players.filter(
-        (item) => item.id !== message.playerId
-      );
-      newPlayers.sort((a, b) => a.order - b.order);
-      return { ...state, players: newPlayers };
+      return {
+        ...state,
+        players: playerAdapter.removeOne(message.playerId, state.players),
+      };
+    }),
+    on(GameHubActions.credentialsUpdated, (state, { credentials }) => {
+      return {
+        ...state,
+        credentials: credentials,
+      };
     }),
     on(GamesApiActions.joinedGame, (state, { credentials }) => {
       return { ...state, credentials: credentials };
@@ -53,11 +54,10 @@ export const gameFeature = createFeature({
       return { ...state, game: game };
     }),
     on(GamesApiActions.retrievedPlayers, (state, { players }) => {
-      let newPlayers = [...players].sort((a, b) => a.order - b.order);
-      return { ...state, players: newPlayers };
-    }),
-    on(GamesApiActions.retrievedCurrentPlayer, (state, { player }) => {
-      return { ...state, currentPlayer: player };
+      return {
+        ...state,
+        players: playerAdapter.setAll(players, state.players),
+      };
     }),
     on(GameActions.clearCredentials, (state) => {
       // Game or Player is no longer valid, reset game state
@@ -66,22 +66,26 @@ export const gameFeature = createFeature({
         currentPlayer: null,
         credentials: null,
         game: null,
-        players: [],
+        players: playerAdapter.removeAll(state.players),
       };
     }),
-    on(GameActions.updateTracker, (state, { tracker }) => {
-      const player = {
-        ...state.currentPlayer,
-        trackerValues: {
-          ...state.currentPlayer?.trackerValues,
-          [tracker.trackerId]: tracker.value,
-        },
-      } as Player;
-      return { ...state, currentPlayer: player };
+    on(GameActions.updateTracker, (state, { playerId, tracker }) => {
+      return {
+        ...state,
+        players: playerAdapter.updateOne(
+          {
+            id: playerId,
+            changes: { trackerValues: { [tracker.trackerId]: tracker.value } },
+          },
+          state.players
+        ),
+      };
     }),
     on(PlayersApiActions.playerRemoved, (state, { playerId }) => {
-      let newPlayers = state.players.filter((item) => item.id !== playerId);
-      return { ...state, players: newPlayers };
+      return {
+        ...state,
+        players: playerAdapter.removeOne(playerId, state.players),
+      };
     })
   ),
 });
@@ -92,7 +96,31 @@ export const {
   selectGameState, // feature selector
   selectHubConnected,
   selectCredentials,
-  selectCurrentPlayer,
   selectGame,
   selectPlayers,
 } = gameFeature;
+
+const { selectIds, selectEntities, selectAll, selectTotal } =
+  playerAdapter.getSelectors();
+
+export const selectPlayerIds = createSelector(selectPlayers, selectIds);
+
+export const selectPlayersEntities = createSelector(
+  selectPlayers,
+  selectEntities
+);
+
+export const selectAllPlayers = createSelector(selectPlayers, selectAll);
+
+export const selectTotalPlayers = createSelector(selectPlayers, selectTotal);
+
+export const selectCurrentPlayerId = createSelector(
+  selectCredentials,
+  (credentials) => credentials?.playerId
+);
+
+export const selectCurrentPlayer = createSelector(
+  selectCurrentPlayerId,
+  selectPlayersEntities,
+  (playerId, entities) => (playerId ? entities[playerId] : null)!
+);
