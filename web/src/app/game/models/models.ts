@@ -14,9 +14,13 @@ export interface Game {
   name: string;
   entryCode: string;
   options: GameOptions;
+  state: string;
   currentTurnPlayerId?: string;
   lastTurnStartTime?: string;
   trackers: Tracker[];
+  createdDate: string;
+  startedDate?: string;
+  completedDate?: string;
 }
 
 export interface GameOptions {

@@ -102,7 +102,19 @@ export class GameService {
     return this.http.post<any>(url, body);
   }
 
-  public removePlayer(playerId: string): Observable<Object> {
+  public startGame(gameId: string): Observable<any> {
+    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Start`;
+
+    return this.http.post(url, null);
+  }
+
+  public endGame(gameId: string): Observable<any> {
+    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Complete`;
+
+    return this.http.post(url, null);
+  }
+
+  public removePlayer(playerId: string): Observable<any> {
     const url = `${environment.baseUrl}/api/Players/${playerId}`;
 
     return this.http.delete(url);

@@ -1,10 +1,13 @@
 using GameManager.Application.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
+using GameManager.Application.Features.Games.Commands.EndGame;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.Commands.ReorderPlayers;
+using GameManager.Application.Features.Games.Commands.StartGame;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
+using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -94,6 +97,34 @@ public class GamesController : ControllerBase
 
         return this.GetActionResult(response);
     }
+    
+    [HttpPost("{id}/Actions/Start")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [Authorize]
+    public async Task<IActionResult> StartGame(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new StartGameCommand(id), cancellationToken);
+
+        return this.GetActionResult(response);
+    }
+    
+    [HttpPost("{id}/Actions/Complete")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [Authorize]
+    public async Task<IActionResult> EndGame(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new EndGameCommand(id), cancellationToken);
+
+        return this.GetActionResult(response);
+    }
 
     [HttpPost("Join")]
     [ProducesResponseType(typeof(PlayerCredentialsDTO), StatusCodes.Status200OK)]
@@ -104,6 +135,18 @@ public class GamesController : ControllerBase
     {
         var response = await _mediator.Send(player, cancellationToken);
 
+        return this.GetActionResult(response);
+    }
+
+    [HttpGet("{id}/Summary")]
+    public async Task<IActionResult> GetGameSummary(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetGameSummaryQuery(id);
+        
+        var response = await _mediator.Send(query, cancellationToken);
+        
         return this.GetActionResult(response);
     }
 

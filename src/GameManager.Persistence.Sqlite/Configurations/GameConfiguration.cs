@@ -18,8 +18,16 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
             .IsRequired()
             .HasMaxLength(10);
         
-        builder.HasOne(t => t.Options)
-            .WithOne();
+        builder.OwnsOne(t => t.Options, build =>
+        {
+            build.ToTable("GameOptions");
+        });
+
+        builder.OwnsOne(t => t.CurrentTurn, build =>
+        {
+            build.Property(t => t.PlayerId).HasColumnName("CurrentTurnPlayerId");
+            build.Property(t => t.StartTime).HasColumnName("CurrentTurnStartTime");
+        });
 
         builder.HasIndex(t => t.EntryCode)
             .IsUnique();

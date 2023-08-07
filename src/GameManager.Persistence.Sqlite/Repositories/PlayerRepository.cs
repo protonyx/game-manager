@@ -76,6 +76,21 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
         return players;
     }
+    
+    public async Task<ICollection<Player>> GetSummariesByGameIdAsync(Guid gameId)
+    {
+        var players = await _context.Set<Player>()
+            .AsQueryable()
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(t => t.Turns)
+            .Include(t => t.TrackerHistory)
+            .Where(p => p.GameId == gameId)
+            .OrderBy(p => p.Order)
+            .ToListAsync();
+
+        return players;
+    }
 
     public override async Task<Player> UpdateAsync(Player updates)
     {

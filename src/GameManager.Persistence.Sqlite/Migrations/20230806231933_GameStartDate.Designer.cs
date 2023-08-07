@@ -3,6 +3,7 @@ using System;
 using GameManager.Persistence.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameManager.Server.Migrations
 {
     [DbContext(typeof(GameContext))]
-    partial class GameContextModelSnapshot : ModelSnapshot
+    [Migration("20230806231933_GameStartDate")]
+    partial class GameStartDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.9");

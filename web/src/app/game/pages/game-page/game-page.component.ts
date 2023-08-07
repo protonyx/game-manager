@@ -163,7 +163,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onStartGame(): void {
-    this.store.dispatch(GameActions.endTurn({ gameId: this.game!.id }));
+    this.store.dispatch(GameActions.startGame({ gameId: this.game!.id }));
+  }
+
+  onEndGame() {
+    this.store.dispatch(GameActions.endGame({ gameId: this.game!.id }));
   }
 
   onRefresh(): void {

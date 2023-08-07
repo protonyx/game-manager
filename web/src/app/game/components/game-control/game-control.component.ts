@@ -24,11 +24,18 @@ export class GameControlComponent {
   @Output()
   public advanceTurn: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output()
+  public endGame: EventEmitter<void> = new EventEmitter<void>();
+
   onStartGame(): void {
     this.startGame.emit();
   }
 
   onAdvanceTurn(): void {
     this.advanceTurn.emit();
+  }
+
+  onEndGame() {
+    this.endGame.emit();
   }
 }

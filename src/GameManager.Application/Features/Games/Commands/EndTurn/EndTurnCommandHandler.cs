@@ -4,6 +4,7 @@ using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
+using GameManager.Domain.Common;
 using GameManager.Domain.Entities;
 using MediatR;
 
@@ -54,37 +55,33 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
         {
             return CommandResponses.NotFound();
         }
-        if (game.CurrentTurnPlayerId == null)
-        {
-            var firstPlayer = players.First();
 
-            game.CurrentTurnPlayerId = firstPlayer.Id;
+        if (game.State != GameState.InProgress)
+        {
+            return CommandResponses.Failure("Game is not in progress");
         }
-        else
+        
+        var currentPlayer = players.First(t => t.Id == game.CurrentTurn.PlayerId);
+
+        if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
         {
-            var currentPlayer = players.First(t => t.Id == game.CurrentTurnPlayerId);
-
-            if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
-            {
-                return CommandResponses.AuthorizationError("Only the current player can end the turn");
-            }
-            
-            var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
-
-            var turn = new Turn()
-            {
-                PlayerId = currentPlayer.Id,
-                StartTime = game.LastTurnStartTime ?? utcNow,
-                EndTime = utcNow
-            };
-            turn.Duration = turn.EndTime - turn.StartTime;
-
-            await _turnRepository.CreateAsync(turn);
-
-            game.CurrentTurnPlayerId = nextPlayer.Id;
+            return CommandResponses.AuthorizationError("Only the current player can end the turn");
         }
 
-        game.LastTurnStartTime = utcNow;
+        var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
+
+        var turn = new Turn()
+        {
+            PlayerId = currentPlayer.Id,
+            StartTime = game.CurrentTurn?.StartTime ?? utcNow,
+            EndTime = utcNow
+        };
+        turn.Duration = turn.EndTime - turn.StartTime;
+
+        await _turnRepository.CreateAsync(turn);
+
+        game.CurrentTurn!.PlayerId = nextPlayer.Id;
+        game.CurrentTurn.StartTime = utcNow;
         var updatedGame = await _gameRepository.UpdateAsync(game);
         
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);

@@ -256,6 +256,28 @@ export class GameEffects {
     )
   );
 
+  startGame$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(GameActions.startGame),
+        exhaustMap((action: { gameId: string }) =>
+          this.gameService.startGame(action.gameId)
+        )
+      ),
+    { dispatch: false }
+  );
+
+  endGame$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(GameActions.endGame),
+        exhaustMap((action: { gameId: string }) =>
+          this.gameService.endGame(action.gameId)
+        )
+      ),
+    { dispatch: false }
+  );
+
   $authenticationError = createEffect(() =>
     this.actions$.pipe(
       ofType(GamesApiActions.authenticationError),

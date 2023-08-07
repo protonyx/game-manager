@@ -8,7 +8,9 @@
       [game]="game$ | async"
       [isAdmin]="isAdmin$ | async"
       (startGame)="onStartGame()"
-    (advanceTurn)="onEndTurn()"></app-game-control>
+      (advanceTurn)="onEndTurn()"
+      (endGame)="onEndGame()">
+    </app-game-control>
   </mat-expansion-panel>
 
   <mat-expansion-panel [expanded]="true">
@@ -29,7 +31,7 @@
   </mat-expansion-panel>
 
   <mat-expansion-panel
-    *ngIf="game && game.currentTurnPlayerId && currentPlayer"
+    *ngIf="game && game.state === 'InProgress' && currentPlayer"
     [expanded]="true"
     [class.is-active]="isMyTurn$ | async">
     <mat-expansion-panel-header>
@@ -46,7 +48,7 @@
 
   <mat-expansion-panel
     [expanded]="true"
-    *ngIf="trackers && trackers.length > 0">
+    *ngIf="game?.state === 'InProgress' && trackers && trackers.length > 0">
     <mat-expansion-panel-header>
       <mat-panel-title> Trackers</mat-panel-title>
     </mat-expansion-panel-header>

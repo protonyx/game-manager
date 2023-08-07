@@ -19,4 +19,6 @@ public class Player
     public ICollection<TrackerValue> TrackerValues { get; set; } = new List<TrackerValue>();
 
     public ICollection<Turn> Turns { get; set; } = new List<Turn>();
+    
+    public ICollection<TrackerHistory> TrackerHistory { get; set; } = new List<TrackerHistory>();
 }

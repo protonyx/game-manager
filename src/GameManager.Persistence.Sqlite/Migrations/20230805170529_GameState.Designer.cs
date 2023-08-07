@@ -3,6 +3,7 @@ using System;
 using GameManager.Persistence.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameManager.Server.Migrations
 {
     [DbContext(typeof(GameContext))]
-    partial class GameContextModelSnapshot : ModelSnapshot
+    [Migration("20230805170529_GameState")]
+    partial class GameState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
@@ -29,6 +32,12 @@ namespace GameManager.Server.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("CurrentTurnPlayerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CurrentTurnStartTime")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("EntryCode")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -37,9 +46,6 @@ namespace GameManager.Server.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("StartedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("State")
@@ -187,27 +193,6 @@ namespace GameManager.Server.Migrations
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
                 {
-                    b.OwnsOne("GameManager.Domain.Entities.CurrentTurnDetails", "CurrentTurn", b1 =>
-                        {
-                            b1.Property<Guid>("GameId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<Guid>("PlayerId")
-                                .HasColumnType("TEXT")
-                                .HasColumnName("CurrentTurnPlayerId");
-
-                            b1.Property<DateTime>("StartTime")
-                                .HasColumnType("TEXT")
-                                .HasColumnName("CurrentTurnStartTime");
-
-                            b1.HasKey("GameId");
-
-                            b1.ToTable("Games");
-
-                            b1.WithOwner()
-                                .HasForeignKey("GameId");
-                        });
-
                     b.OwnsOne("GameManager.Domain.Entities.GameOptions", "Options", b1 =>
                         {
                             b1.Property<Guid>("GameId")
@@ -223,8 +208,6 @@ namespace GameManager.Server.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("GameId");
                         });
-
-                    b.Navigation("CurrentTurn");
 
                     b.Navigation("Options")
                         .IsRequired();
@@ -251,7 +234,7 @@ namespace GameManager.Server.Migrations
             modelBuilder.Entity("GameManager.Domain.Entities.TrackerHistory", b =>
                 {
                     b.HasOne("GameManager.Domain.Entities.Player", null)
-                        .WithMany("TrackerHistory")
+                        .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -294,8 +277,6 @@ namespace GameManager.Server.Migrations
 
             modelBuilder.Entity("GameManager.Domain.Entities.Player", b =>
                 {
-                    b.Navigation("TrackerHistory");
-
                     b.Navigation("TrackerValues");
 
                     b.Navigation("Turns");

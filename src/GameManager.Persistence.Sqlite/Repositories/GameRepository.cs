@@ -38,6 +38,21 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         return await base.CreateAsync(game);
     }
 
+    public override Task<Game> UpdateAsync(Game entity)
+    {
+        if (entity.CurrentTurn != null)
+        {
+            var entry = _context.Entry(entity.CurrentTurn);
+
+            if (entry.State == EntityState.Detached)
+            {
+                _context.Attach(entity.CurrentTurn);
+            }
+        }
+        
+        return base.UpdateAsync(entity);
+    }
+
     public override async Task<Game?> GetByIdAsync(Guid gameId)
     {
         IQueryable<Game> queryable = _context.Set<Game>()

@@ -4,15 +4,23 @@
     type="button"
     color="accent"
     (click)="onStartGame()"
-    *ngIf="!game?.currentTurnPlayerId">
+    *ngIf="game?.state === 'Preparing'">
     Start Game
   </button>
-    <button
+  <button
     mat-raised-button
     type="button"
     color="warn"
     (click)="onAdvanceTurn()"
-    *ngIf="isAdmin && game?.currentTurnPlayerId">
+    *ngIf="game?.state === 'InProgress'">
     Force End Turn
+  </button>
+  <button
+    mat-raised-button
+    type="button"
+    color="primary"
+    (click)="onEndGame()"
+    *ngIf="game?.state === 'InProgress'">
+    End Game
   </button>
 </mat-action-row>

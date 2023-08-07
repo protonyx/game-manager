@@ -20,6 +20,11 @@ public static class ClaimsPrincipalExtensions
     {
         return user.GetGameId() == gameId;
     }
+
+    public static bool IsAdminForGame(this ClaimsPrincipal user, Guid gameId)
+    {
+        return user.GetGameId() == gameId && user.IsInRole(GameManagerClaimTypes.AdminRole);
+    }
     
     public static Guid? GetPlayerId(this ClaimsPrincipal user)
     {

@@ -13,7 +13,7 @@ public class TrackerHistoryConfiguration : IEntityTypeConfiguration<TrackerHisto
         builder.HasKey(t => t.Id);
 
         builder.HasOne<Player>()
-            .WithMany()
+            .WithMany(t => t.TrackerHistory)
             .HasForeignKey(t => t.PlayerId);
 
         builder.HasOne<Tracker>()
