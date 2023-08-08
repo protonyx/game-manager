@@ -1,4 +1,4 @@
-import { Game, Player, PlayerCredentials } from '../models/models';
+import { Game, GameSummary, Player, PlayerCredentials } from '../models/models';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 
 export interface GameState {
@@ -6,6 +6,7 @@ export interface GameState {
   credentials: PlayerCredentials | null;
   game: Game | null;
   players: EntityState<Player>;
+  summary: GameSummary | null;
 }
 
 export function selectPlayerId(a: Player): string {
@@ -32,4 +33,5 @@ export const initialState: GameState = {
   credentials: null,
   game: null,
   players: playerAdapter.getInitialState(),
+  summary: null,
 };

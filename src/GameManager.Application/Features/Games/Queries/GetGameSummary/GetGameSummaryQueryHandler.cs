@@ -5,6 +5,7 @@ using GameManager.Application.Contracts.Queries;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Queries;
 using GameManager.Domain.Common;
+using GameManager.Domain.Entities;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
@@ -48,7 +49,18 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
             Name = game.Name,
             CreatedDate = game.CreatedDate,
             CompletedDate = game.CompletedDate,
-            Players = players.Select(_mapper.Map<PlayerSummaryDTO>).ToList()
+            Players = players.Select(p =>
+            {
+                var dto = _mapper.Map<PlayerSummaryDTO>(p);
+
+                foreach (var trackerHistory in dto.TrackerHistory)
+                {
+                    var timeDiff = trackerHistory.ChangedTime - (game.StartedDate ?? game.CreatedDate);
+                    trackerHistory.SecondsSinceGameStart = (int)Math.Abs(timeDiff.TotalSeconds);
+                }
+                
+                return dto;
+            }).ToList()
         };
 
         return QueryResponses.Object(ret);

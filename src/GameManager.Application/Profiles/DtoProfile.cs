@@ -33,7 +33,8 @@ public class DtoProfile : Profile
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())
             .ForMember(t => t.GameId, opt => opt.Ignore());
-        CreateMap<TrackerHistory, TrackerHistoryDTO>();
+        CreateMap<TrackerHistory, TrackerHistoryDTO>()
+            .ForMember(t => t.SecondsSinceGameStart, opt => opt.Ignore());
         CreateMap<Turn, TurnDTO>()
             .ForMember(t => t.DurationSeconds, opt => opt.MapFrom(t => t.Duration.TotalSeconds));
     }

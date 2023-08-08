@@ -6,6 +6,7 @@ import {
 } from '@ngrx/store';
 import {
   Game,
+  GameSummary,
   JoinGame,
   NewGame,
   Player,
@@ -27,6 +28,7 @@ export const GameActions = createActionGroup({
     'Leave Game': emptyProps(),
     'Clear Credentials': emptyProps(),
     'Load Game': props<{ gameId: string }>(),
+    'Load Game Summary': props<{ gameId: string }>(),
     'Load Players': props<{ gameId: string }>(),
     'Remove Player': props<{ playerId: string }>(),
     'Load Player': props<{ playerId: string }>(),
@@ -64,6 +66,8 @@ export const GamesApiActions = createActionGroup({
     'Left Game': emptyProps(),
     'Retrieved Game': props<{ game: Game }>(),
     'Retrieved Game Error': props<{ error: string }>(),
+    'Retrieved Game Summary': props<{ summary: GameSummary }>(),
+    'Retrieved Game Summary Error': props<{ error: string }>(),
     'Retrieved Players': props<{ players: Player[] }>(),
     'Retrieved Players Error': props<{ error: string }>(),
     'Retrieved Player': props<{ player: Player }>(),

@@ -135,6 +135,28 @@ export class GameEffects {
     )
   );
 
+  loadGameSummary$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameActions.loadGameSummary),
+      exhaustMap((action) =>
+        this.gameService.getGameSummary(action.gameId).pipe(
+          map((summary) => GamesApiActions.retrievedGameSummary({ summary })),
+          catchError((error) => {
+            if (error.status === 400) {
+              return of(
+                GamesApiActions.retrievedGameSummaryError({
+                  error: error.error.title,
+                })
+              );
+            }
+
+            return EMPTY;
+          })
+        )
+      )
+    )
+  );
+
   $loadPlayers = createEffect(() =>
     this.actions$.pipe(
       ofType(GameActions.loadPlayers),

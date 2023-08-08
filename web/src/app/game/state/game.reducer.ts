@@ -53,6 +53,9 @@ export const gameFeature = createFeature({
     on(GamesApiActions.retrievedGame, (state, { game }) => {
       return { ...state, game: game };
     }),
+    on(GamesApiActions.retrievedGameSummary, (state, { summary }) => {
+      return { ...state, summary: summary };
+    }),
     on(GamesApiActions.retrievedPlayers, (state, { players }) => {
       return {
         ...state,
@@ -98,6 +101,7 @@ export const {
   selectCredentials,
   selectGame,
   selectPlayers,
+  selectSummary,
 } = gameFeature;
 
 const { selectIds, selectEntities, selectAll, selectTotal } =

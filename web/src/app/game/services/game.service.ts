@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Game,
+  GameSummary,
   JoinGame,
   NewGame,
   Player,
@@ -30,6 +31,12 @@ export class GameService {
     const url = `${environment.baseUrl}/api/Games/${gameId}`;
 
     return this.http.get<Game>(url);
+  }
+
+  public getGameSummary(gameId: string): Observable<GameSummary> {
+    const url = `${environment.baseUrl}/api/Games/${gameId}/Summary`;
+
+    return this.http.get<GameSummary>(url);
   }
 
   public getPlayer(playerId: string): Observable<Player> {

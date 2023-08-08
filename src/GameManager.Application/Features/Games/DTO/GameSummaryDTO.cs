@@ -10,5 +10,7 @@ public class GameSummaryDTO
     
     public DateTime CreatedDate { get; set; }
 
+    public DateTime? StartedDate { get; set; }
+
     public DateTime? CompletedDate { get; set; }
 }

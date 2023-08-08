@@ -23,6 +23,23 @@ export interface Game {
   completedDate?: string;
 }
 
+export interface GameSummary {
+  id: string;
+  name: string;
+  players: PlayerSummary[];
+  createdDate: string;
+  startedDate?: string;
+  completedDate?: string;
+}
+
+export interface PlayerSummary {
+  id: string;
+  order: number;
+  name: string;
+  turns: PlayerTurn[];
+  trackerHistory: TrackerHistory[];
+}
+
 export interface GameOptions {
   shareOtherPlayerTrackers: boolean;
 }
@@ -38,11 +55,24 @@ export interface TrackerValue {
   value: number;
 }
 
+export interface TrackerHistory {
+  trackerId: string;
+  changedTime: string;
+  newValue: number;
+  secondsSinceGameStart?: number;
+}
+
 export interface Player {
   id: string;
   order: number;
   name: string;
   trackerValues: any;
+}
+
+export interface PlayerTurn {
+  startTime: string;
+  endTime: string;
+  durationSeconds: number;
 }
 
 export interface PlayerCredentials {
