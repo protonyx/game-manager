@@ -49,6 +49,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
             Name = game.Name,
             CreatedDate = game.CreatedDate,
             CompletedDate = game.CompletedDate,
+            Trackers = game.Trackers.Select(_mapper.Map<TrackerDTO>).ToList(),
             Players = players.Select(p =>
             {
                 var dto = _mapper.Map<PlayerSummaryDTO>(p);

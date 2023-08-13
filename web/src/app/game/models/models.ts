@@ -26,6 +26,7 @@ export interface Game {
 export interface GameSummary {
   id: string;
   name: string;
+  trackers: Tracker[];
   players: PlayerSummary[];
   createdDate: string;
   startedDate?: string;
@@ -60,6 +61,14 @@ export interface TrackerHistory {
   changedTime: string;
   newValue: number;
   secondsSinceGameStart?: number;
+}
+
+export interface PlayerTrackerHistory extends TrackerHistory {
+  playerId: string;
+}
+
+export interface TrackerSummary extends Tracker {
+  trackerHistory: PlayerTrackerHistory[];
 }
 
 export interface Player {
