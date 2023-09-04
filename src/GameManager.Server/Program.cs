@@ -12,6 +12,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +94,54 @@ builder.Services.AddSqlitePersistenceServices();
 
 builder.Services.AddHostedService<GamePruningService>();
 
+var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
+
+if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+{
+    var resources = ResourceBuilder.CreateDefault()
+        .AddService("game-manager", serviceInstanceId: Environment.MachineName);
+    
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tb =>
+        {
+            tb.SetResourceBuilder(resources);
+            tb.AddAspNetCoreInstrumentation(opt =>
+                {
+                    opt.Filter = hc => !hc.Request.Method.Equals("OPTIONS")
+                        && !hc.Request.Path.StartsWithSegments("/health")
+                        && !hc.Request.Path.StartsWithSegments("/metrics");
+                })
+                .AddHttpClientInstrumentation()
+                .AddEntityFrameworkCoreInstrumentation();
+            tb.AddOtlpExporter(otlp =>
+            {
+                otlp.Endpoint = new Uri(otlpEndpoint);
+                otlp.Protocol = OtlpExportProtocol.Grpc;
+            });
+        })
+        .WithMetrics(mb =>
+        {
+            mb.SetResourceBuilder(resources);
+            mb.AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation();
+            mb.AddPrometheusExporter(prom =>
+            {
+                prom.ScrapeEndpointPath = "/metrics";
+            });
+        });
+
+    builder.Logging.AddOpenTelemetry(opt =>
+    {
+        opt.IncludeFormattedMessage = false;
+        opt.SetResourceBuilder(resources);
+        opt.AddOtlpExporter(otlp =>
+        {
+            otlp.Endpoint = new Uri(otlpEndpoint);
+            otlp.Protocol = OtlpExportProtocol.Grpc;
+        });
+    });
+}
+
 var app = builder.Build();
 
 // Run migrations
@@ -108,6 +161,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwaggerUI();
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
