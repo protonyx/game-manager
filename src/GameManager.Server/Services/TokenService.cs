@@ -46,7 +46,8 @@ public class TokenService : ITokenService
     {
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
             _configuration["Jwt:Audience"],
-            identity.Claims,
+            claims: identity.Claims,
+            notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: _signingCredentials);
         
