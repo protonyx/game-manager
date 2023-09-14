@@ -161,7 +161,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwaggerUI();
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
