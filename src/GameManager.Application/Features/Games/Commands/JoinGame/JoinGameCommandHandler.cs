@@ -8,6 +8,7 @@ using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerCreated;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
@@ -40,7 +41,7 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
 
     public async Task<ICommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetGameByEntryCodeAsync(request.EntryCode);
+        var game = await _gameRepository.GetGameByEntryCodeAsync(EntryCode.Of(request.EntryCode));
         
         if (game == null)
         {

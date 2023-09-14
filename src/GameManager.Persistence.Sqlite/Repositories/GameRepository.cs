@@ -2,6 +2,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,10 +68,10 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         return game;
     }
 
-    public async Task<Game?> GetGameByEntryCodeAsync(string entryCode)
+    public async Task<Game?> GetGameByEntryCodeAsync(EntryCode entryCode)
     {
         var game = await _context.Set<Game>()
-            .Where(t => t.EntryCode == entryCode.ToUpper())
+            .Where(t => t.EntryCode == entryCode)
             .FirstOrDefaultAsync();
 
         return game;

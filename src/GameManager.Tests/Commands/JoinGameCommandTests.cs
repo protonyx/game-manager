@@ -3,6 +3,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -14,7 +15,7 @@ public class JoinGameCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<string>()))
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
             .ReturnsAsync(default(Game));
         
         var cmd = fixture.Create<JoinGameCommand>();
@@ -34,7 +35,7 @@ public class JoinGameCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<string>()))
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
            .ReturnsAsync(fixture.Create<Game>());
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>()))

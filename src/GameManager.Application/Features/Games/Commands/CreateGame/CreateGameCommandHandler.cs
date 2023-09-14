@@ -6,6 +6,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Services;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
@@ -32,15 +33,15 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, IComm
         var game = new Game()
         {
             Name = request.Name,
-            EntryCode = EntryCodeGenerator.Create(EntryCodeLength),
+            EntryCode = EntryCode.New(EntryCodeLength),
             Options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions(),
             Trackers = request.Trackers.Select(_mapper.Map<Tracker>).ToList()
         };
 
-        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode))
+        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode.Value))
         {
             // Generate a new entry code until we find a unique code
-            game.EntryCode = EntryCodeGenerator.Create(EntryCodeLength);
+            game.EntryCode = EntryCode.New(EntryCodeLength);
         }
         
         // Validate

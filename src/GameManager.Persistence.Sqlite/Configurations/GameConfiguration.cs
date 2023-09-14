@@ -1,4 +1,5 @@
 ﻿using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
             .HasMaxLength(100);
         
         builder.Property(t => t.EntryCode)
+            .HasConversion(
+                v => v.Value,
+                v => EntryCode.Of(v))
             .IsRequired()
             .HasMaxLength(10);
         

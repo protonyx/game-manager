@@ -1,4 +1,5 @@
 using GameManager.Domain.Common;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
@@ -8,7 +9,11 @@ public class Game
 
     public string Name { get; set; } = string.Empty;
 
-    public string EntryCode { get; set; } = string.Empty;
+    private string _entryCode = string.Empty;
+    public EntryCode EntryCode {
+        get => _entryCode;
+        set => _entryCode = value.Value;
+    }
 
     public GameState State { get; set; } = GameState.Preparing;
 
