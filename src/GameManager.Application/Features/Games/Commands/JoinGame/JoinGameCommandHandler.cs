@@ -48,11 +48,15 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
             return CommandResponses.Failure("The entry code is invalid.");
         }
 
-        var newPlayer = new Player()
+        var newPlayer = new Player(PlayerName.Of(request.Name), game);
+        
+        // Promote the player if they are the first
+        var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id);
+
+        if (existingPlayerCount == 0)
         {
-            GameId = game.Id,
-            Name = request.Name
-        };
+            newPlayer.Promote();
+        }
         
         // Validate
         var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);

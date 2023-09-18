@@ -3,6 +3,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -13,7 +14,12 @@ public class UpdatePlayerCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        var player = fixture.Create<Player>();
+        var game = fixture.Build<Game>()
+            .With(t => t.EntryCode, EntryCode.New(4))
+            .Create();
+        var player = fixture.Build<Player>()
+            .FromFactory(() => new Player(PlayerName.Of(fixture.Create<string>()), game))
+            .Create();
         var playerRepository = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepository.Setup(x => x.GetByIdAsync(player.Id))
             .ReturnsAsync(player);

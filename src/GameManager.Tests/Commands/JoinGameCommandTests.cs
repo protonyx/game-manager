@@ -18,7 +18,9 @@ public class JoinGameCommandTests
         gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
             .ReturnsAsync(default(Game));
         
-        var cmd = fixture.Create<JoinGameCommand>();
+        var cmd = fixture.Build<JoinGameCommand>()
+            .With(t => t.EntryCode, EntryCode.New(4).Value)
+            .Create();
         var handler = fixture.Create<JoinGameCommandHandler>();
 
         // Act
@@ -34,17 +36,22 @@ public class JoinGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
+        var game = fixture.Build<Game>()
+            .With(t => t.EntryCode, EntryCode.New(4))
+            .Create();
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
-           .ReturnsAsync(fixture.Create<Game>());
+           .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>()))
-          .ReturnsAsync(fixture.Create<Player>());
+          .ReturnsAsync((Player p) => p);
         var playerValidator = new InlineValidator<Player>();
         fixture.Inject<IValidator<Player>>(playerValidator);
         
         var handler = fixture.Create<JoinGameCommandHandler>();
-        var cmd = fixture.Create<JoinGameCommand>();
+        var cmd = fixture.Build<JoinGameCommand>()
+            .With(t => t.EntryCode, EntryCode.New(4).Value)
+            .Create();
         
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);

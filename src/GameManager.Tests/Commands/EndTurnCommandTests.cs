@@ -3,6 +3,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Common;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -15,20 +16,17 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = fixture.Build<Game>()
+            .With(t => t.EntryCode, EntryCode.New(4))
             .With(t => t.State, GameState.InProgress)
             .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
+        var players = fixture.Build<Player>()
+            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        var player2 = players[1];
+        player2.SetOrder(2);
         game.CurrentTurn = new CurrentTurnDetails()
         {
             PlayerId = player1.Id
@@ -39,6 +37,7 @@ public class EndTurnCommandTests
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)))
             .ReturnsUsingFixture(fixture.Build<Game>()
+                .With(t => t.EntryCode, EntryCode.New(4))
                 .With(g => g.Id, game.Id)
                 .With(g => g.CurrentTurn, new CurrentTurnDetails()
                 {
@@ -71,20 +70,18 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = fixture.Build<Game>()
+            .With(t => t.EntryCode, EntryCode.New(4))
             .With(t => t.State, GameState.InProgress)
             .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, true)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
+        var players = fixture.Build<Player>()
+            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        player1.Promote();
+        var player2 = players[1];
+        player2.SetOrder(2);
         game.CurrentTurn = new CurrentTurnDetails()
         {
             PlayerId = player2.Id
@@ -95,6 +92,7 @@ public class EndTurnCommandTests
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)))
             .ReturnsUsingFixture(fixture.Build<Game>()
+                .With(t => t.EntryCode, EntryCode.New(4))
                 .With(g => g.Id, game.Id)
                 .With(g => g.CurrentTurn,  new CurrentTurnDetails()
             {
@@ -127,20 +125,17 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = fixture.Build<Game>()
+            .With(t => t.EntryCode, EntryCode.New(4))
             .With(t => t.State, GameState.InProgress)
             .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
+        var players = fixture.Build<Player>()
+            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        var player2 = players[1];
+        player2.SetOrder(2);
         game.CurrentTurn = new CurrentTurnDetails()
         {
             PlayerId = player1.Id

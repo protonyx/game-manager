@@ -29,7 +29,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
 
             if (player != null)
             {
-                player.Order = i + 1;
+                player.SetOrder(i + 1);
             }
         }
 

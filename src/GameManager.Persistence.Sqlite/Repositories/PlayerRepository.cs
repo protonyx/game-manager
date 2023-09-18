@@ -23,15 +23,12 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         var maxOrder = existingPlayers.Any()
             ? existingPlayers.Max(t => t.Order)
             : 0;
-
-        newPlayer.Id = Guid.NewGuid();
-        newPlayer.Active = true;
-        newPlayer.Order = maxOrder + 1;
-        newPlayer.LastHeartbeat = DateTime.UtcNow;
+        
+        newPlayer.SetOrder(maxOrder + 1);
 
         if (!existingPlayers.Any(p => p.IsAdmin))
         {
-            newPlayer.IsAdmin = true;
+            newPlayer.Promote();
         }
 
         newPlayer.TrackerValues = new List<TrackerValue>();
@@ -62,6 +59,13 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .FirstOrDefaultAsync(t => t.Id == playerId);
 
         return player;
+    }
+
+    public Task<int> GetActivePlayerCountAsync(Guid gameId)
+    {
+        return _context.Set<Player>()
+            .Where(p => p.GameId == gameId && p.Active)
+            .CountAsync();
     }
 
     public async Task<ICollection<Player>> GetPlayersByGameIdAsync(Guid gameId)
@@ -102,12 +106,10 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             throw new InvalidOperationException("Player not found");
 
         // Update name
-        if (!string.IsNullOrWhiteSpace(updates.Name))
+        if (updates.Name != null)
         {
             existing.Name = updates.Name;
         }
-
-        existing.IsAdmin = updates.IsAdmin;
 
         // Update trackers
         foreach (var tracker in existing.TrackerValues)
@@ -136,7 +138,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
     {
         var query = _context.Set<Player>()
             .AsQueryable()
-            .Where(p => p.GameId == gameId && p.Active && p.Name.ToLower().Equals(name.ToLower()));
+            .Where(p => p.GameId == gameId && p.Active && p.Name.Equals(name));
 
         if (playerId.HasValue)
         {
@@ -150,15 +152,14 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public async Task UpdatePlayerHeartbeatAsync(Guid playerId)
     {
-        var player = await _context.Set<Player>()
-            .FirstOrDefaultAsync(t => t.Id == playerId);
+        var player = await _context.Set<Player>().FindAsync(playerId);
 
         if (player == null)
         {
             return;
         }
-
-        player.LastHeartbeat = DateTime.UtcNow;
+        
+        player.UpdateHeartbeat();
 
         await _context.SaveChangesAsync();
     }
@@ -185,7 +186,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         // Reindex order starting at 1
         for (int i = 0; i < players.Count; i++)
         {
-            players[i].Order = i + 1;
+            players[i].SetOrder(i + 1);
         }
 
         await _context.SaveChangesAsync();
@@ -195,8 +196,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
     public override async Task DeleteAsync(Player player)
     {
-        player.Active = false;
-        player.Order = 0;
+        player.SoftDelete();
 
         _context.Entry(player).State = EntityState.Modified;
             
@@ -210,7 +210,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             
         for (int i = 0; i < players.Count; i++)
         {
-            players[i].Order = i + 1;
+            players[i].SetOrder(i + 1);
         }
 
         await _context.SaveChangesAsync();
