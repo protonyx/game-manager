@@ -14,9 +14,7 @@ public class UpdatePlayerCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        var game = fixture.Build<Game>()
-            .With(t => t.EntryCode, EntryCode.New(4))
-            .Create();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var player = fixture.Build<Player>()
             .FromFactory(() => new Player(PlayerName.Of(fixture.Create<string>()), game))
             .Create();

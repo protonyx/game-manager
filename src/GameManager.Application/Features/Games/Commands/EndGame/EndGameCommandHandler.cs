@@ -35,9 +35,7 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, ICommandRes
             return CommandResponses.Failure("Game is not in progress");
         }
         
-        game.State = GameState.Complete;
-        game.CompletedDate = DateTime.UtcNow;
-        game.CurrentTurn = null;
+        game.Complete();
         
         var updatedGame = await _gameRepository.UpdateAsync(game);
 

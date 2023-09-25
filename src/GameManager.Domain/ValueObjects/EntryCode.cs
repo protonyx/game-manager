@@ -5,10 +5,12 @@ namespace GameManager.Domain.ValueObjects;
 public class EntryCode
 {
     private const string ValidEntryCodeCharacters = "ABCEFHJKMNPQRTWXY0123456789";
+
+    private const int DefaultEntryCodeLength = 4;
     
     public string Value { get; }
 
-    public static EntryCode New(int length)
+    public static EntryCode New(int length = DefaultEntryCodeLength)
     {
         var charSet = new HashSet<char>(ValidEntryCodeCharacters);
         
@@ -44,7 +46,7 @@ public class EntryCode
 
     public static implicit operator EntryCode(string value)
     {
-        return new EntryCode(value);
+        return EntryCode.Of(value);
     }
 
     private bool Equals(EntryCode other)

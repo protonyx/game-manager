@@ -36,9 +36,7 @@ public class JoinGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        var game = fixture.Build<Game>()
-            .With(t => t.EntryCode, EntryCode.New(4))
-            .Create();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
            .ReturnsAsync(game);

@@ -80,8 +80,8 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
         await _turnRepository.CreateAsync(turn);
 
-        game.CurrentTurn!.PlayerId = nextPlayer.Id;
-        game.CurrentTurn.StartTime = utcNow;
+        game.SetCurrentTurn(nextPlayer);
+        
         var updatedGame = await _gameRepository.UpdateAsync(game);
         
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);

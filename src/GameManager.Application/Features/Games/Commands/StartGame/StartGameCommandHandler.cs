@@ -41,25 +41,19 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, IComman
             return CommandResponses.NotFound();
         }
         
-        if (game.State != GameState.Preparing)
-        {
-            return CommandResponses.Failure("Game is already in progress");
-        }
-        else if (!_userContext.User!.IsAdminForGame(game.Id))
+        if (!_userContext.User!.IsAdminForGame(game.Id))
         {
             return CommandResponses.AuthorizationError("Only the game creator can start the game");
+        }
+        else if (game.State != GameState.Preparing)
+        {
+            return CommandResponses.Failure("Game is already in progress");
         }
 
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
         var firstPlayer = players.OrderBy(t => t.Order).First();
 
-        game.State = GameState.InProgress;
-        game.StartedDate = DateTime.UtcNow;
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = firstPlayer.Id,
-            StartTime = DateTime.UtcNow
-        };
+        game.Start(firstPlayer);
         
         var updatedGame = await _gameRepository.UpdateAsync(game);
         
