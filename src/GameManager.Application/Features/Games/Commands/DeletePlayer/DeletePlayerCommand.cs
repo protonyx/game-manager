@@ -1,12 +1,10 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Commands;
-using MediatR;
+﻿using GameManager.Application.Contracts.Commands;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommand : IRequest<ICommandResponse>
+public class DeletePlayerCommand : IRequest<UnitResult<CommandError>>
 {
-    public Guid PlayerId { get; set; }
+    public Guid PlayerId { get; }
 
     public DeletePlayerCommand(Guid playerId)
     {

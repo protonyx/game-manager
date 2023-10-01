@@ -47,10 +47,7 @@ public class GameHub : Hub<IGameClientNotificationService>
 
         if (playerId.HasValue)
         {
-            await _mediator.Send(new UpdateHeartbeatCommand()
-            {
-                PlayerId = playerId.Value
-            });
+            await _mediator.Send(new UpdateHeartbeatCommand(playerId.Value));
         }
     }
 

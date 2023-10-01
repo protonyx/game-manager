@@ -1,18 +1,12 @@
-﻿using AutoMapper;
-using FluentValidation;
-using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
+﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
-using GameManager.Domain.Entities;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 
-public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, ICommandResponse>
+public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, Result<PlayerDTO, CommandError>>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -38,22 +32,20 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, I
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PlayerDTO, CommandError>> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
     {
         var player = await _playerRepository.GetByIdAsync(request.PlayerId);
 
         if (player == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.PlayerNotFound(request.PlayerId);
         }
         
-        if (_userContext.User == null || !_userContext.User.IsAuthorizedForGame(player.GameId))
+        if (_userContext.User == null
+            || !_userContext.User.IsAuthorizedForGame(player.GameId)
+            || !_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
-            return CommandResponses.AuthorizationError("Player is not part of this game");
-        }
-        else if (!_userContext.User.IsAuthorizedForPlayer(player.Id))
-        {
-            return CommandResponses.AuthorizationError("Not authorized to update this player");
+            return GameErrors.Commands.PlayerNotAuthorized("update player");
         }
 
         // Map changes onto entity
@@ -64,7 +56,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, I
 
         if (!result.IsValid)
         {
-            return CommandResponses.ValidationError(result);
+            return CommandError.Validation<Player>(result);
         }
 
         var updatedPlayer = await _playerRepository.UpdateAsync(player);
@@ -73,6 +65,6 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, I
 
         var dto = _mapper.Map<PlayerDTO>(updatedPlayer);
 
-        return CommandResponses.Data(request.PlayerId, dto);
+        return dto;
     }
 }

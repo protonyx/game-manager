@@ -5,7 +5,7 @@ namespace GameManager.Application.Contracts.Persistence;
 
 public interface IGameRepository : IAsyncRepository<Game>
 {
-    Task<ICollection<Game>> FindAsync(DateTime? olderThan = null);
+    Task<IReadOnlyList<Game>> FindAsync(DateTime? olderThan = null);
     
     Task<Game?> GetGameByEntryCodeAsync(EntryCode entryCode);
 

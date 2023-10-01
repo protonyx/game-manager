@@ -1,43 +1,78 @@
-using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Authorization;
+using GameManager.Application.Contracts;
+using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
-public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand>
+public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand, UnitResult<CommandError>>
 {
+    private readonly IGameRepository _gameRepository;
+    
     private readonly IPlayerRepository _playerRepository;
 
     private readonly IMediator _mediator;
 
-    public ReorderPlayersCommandHandler(IPlayerRepository playerRepository, IMediator mediator)
+    private readonly IUserContext _userContext;
+
+    public ReorderPlayersCommandHandler(
+        IGameRepository gameRepository,
+        IPlayerRepository playerRepository,
+        IMediator mediator,
+        IUserContext userContext)
     {
+        _gameRepository = gameRepository;
         _playerRepository = playerRepository;
         _mediator = mediator;
+        _userContext = userContext;
     }
 
-    public async Task Handle(ReorderPlayersCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<CommandError>> Handle(ReorderPlayersCommand request, CancellationToken cancellationToken)
     {
-        var playerIds = request.PlayerIds;
+        var game = await _gameRepository.GetByIdAsync(request.GameId);
 
-        var players = (await _playerRepository.GetPlayersByGameIdAsync(request.GameId)).ToList();
+        if (game == null)
+        {
+            return GameErrors.Commands.GameNotFound(request.GameId);
+        }
+        
+        if (!_userContext.User!.IsAuthorizedForGame(game.Id))
+        {
+            return GameErrors.Commands.PlayerNotAuthorized();
+        }
+
+        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
+
+        var newIdList = request.PlayerIds;
+        var existingIdSet = players.Where(p => p.Active).Select(p => p.Id).ToHashSet();
         
         // Rearrange players based on input list
-        for (int i = 0; i < playerIds.Count; i++)
+        var nextOrder = 1;
+        foreach (var playerId in newIdList)
         {
-            var player = players.FirstOrDefault(p => p.Id == playerIds[i]);
+            var player = players.FirstOrDefault(p => p.Id == playerId);
 
             if (player != null)
             {
-                player.SetOrder(i + 1);
+                player.SetOrder(nextOrder++);
+                existingIdSet.Remove(playerId);
             }
         }
 
-        await _playerRepository.UpdatePlayersAsync(players);
+        foreach (var playerId in existingIdSet)
+        {
+            var player = players.FirstOrDefault(p => p.Id == playerId);
+
+            player?.SetOrder(nextOrder++);
+        }
+
+        await _playerRepository.UpdatePlayersAsync(players.ToList());
 
         foreach (var player in players)
         {
             await _mediator.Publish(new PlayerUpdatedNotification(player), cancellationToken);
         }
+        
+        return UnitResult.Success<CommandError>();
     }
 }

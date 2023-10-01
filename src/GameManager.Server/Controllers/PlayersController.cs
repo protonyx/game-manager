@@ -46,13 +46,13 @@ public class PlayersController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] PlayerDTO dto)
     {
-        var response = await _mediator.Send(new UpdatePlayerCommand()
+        var result = await _mediator.Send(new UpdatePlayerCommand()
         {
             PlayerId = id,
             Player = dto
         });
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPatch("{id}")]
@@ -77,22 +77,27 @@ public class PlayersController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
-        var updateResponse = await _mediator.Send(new UpdatePlayerCommand()
+        var updateResult = await _mediator.Send(new UpdatePlayerCommand()
         {
             PlayerId = id,
             Player = player
         });
 
-        return this.GetActionResult(updateResponse);
+        return updateResult.IsSuccess ? Ok(updateResult.Value) : this.GetErrorActionResult(updateResult.Error);
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeletePlayer([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new DeletePlayerCommand(id));
+        var result = await _mediator.Send(new DeletePlayerCommand(id));
 
-        return this.GetActionResult(response);
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Turns")]

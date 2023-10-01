@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Commands;
+﻿using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Domain.Entities;
@@ -23,10 +23,10 @@ public class CreateGameCommandTests
         var cmd = fixture.Create<CreateGameCommand>();
         
         // Act
-        var response = await sut.Handle(cmd, CancellationToken.None);
+        var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        response.Should().BeOfType<EntityCommandResponse>();
+        result.IsSuccess.Should().BeTrue();
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Once);
     }
     
@@ -48,8 +48,9 @@ public class CreateGameCommandTests
         var response = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        response.Should().BeOfType<ValidationErrorCommandResponse>();
+        response.IsFailure.Should().BeTrue();
+        response.Error.ErrorType.Should().Be(CommandErrorType.ValidationError);
+        response.Error.ValidationResult.IsValid.Should().BeFalse();
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Never);
-        response.As<ValidationErrorCommandResponse>().Result.IsValid.Should().BeFalse();
     }
 }

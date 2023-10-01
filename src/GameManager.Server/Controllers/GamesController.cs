@@ -1,4 +1,3 @@
-using GameManager.Application.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.EndGame;
 using GameManager.Application.Features.Games.Commands.EndTurn;
@@ -33,16 +32,13 @@ public class GamesController : ControllerBase
         [FromBody] CreateGameCommand game,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(game, cancellationToken);
+        var result = await _mediator.Send(game, cancellationToken);
 
-        if (response is EntityCommandResponse entity)
-        {
-            return CreatedAtAction(nameof(GetGame), 
-                new {id = entity.Id},
-                entity.Value);
-        }
-
-        return this.GetActionResult(response);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetGame),
+                new {id = result.Value.Id},
+                result.Value)
+            : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}")]
@@ -79,9 +75,9 @@ public class GamesController : ControllerBase
         [FromBody] PlayerIdListDTO playerIdList,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
+        var result = await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
 
-        return NoContent();
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("{id}/Actions/EndTurn")]
@@ -93,9 +89,9 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new EndTurnCommand(id), cancellationToken);
+        var result = await _mediator.Send(new EndTurnCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
     
     [HttpPost("{id}/Actions/Start")]
@@ -107,9 +103,9 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new StartGameCommand(id), cancellationToken);
+        var result = await _mediator.Send(new StartGameCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
     
     [HttpPost("{id}/Actions/Complete")]
@@ -121,9 +117,9 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new EndGameCommand(id), cancellationToken);
+        var result = await _mediator.Send(new EndGameCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("Join")]
@@ -133,9 +129,9 @@ public class GamesController : ControllerBase
         [FromBody] JoinGameCommand player,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(player, cancellationToken);
+        var result = await _mediator.Send(player, cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Summary")]

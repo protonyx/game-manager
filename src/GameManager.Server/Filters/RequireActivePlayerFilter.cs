@@ -1,8 +1,9 @@
-﻿using GameManager.Application;
-using GameManager.Application.Authorization;
+﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Features.Games;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace GameManager.Server.Filters;
 
@@ -10,9 +11,14 @@ public class RequireActivePlayerFilter : IAsyncAuthorizationFilter
 {
     private readonly IPlayerRepository _playerRepository;
 
-    public RequireActivePlayerFilter(IPlayerRepository playerRepository)
+    private readonly ProblemDetailsFactory _problemDetailsFactory;
+
+    public RequireActivePlayerFilter(
+        IPlayerRepository playerRepository,
+        ProblemDetailsFactory problemDetailsFactory)
     {
         _playerRepository = playerRepository;
+        _problemDetailsFactory = problemDetailsFactory;
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -29,7 +35,16 @@ public class RequireActivePlayerFilter : IAsyncAuthorizationFilter
 
         if (player is not {Active: true})
         {
-            context.Result = new ForbidResult();
+            var pd = _problemDetailsFactory.CreateProblemDetails(
+                context.HttpContext,
+                statusCode: StatusCodes.Status403Forbidden,
+                type: GameErrors.ErrorCodes.PlayerInvalidState,
+                detail: "Player is not active");
+                
+            context.Result = new ObjectResult(pd)
+            {
+                StatusCode = pd.Status
+            };
         }
     }
 }

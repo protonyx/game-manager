@@ -1,4 +1,3 @@
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.DTO;
@@ -27,8 +26,7 @@ public class JoinGameCommandTests
         var result = await handler.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<FailureCommandResponse>();
-        result.As<FailureCommandResponse>().Reason.Should().Be("The entry code is invalid.");
+        result.IsFailure.Should().BeTrue();
     }
 
     [Fact]
@@ -57,8 +55,7 @@ public class JoinGameCommandTests
         var result = await handler.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<EntityCommandResponse>();
-        result.As<EntityCommandResponse>().Value.Should().BeOfType<PlayerCredentialsDTO>();
+        result.IsSuccess.Should().BeTrue();
         playerRepo.Verify(t => t.CreateAsync(It.IsAny<Player>()), Times.Once);
     }
 }

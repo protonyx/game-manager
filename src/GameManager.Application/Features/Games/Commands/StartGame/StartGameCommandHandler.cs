@@ -1,16 +1,11 @@
 ﻿using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
-using GameManager.Domain.Common;
-using GameManager.Domain.Entities;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.StartGame;
 
-public class StartGameCommandHandler : IRequestHandler<StartGameCommand, ICommandResponse>
+public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<CommandError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -32,22 +27,23 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, IComman
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(StartGameCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<CommandError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId);
 
         if (game == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.GameNotFound(request.GameId);
         }
         
         if (game.State != GameState.Preparing)
         {
-            return CommandResponses.Failure("Game is already in progress");
+            return GameErrors.Commands.GameAlreadyInProgress();
         }
-        else if (!_userContext.User!.IsAdminForGame(game.Id))
+        
+        if (!_userContext.User!.IsAdminForGame(game.Id))
         {
-            return CommandResponses.AuthorizationError("Only the game creator can start the game");
+            return GameErrors.Commands.PlayerNotAuthorized("start the game");
         }
 
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
@@ -65,6 +61,6 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, IComman
         
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
-        return CommandResponses.Success();
+        return UnitResult.Success<CommandError>();
     }
 }

@@ -19,18 +19,15 @@ public class ReorderPlayersCommandTests
             .FromFactory(() => new Player(PlayerName.Of(fixture.Create<string>()), game))
             .CreateMany(3)
             .ToList();
-        // var players = new[]
-        // {
-        //     fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-        //     fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-        //     fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-        // };
-        IEnumerable<Player> reorderedPlayers = Enumerable.Empty<Player>();
+        ICollection<Player> reorderedPlayers = null;
+        var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(players);
-        playerRepo.Setup(t => t.UpdatePlayersAsync(It.IsAny<IEnumerable<Player>>()))
-            .Callback((IEnumerable<Player> p) => reorderedPlayers = p)
+        playerRepo.Setup(t => t.UpdatePlayersAsync(It.IsAny<ICollection<Player>>()))
+            .Callback((ICollection<Player> p) => reorderedPlayers = p)
             .Returns(Task.CompletedTask);
 
         fixture.SetUser(user =>
@@ -49,9 +46,11 @@ public class ReorderPlayersCommandTests
         });
 
         // Act
-        await sut.Handle(command, CancellationToken.None);
+        var result = await sut.Handle(command, CancellationToken.None);
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        reorderedPlayers.Should().NotBeNull();
         reorderedPlayers.Select(t => t.Id).Should().BeEquivalentTo(command.PlayerIds);
     }
 }

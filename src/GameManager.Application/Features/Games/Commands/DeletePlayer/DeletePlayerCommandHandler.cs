@@ -1,16 +1,13 @@
 ﻿using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
 using GameManager.Application.Services;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, ICommandResponse>
+public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<CommandError>>
 {
     private readonly IPlayerRepository _playerRepository;
     
@@ -36,22 +33,22 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, I
         _notificationService = notificationService;
     }
 
-    public async Task<ICommandResponse> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<CommandError>> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
     {
         var player = await _playerRepository.GetByIdAsync(request.PlayerId);
 
         if (player == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.PlayerNotFound(request.PlayerId);
         }
         
         if (_userContext.User == null || !_userContext.User.IsAuthorizedForGame(player.GameId))
         {
-            return CommandResponses.AuthorizationError("Player is not part of this game");
+            return CommandError.Authorization("Player is not part of this game");
         }
         else if (!_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
-            return CommandResponses.AuthorizationError("Not authorized to update this player");
+            return CommandError.Authorization("Not authorized to update this player");
         }
         
         await _playerRepository.DeleteByIdAsync(request.PlayerId);
@@ -88,6 +85,6 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, I
             }
         }
 
-        return CommandResponses.Success();
+        return UnitResult.Success<CommandError>();
     }
 }

@@ -1,13 +1,9 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
-using GameManager.Domain.Common;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.EndGame;
 
-public class EndGameCommandHandler : IRequestHandler<EndGameCommand, ICommandResponse>
+public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<CommandError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -21,18 +17,18 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, ICommandRes
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(EndGameCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<CommandError>> Handle(EndGameCommand request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId);
 
         if (game == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.GameNotFound(request.GameId);
         }
         
         if (game.State != GameState.InProgress)
         {
-            return CommandResponses.Failure("Game is not in progress");
+            return GameErrors.Commands.GameNotInProgress(game.Id);
         }
         
         game.State = GameState.Complete;
@@ -42,7 +38,7 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, ICommandRes
         var updatedGame = await _gameRepository.UpdateAsync(game);
 
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
-        
-        return CommandResponses.Success();
+
+        return UnitResult.Success<CommandError>();
     }
 }

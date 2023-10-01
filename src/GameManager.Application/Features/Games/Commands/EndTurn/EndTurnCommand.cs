@@ -1,9 +1,8 @@
 ﻿using GameManager.Application.Contracts.Commands;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
 
-public class EndTurnCommand : IRequest<ICommandResponse>
+public class EndTurnCommand : IRequest<UnitResult<CommandError>>
 {
     public Guid GameId { get; }
 

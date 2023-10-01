@@ -1,5 +1,4 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Queries;
 using GameManager.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -8,42 +7,48 @@ namespace GameManager.Server;
 
 public static class ControllerExtensions
 {
-    public static IActionResult GetActionResult(this ControllerBase controller, ICommandResponse commandResponse)
+    public static IActionResult GetErrorActionResult(this ControllerBase controller, CommandError error)
     {
-        if (commandResponse is EntityCommandResponse data)
+        switch (error.ErrorType)
         {
-            return controller.Ok(data.Value);
+            case CommandErrorType.GeneralFailure:
+                return controller.Problem(
+                    type: error.ErrorCode,
+                    title: error.ErrorType.ToString(),
+                    detail: error.Reason,
+                    statusCode: StatusCodes.Status400BadRequest);
+            case CommandErrorType.ValidationError:
+                controller.ModelState.AddValidationResults(error.ValidationResult!);
+                
+                return controller.ValidationProblem(
+                    type: error.ErrorCode,
+                    title: error.ErrorType.ToString(),
+                    detail: error.Reason,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    modelStateDictionary: controller.ModelState);
+            case CommandErrorType.AuthorizationError:
+                return controller.Problem(
+                    type: error.ErrorCode,
+                    title: error.ErrorType.ToString(),
+                    detail: error.Reason,
+                    statusCode: StatusCodes.Status403Forbidden);
+            case CommandErrorType.NotFoundError:
+                return controller.Problem(
+                    type: error.ErrorType.ToString(),
+                    statusCode: StatusCodes.Status404NotFound);
+            case CommandErrorType.Unknown:
+                return controller.Problem(
+                    type: error.ErrorCode,
+                    title: error.ErrorType.ToString(),
+                    detail: error.Reason,
+                    statusCode: StatusCodes.Status400BadRequest);
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        else if (commandResponse is SuccessfulCommandResponse success)
-        {
-            return controller.NoContent();
-        }
-        else if (commandResponse is FailureCommandResponse failure)
-        {
-            return controller.Problem(
-                detail: failure.Reason,
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-        else if (commandResponse is AuthorizationErrorCommandResponse authorizationError)
-        {
-            return controller.Problem(
-                detail: authorizationError.Reason,
-                statusCode: StatusCodes.Status403Forbidden);
-        }
-        else if (commandResponse is ValidationErrorCommandResponse {Result.IsValid: false} validationError)
-        {
-            controller.ModelState.AddValidationResults(validationError.Result);
 
-            return controller.ValidationProblem(controller.ModelState);
-        }
-        else if (commandResponse is NotFoundCommandResponse notFound)
-        {
-            return controller.NotFound();
-        }
-
-        return controller.Ok();
+        return controller.NoContent();
     }
-
+    
     public static IActionResult GetActionResult(this ControllerBase controller, IQueryResponse queryResponse)
     {
         if (queryResponse is ObjectQueryResponse obj)

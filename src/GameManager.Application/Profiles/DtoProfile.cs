@@ -1,5 +1,6 @@
 using AutoMapper;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Profiles;

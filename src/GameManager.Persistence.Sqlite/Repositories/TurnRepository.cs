@@ -10,7 +10,7 @@ public class TurnRepository : BaseRepository<Turn>, ITurnRepository
     {
     }
 
-    public async Task<ICollection<Turn>> GetTurnsByPlayerId(Guid playerId)
+    public async Task<IReadOnlyList<Turn>> GetTurnsByPlayerId(Guid playerId)
     {
         var turns = await _context.Set<Turn>()
             .AsQueryable()

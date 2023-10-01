@@ -15,7 +15,7 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     {
     }
     
-    public async Task<ICollection<Game>> FindAsync(DateTime? olderThan = null)
+    public async Task<IReadOnlyList<Game>> FindAsync(DateTime? olderThan = null)
     {
         IQueryable<Game> query = _context.Set<Game>()
             .AsQueryable()

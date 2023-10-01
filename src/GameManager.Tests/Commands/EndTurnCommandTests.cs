@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Commands;
+﻿using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Common;
@@ -59,7 +59,7 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<SuccessfulCommandResponse>();
+        result.IsSuccess.Should().BeTrue();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)), Times.Once);
     }
     
@@ -114,7 +114,7 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<SuccessfulCommandResponse>();
+        result.IsSuccess.Should().BeTrue();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)), Times.Once);
     }
     
@@ -160,7 +160,8 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<AuthorizationErrorCommandResponse>();
+        result.IsFailure.Should().BeTrue();
+        result.Error.ErrorType.Should().Be(CommandErrorType.AuthorizationError);
         gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>()), Times.Never());
     }
 }

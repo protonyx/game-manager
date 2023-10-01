@@ -1,16 +1,11 @@
 ﻿using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
-using GameManager.Domain.Common;
-using GameManager.Domain.Entities;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
 
-public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandResponse>
+public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<CommandError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -36,7 +31,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(EndTurnCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<CommandError>> Handle(EndTurnCommand request, CancellationToken cancellationToken)
     {
         var utcNow = DateTime.UtcNow;
 
@@ -44,7 +39,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
         if (game == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.GameNotFound(request.GameId);
         }
         
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
@@ -53,19 +48,24 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
 
         if (requestPlayer == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.Commands.PlayerNotInGame();
+        }
+
+        if (!_userContext.User!.IsAuthorizedForGame(game.Id))
+        {
+            return GameErrors.Commands.PlayerNotAuthorized();
         }
 
         if (game.State != GameState.InProgress)
         {
-            return CommandResponses.Failure("Game is not in progress");
+            return GameErrors.Commands.GameNotInProgress(game.Id);
         }
         
         var currentPlayer = players.First(t => t.Id == game.CurrentTurn.PlayerId);
 
         if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
         {
-            return CommandResponses.AuthorizationError("Only the current player can end the turn");
+            return GameErrors.Commands.PlayerNotAuthorized("end the turn");
         }
 
         var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
@@ -86,6 +86,6 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, ICommandRes
         
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
-        return CommandResponses.Success();
+        return UnitResult.Success<CommandError>();
     }
 }

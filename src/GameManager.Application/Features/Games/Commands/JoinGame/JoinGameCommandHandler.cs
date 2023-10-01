@@ -1,19 +1,13 @@
-﻿using FluentValidation;
-using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
+﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerCreated;
-using GameManager.Application.Services;
-using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandResponse>
+public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<PlayerCredentialsDTO, CommandError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -39,13 +33,13 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PlayerCredentialsDTO, CommandError>> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetGameByEntryCodeAsync(EntryCode.Of(request.EntryCode));
         
         if (game == null)
         {
-            return CommandResponses.Failure("The entry code is invalid.");
+            return GameErrors.Commands.InvalidEntryCode();
         }
 
         var newPlayer = new Player(PlayerName.Of(request.Name), game);
@@ -63,7 +57,7 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
 
         if (!validationResult.IsValid)
         {
-            return CommandResponses.ValidationError(validationResult);
+            return CommandError.Validation<Player>(validationResult);
         }
 
         newPlayer = await _playerRepository.CreateAsync(newPlayer);
@@ -88,6 +82,6 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
             IsAdmin = newPlayer.IsAdmin
         };
 
-        return CommandResponses.Data(game.Id, dto);
+        return dto;
     }
 }

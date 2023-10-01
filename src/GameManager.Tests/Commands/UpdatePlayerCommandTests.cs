@@ -1,4 +1,3 @@
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.DTO;
@@ -46,7 +45,7 @@ public class UpdatePlayerCommandTests
         var result = await sut.Handle(command, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<EntityCommandResponse>();
+        result.IsSuccess.Should().BeTrue();
         playerRepository.Verify(x => x.UpdateAsync(It.IsAny<Player>()), Times.Once);
     }
 }

@@ -68,7 +68,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .CountAsync();
     }
 
-    public async Task<ICollection<Player>> GetPlayersByGameIdAsync(Guid gameId)
+    public async Task<IReadOnlyList<Player>> GetPlayersByGameIdAsync(Guid gameId)
     {
         var players = await _context.Set<Player>()
             .AsQueryable()
@@ -81,7 +81,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return players;
     }
     
-    public async Task<ICollection<Player>> GetSummariesByGameIdAsync(Guid gameId)
+    public async Task<IReadOnlyList<Player>> GetSummariesByGameIdAsync(Guid gameId)
     {
         var players = await _context.Set<Player>()
             .AsQueryable()
@@ -150,21 +150,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return playersWithName == 0;
     }
 
-    public async Task UpdatePlayerHeartbeatAsync(Guid playerId)
-    {
-        var player = await _context.Set<Player>().FindAsync(playerId);
-
-        if (player == null)
-        {
-            return;
-        }
-        
-        player.UpdateHeartbeat();
-
-        await _context.SaveChangesAsync();
-    }
-
-    public Task UpdatePlayersAsync(IEnumerable<Player> players)
+    public Task UpdatePlayersAsync(ICollection<Player> players)
     {
         foreach (var player in players)
         {
@@ -180,9 +166,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .Where(t => t.GameId == gameId && t.Active)
             .OrderBy(t => t.Order)
             .ToListAsync();
-
         
-
         // Reindex order starting at 1
         for (int i = 0; i < players.Count; i++)
         {
