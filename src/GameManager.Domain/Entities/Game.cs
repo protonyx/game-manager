@@ -5,27 +5,84 @@ namespace GameManager.Domain.Entities;
 
 public class Game
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; private set; }
 
-    private string _entryCode = string.Empty;
-    public EntryCode EntryCode {
-        get => _entryCode;
-        set => _entryCode = value.Value;
+    public EntryCode? EntryCode { get; private set; }
+
+    public GameState State { get; private set; }
+
+    public GameOptions Options { get; private set; }
+    
+    public CurrentTurnDetails? CurrentTurn { get; private set; }
+
+    private List<Tracker> _trackers = new();
+    public IReadOnlyList<Tracker> Trackers => _trackers.ToList();
+
+    public DateTime CreatedDate { get; private set; }
+
+    public DateTime? StartedDate { get; private set; }
+
+    public DateTime? CompletedDate { get; private set; }
+
+    protected Game()
+    {
+        
+    }
+    
+    public Game(string name, GameOptions options)
+    {
+        Id = Guid.NewGuid();
+        EntryCode = EntryCode.New();
+        Name = name;
+        State = GameState.Preparing;
+        Options = options;
+        CreatedDate = DateTime.UtcNow;
     }
 
-    public GameState State { get; set; } = GameState.Preparing;
+    public void RegenerateEntryCode()
+    {
+        if (State != GameState.Preparing)
+        {
+            throw new InvalidOperationException("Invalid game state");
+        }
 
-    public GameOptions Options { get; set; } = new GameOptions();
-    
-    public CurrentTurnDetails? CurrentTurn { get; set; }
+        EntryCode = EntryCode.New();
+    }
 
-    public ICollection<Tracker> Trackers { get; set; } = new List<Tracker>();
+    public void Start(Player startingPlayer)
+    {
+        if (State != GameState.Preparing)
+        {
+            throw new InvalidOperationException("Invalid game state");
+        }
 
-    public DateTime CreatedDate { get; set; }
+        State = GameState.InProgress;
+        StartedDate = DateTime.UtcNow;
+        SetCurrentTurn(startingPlayer);
+    }
 
-    public DateTime? StartedDate { get; set; }
+    public void Complete()
+    {
+        if (State != GameState.InProgress)
+        {
+            throw new InvalidOperationException("Invalid game state");
+        }
 
-    public DateTime? CompletedDate { get; set; }
+        State = GameState.Complete;
+        CompletedDate = DateTime.UtcNow;
+        CurrentTurn = null;
+        EntryCode = null;
+    }
+
+    public void SetCurrentTurn(Player currentPlayer)
+    {
+        CurrentTurn = new CurrentTurnDetails(currentPlayer);
+    }
+
+    public void AddTracker(Tracker tracker)
+    {
+        this._trackers.Add(tracker);
+    }
 }

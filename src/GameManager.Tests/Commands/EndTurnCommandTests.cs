@@ -15,10 +15,7 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.EntryCode, EntryCode.New(4))
-            .With(t => t.State, GameState.InProgress)
-            .Create();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var players = fixture.Build<Player>()
             .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
             .CreateMany(2)
@@ -27,22 +24,13 @@ public class EndTurnCommandTests
         player1.SetOrder(1);
         var player2 = players[1];
         player2.SetOrder(2);
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player1.Id
-        };
+        game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetByIdAsync(game.Id))
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)))
-            .ReturnsUsingFixture(fixture.Build<Game>()
-                .With(t => t.EntryCode, EntryCode.New(4))
-                .With(g => g.Id, game.Id)
-                .With(g => g.CurrentTurn, new CurrentTurnDetails()
-                {
-                    PlayerId = player2.Id
-                }));
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
@@ -69,10 +57,7 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.EntryCode, EntryCode.New(4))
-            .With(t => t.State, GameState.InProgress)
-            .Create();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var players = fixture.Build<Player>()
             .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
             .CreateMany(2)
@@ -82,22 +67,13 @@ public class EndTurnCommandTests
         player1.Promote();
         var player2 = players[1];
         player2.SetOrder(2);
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player2.Id
-        };
+        game.Start(player2);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetByIdAsync(game.Id))
             .ReturnsAsync(game);
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)))
-            .ReturnsUsingFixture(fixture.Build<Game>()
-                .With(t => t.EntryCode, EntryCode.New(4))
-                .With(g => g.Id, game.Id)
-                .With(g => g.CurrentTurn,  new CurrentTurnDetails()
-            {
-                PlayerId = player1.Id
-            }));
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
             .ReturnsAsync(new List<Player>() {player1, player2});
@@ -124,10 +100,7 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.EntryCode, EntryCode.New(4))
-            .With(t => t.State, GameState.InProgress)
-            .Create();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var players = fixture.Build<Player>()
             .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
             .CreateMany(2)
@@ -136,10 +109,7 @@ public class EndTurnCommandTests
         player1.SetOrder(1);
         var player2 = players[1];
         player2.SetOrder(2);
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player1.Id
-        };
+        game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetByIdAsync(game.Id))

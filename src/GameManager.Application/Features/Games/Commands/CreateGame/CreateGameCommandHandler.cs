@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Domain.ValueObjects;
 
@@ -11,8 +11,6 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
     private readonly IValidator<Game> _gameValidator;
 
     private readonly IMapper _mapper;
-    
-    private const int EntryCodeLength = 4;
 
     public CreateGameCommandHandler(IGameRepository gameRepository, IValidator<Game> gameValidator, IMapper mapper)
     {
@@ -23,18 +21,19 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
 
     public async Task<Result<GameDTO, CommandError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
-        var game = new Game()
-        {
-            Name = request.Name,
-            EntryCode = EntryCode.New(EntryCodeLength),
-            Options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions(),
-            Trackers = request.Trackers.Select(_mapper.Map<Tracker>).ToList()
-        };
+        var options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions();
+        var game = new Game(request.Name, options);
 
-        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode.Value))
+        foreach (var trackerDto in request.Trackers)
+        {
+            var tracker = _mapper.Map<Tracker>(trackerDto);
+            game.AddTracker(tracker);
+        }
+
+        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode!.Value))
         {
             // Generate a new entry code until we find a unique code
-            game.EntryCode = EntryCode.New(EntryCodeLength);
+            game.RegenerateEntryCode();
         }
         
         // Validate

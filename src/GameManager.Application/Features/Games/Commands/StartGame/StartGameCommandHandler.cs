@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
@@ -36,7 +36,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
             return GameErrors.Commands.GameNotFound(request.GameId);
         }
         
-        if (game.State != GameState.Preparing)
+        if (!_userContext.User!.IsAdminForGame(game.Id))
         {
             return GameErrors.Commands.GameAlreadyInProgress();
         }
@@ -49,13 +49,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
         var firstPlayer = players.OrderBy(t => t.Order).First();
 
-        game.State = GameState.InProgress;
-        game.StartedDate = DateTime.UtcNow;
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = firstPlayer.Id,
-            StartTime = DateTime.UtcNow
-        };
+        game.Start(firstPlayer);
         
         var updatedGame = await _gameRepository.UpdateAsync(game);
         

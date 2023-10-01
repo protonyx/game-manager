@@ -1,9 +1,6 @@
 using GameManager.Application.Contracts.Persistence;
-using GameManager.Application.Features.Games.Notifications;
-using GameManager.Application.Features.Games.Notifications.GameUpdated;
 using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Persistence.Sqlite.Repositories;
@@ -29,14 +26,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         var games = await query.ToListAsync();
 
         return games;
-    }
-
-    public override async Task<Game> CreateAsync(Game game)
-    {
-        game.Id = Guid.NewGuid();
-        game.CreatedDate = DateTime.UtcNow;
-
-        return await base.CreateAsync(game);
     }
 
     public override Task<Game> UpdateAsync(Game entity)
