@@ -1,3 +1,4 @@
+using FluentValidation.Results;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Domain.Entities;
 
@@ -12,6 +13,7 @@ public static class GameErrors
         public const string GameInvalidState = "game.invalid.state";
         public const string PlayerInvalidId = "player.invalid.id";
         public const string PlayerInvalidState = "player.invalid.state";
+        public const string PlayerInvalidName = "player.invalid.name";
         public const string PlayerNotAuthorized = "player.not_authorized";
     }
     
@@ -46,5 +48,12 @@ public static class GameErrors
         public static CommandError PlayerNotInGame() =>
             CommandError.Authorization("Player is not in the game",
                 errorCode: ErrorCodes.PlayerNotAuthorized);
+
+        public static CommandError PlayerInvalidName(string? reason = null) =>
+            CommandError.Validation(
+                string.IsNullOrWhiteSpace(reason)
+                    ? "Player name is invalid"
+                    : $"Player name is invalid: {reason}",
+                errorCode: ErrorCodes.PlayerInvalidName);
     }
 }

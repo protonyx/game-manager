@@ -32,6 +32,7 @@ public class Game
     }
     
     public Game(string name, GameOptions options)
+        : this()
     {
         Id = Guid.NewGuid();
         EntryCode = EntryCode.New();

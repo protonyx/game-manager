@@ -10,13 +10,13 @@ public class TurnRepository : BaseRepository<Turn>, ITurnRepository
     {
     }
 
-    public async Task<IReadOnlyList<Turn>> GetTurnsByPlayerId(Guid playerId)
+    public async Task<IReadOnlyList<Turn>> GetTurnsByPlayerId(Guid playerId, CancellationToken cancellationToken = default)
     {
         var turns = await _context.Set<Turn>()
             .AsQueryable()
             .AsNoTracking()
             .Where(t => t.PlayerId == playerId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return turns;
     }

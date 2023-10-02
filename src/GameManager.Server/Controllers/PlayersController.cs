@@ -46,11 +46,7 @@ public class PlayersController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] PlayerDTO dto)
     {
-        var result = await _mediator.Send(new UpdatePlayerCommand()
-        {
-            PlayerId = id,
-            Player = dto
-        });
+        var result = await _mediator.Send(new UpdatePlayerCommand(id, dto));
 
         return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
@@ -77,11 +73,7 @@ public class PlayersController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
-        var updateResult = await _mediator.Send(new UpdatePlayerCommand()
-        {
-            PlayerId = id,
-            Player = player
-        });
+        var updateResult = await _mediator.Send(new UpdatePlayerCommand(id, player));
 
         return updateResult.IsSuccess ? Ok(updateResult.Value) : this.GetErrorActionResult(updateResult.Error);
     }

@@ -14,14 +14,12 @@ public class UpdatePlayerCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var game = new Game(fixture.Create<string>(), new GameOptions());
-        var player = fixture.Build<Player>()
-            .FromFactory(() => new Player(PlayerName.Of(fixture.Create<string>()), game))
-            .Create();
+        var player = fixture.BuildPlayer(game).Create();
         var playerRepository = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepository.Setup(x => x.GetByIdAsync(player.Id))
+        playerRepository.Setup(x => x.GetByIdAsync(player.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(player);
-        playerRepository.Setup(x => x.UpdateAsync(It.Is<Player>(p => p.Id == player.Id)))
-            .ReturnsAsync((Player p) => p);
+        playerRepository.Setup(x => x.UpdateAsync(It.Is<Player>(p => p.Id == player.Id), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Player p, CancellationToken ct) => p);
         var playerValidator = new InlineValidator<Player>();
         fixture.Inject<IValidator<Player>>(playerValidator);
         fixture.SetUser(user =>
@@ -31,19 +29,17 @@ public class UpdatePlayerCommandTests
         });
 
         var sut = fixture.Create<UpdatePlayerCommandHandler>();
-        var command = new UpdatePlayerCommand()
-        {
-            PlayerId = player.Id,
-            Player = fixture.Build<PlayerDTO>()
-                .With(p => p.Id, player.Id)
-                .Create()
-        };
+        var dto = fixture.Build<PlayerDTO>()
+            .With(p => p.Id, player.Id)
+            .With(p => p.Name, "Player 1")
+            .Create();
+        var command = new UpdatePlayerCommand(player.Id, dto);
         
         // Act
         var result = await sut.Handle(command, CancellationToken.None);
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        playerRepository.Verify(x => x.UpdateAsync(It.IsAny<Player>()), Times.Once);
+        playerRepository.Verify(x => x.UpdateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

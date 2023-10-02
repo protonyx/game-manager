@@ -35,18 +35,28 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
 
     public async Task<Result<PlayerCredentialsDTO, CommandError>> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetGameByEntryCodeAsync(EntryCode.Of(request.EntryCode));
+        var entryCodeOrError = EntryCode.From(request.EntryCode);
+
+        if (entryCodeOrError.IsFailure)
+            return GameErrors.Commands.InvalidEntryCode();
+        
+        var playerNameOrError = PlayerName.From(request.Name);
+
+        if (playerNameOrError.IsFailure)
+            return GameErrors.Commands.PlayerInvalidName(playerNameOrError.Error);
+        
+        var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
         
         if (game == null)
-        {
             return GameErrors.Commands.InvalidEntryCode();
-        }
 
-        var newPlayer = new Player(PlayerName.Of(request.Name), game);
+        var newPlayer = new Player(playerNameOrError.Value, game);
         
         // Promote the player if they are the first
-        var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id);
+        var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
 
+        newPlayer.SetOrder(existingPlayerCount + 1);
+        
         if (existingPlayerCount == 0)
         {
             newPlayer.Promote();
@@ -60,7 +70,7 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
             return CommandError.Validation<Player>(validationResult);
         }
 
-        newPlayer = await _playerRepository.CreateAsync(newPlayer);
+        newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);
         
         await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
 

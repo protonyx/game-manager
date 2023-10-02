@@ -35,36 +35,42 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
 
     public async Task<UnitResult<CommandError>> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId);
+        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
             return GameErrors.Commands.PlayerNotFound(request.PlayerId);
         }
         
-        if (_userContext.User == null || !_userContext.User.IsAuthorizedForGame(player.GameId))
-        {
-            return CommandError.Authorization("Player is not part of this game");
-        }
-        else if (!_userContext.User.IsAuthorizedForPlayer(player.Id))
+        if (_userContext.User == null 
+            || !_userContext.User.IsAuthorizedForGame(player.GameId)
+            || !_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
             return CommandError.Authorization("Not authorized to update this player");
         }
         
-        await _playerRepository.DeleteByIdAsync(request.PlayerId);
+        player.SoftDelete();
+        
+        await _playerRepository.UpdateAsync(player, cancellationToken);
         
         await _mediator.Publish(new PlayerDeletedNotification(player), cancellationToken);
+        
+        // Update player order for remaining players
+        var players = await _playerRepository.GetPlayersByGameIdAsync(player.GameId, cancellationToken);
+            
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].SetOrder(i + 1);
+        }
         
         // If the deleted player was an admin and there are any remaining players, promote the next player to admin
         if (player.IsAdmin)
         {
-            var players = await _playerRepository.GetPlayersByGameIdAsync(player.GameId);
-
-            var nextPlayer = players.Where(t => t.Active).MinBy(t => t.Order);
+            var nextPlayer = players.Where(t => t.Active).MinBy(t => t.JoinedDate);
 
             if (nextPlayer != null)
             {
-                await _playerRepository.UpdateAsync(nextPlayer);
+                nextPlayer.Promote();
                 
                 // Generate player token
                 var identityBuilder = new PlayerIdentityBuilder();
@@ -84,6 +90,8 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
                 await _notificationService.UpdateCredentials(playerCredentials, cancellationToken);
             }
         }
+
+        await _playerRepository.UpdateManyAsync(players, cancellationToken);
 
         return UnitResult.Success<CommandError>();
     }

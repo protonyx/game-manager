@@ -16,8 +16,8 @@ public class CreateGameCommandTests
         fixture.Inject<IValidator<Game>>(validator);
 
         var repo = fixture.Freeze<Mock<IGameRepository>>();
-        repo.Setup(t => t.CreateAsync(It.IsAny<Game>()))
-            .ReturnsAsync((Game entity) => entity);
+        repo.Setup(t => t.CreateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Game entity, CancellationToken ct) => entity);
 
         var sut = fixture.Create<CreateGameCommandHandler>();
         var cmd = fixture.Create<CreateGameCommand>();
@@ -27,7 +27,7 @@ public class CreateGameCommandTests
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Once);
+        repo.Verify(t => t.CreateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
@@ -51,6 +51,6 @@ public class CreateGameCommandTests
         response.IsFailure.Should().BeTrue();
         response.Error.ErrorType.Should().Be(CommandErrorType.ValidationError);
         response.Error.ValidationResult.IsValid.Should().BeFalse();
-        repo.Verify(t => t.CreateAsync(It.IsAny<Game>()), Times.Never);
+        repo.Verify(t => t.CreateAsync(It.IsAny<Game>(), CancellationToken.None), Times.Never);
     }
 }

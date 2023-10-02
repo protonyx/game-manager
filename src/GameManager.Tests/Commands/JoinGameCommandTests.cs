@@ -14,7 +14,7 @@ public class JoinGameCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>(), CancellationToken.None))
             .ReturnsAsync(default(Game));
         
         var cmd = fixture.Build<JoinGameCommand>()
@@ -36,17 +36,18 @@ public class JoinGameCommandTests
         var fixture = TestUtils.GetTestFixture();
         var game = new Game(fixture.Create<string>(), new GameOptions());
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>()))
-          .ReturnsAsync((Player p) => p);
+        playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()))
+          .ReturnsAsync((Player p, CancellationToken ct) => p);
         var playerValidator = new InlineValidator<Player>();
         fixture.Inject<IValidator<Player>>(playerValidator);
         
         var handler = fixture.Create<JoinGameCommandHandler>();
         var cmd = fixture.Build<JoinGameCommand>()
             .With(t => t.EntryCode, EntryCode.New(4).Value)
+            .With(t => t.Name, "Player 1")
             .Create();
         
         // Act
@@ -54,6 +55,6 @@ public class JoinGameCommandTests
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        playerRepo.Verify(t => t.CreateAsync(It.IsAny<Player>()), Times.Once);
+        playerRepo.Verify(t => t.CreateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

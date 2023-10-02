@@ -4,18 +4,20 @@ public class PlayerName
 {
     public string Value { get; }
 
-    public static PlayerName Of(string value)
+    public static Result<PlayerName> From(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure<PlayerName>("Name is required");
+        if (value.Length < 3)
+            return Result.Failure<PlayerName>("Name is too short");
+        if (value.Length > 20)
+            return Result.Failure<PlayerName>("Name is too long");
+        
         return new PlayerName(value);
     }
     
     private PlayerName(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value));
-        if (value.Length > 100)
-            throw new ArgumentOutOfRangeException(nameof(value), "Name is too long");
-
         Value = value;
     }
     

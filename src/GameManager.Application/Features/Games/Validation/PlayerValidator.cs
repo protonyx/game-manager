@@ -18,11 +18,6 @@ public class PlayerValidator : AbstractValidator<Player>
             .WithMessage("Game must exist");
 
         RuleFor(t => t.Name)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull();
-            //.Length(3, 20);
-
-        RuleFor(t => t.Name)
             .MustAsync((player, name, cancellationToken) =>
                 playerRepository.NameIsUniqueAsync(player.GameId, name.Value, player.Id))
             .WithMessage("{PropertyName} must be unique");

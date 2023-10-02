@@ -26,6 +26,14 @@ public class CommandError
         };
     }
 
+    public static CommandError Validation(string message, string? errorCode = null)
+    {
+        return new CommandError(CommandErrorType.ValidationError, errorCode)
+        {
+            Reason = message
+        };
+    }
+
     public static CommandError Validation<T>(ValidationResult validationResults, string? errorCode = null)
     {
         return new CommandError(CommandErrorType.ValidationError, errorCode)

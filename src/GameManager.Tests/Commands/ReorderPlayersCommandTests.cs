@@ -13,19 +13,19 @@ public class ReorderPlayersCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var game = new Game(fixture.Create<string>(), new GameOptions());
-        var players = fixture.Build<Player>()
-            .FromFactory(() => new Player(PlayerName.Of(fixture.Create<string>()), game))
+        var players = fixture.BuildPlayer(game)
             .CreateMany(3)
             .ToList();
+        
         ICollection<Player> reorderedPlayers = null;
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(players);
-        playerRepo.Setup(t => t.UpdatePlayersAsync(It.IsAny<ICollection<Player>>()))
-            .Callback((ICollection<Player> p) => reorderedPlayers = p)
+        playerRepo.Setup(t => t.UpdateManyAsync(It.IsAny<IEnumerable<Player>>(), CancellationToken.None))
+            .Callback((IEnumerable<Player> p, CancellationToken ct) => reorderedPlayers = p.ToList())
             .Returns(Task.CompletedTask);
 
         fixture.SetUser(user =>

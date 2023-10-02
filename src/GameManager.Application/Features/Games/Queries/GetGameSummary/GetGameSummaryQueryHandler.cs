@@ -1,11 +1,6 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts.Persistence;
-using GameManager.Application.Contracts.Queries;
+﻿using GameManager.Application.Contracts.Queries;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Queries;
-using GameManager.Domain.Common;
-using GameManager.Domain.Entities;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
@@ -29,7 +24,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
 
     public async Task<IQueryResponse<GameSummaryDTO>> Handle(GetGameSummaryQuery request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         if (game == null)
         {
@@ -40,7 +35,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
             return QueryResponses.AuthorizationError<GameSummaryDTO>("Summary only available for completed games");
         }
 
-        var players = await _playerRepository.GetSummariesByGameIdAsync(game.Id);
+        var players = await _playerRepository.GetSummariesByGameIdAsync(game.Id, cancellationToken);
 
         var ret = new GameSummaryDTO()
         {
@@ -52,6 +47,8 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
             Players = players.Select(p =>
             {
                 var dto = _mapper.Map<PlayerSummaryDTO>(p);
+                
+                // TODO: Get Turns and TrackerHistory
 
                 foreach (var trackerHistory in dto.TrackerHistory)
                 {

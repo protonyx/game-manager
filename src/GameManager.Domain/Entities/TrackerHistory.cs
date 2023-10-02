@@ -11,4 +11,8 @@ public class TrackerHistory
     public DateTime ChangedTime { get; set; }
     
     public int NewValue { get; set; }
+    
+    public virtual Player Player { get; set; }
+
+    public virtual Tracker Tracker { get; set; }
 }

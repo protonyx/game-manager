@@ -18,7 +18,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(t => t.Name)
             .HasConversion(
                 v => v.Value,
-                v => PlayerName.Of(v))
+                v => PlayerName.From(v).Value)
             .IsRequired()
             .HasMaxLength(20);
         builder.Property(t => t.Active)

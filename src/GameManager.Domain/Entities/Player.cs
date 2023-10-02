@@ -4,39 +4,25 @@ namespace GameManager.Domain.Entities;
 
 public class Player
 {
-    private readonly Guid _id;
-    public Guid Id => _id;
+    public Guid Id { get; private set; }
 
-    private readonly Guid _gameId;
-    public Guid GameId => _gameId;
+    public Guid GameId { get; private set; }
 
-    private int _order;
-    public int Order => _order;
-
-    private string _name;
-    public PlayerName Name
-    {
-        get => PlayerName.Of(_name);
-        set => _name = value.Value;
-    }
-
-    private bool _active;
-    public bool Active => _active;
-
-    private bool _isAdmin;
-    public bool IsAdmin => _isAdmin;
-
-    private DateTime _joinedDate;
-    public DateTime JoinedDate => _joinedDate;
-
-    private DateTime? _lastHeartbeat;
-    public DateTime? LastHeartbeat => _lastHeartbeat;
-
-    public ICollection<TrackerValue> TrackerValues { get; set; } = new List<TrackerValue>();
-
-    public ICollection<Turn> Turns { get; set; } = new List<Turn>();
+    public int Order { get; private set; }
     
-    public ICollection<TrackerHistory> TrackerHistory { get; set; } = new List<TrackerHistory>();
+    public PlayerName Name { get; private set; }
+
+    public bool Active {get; private set; }
+
+    public bool IsAdmin { get; private set; }
+    
+    public DateTime JoinedDate { get; private set; }
+
+    public DateTime? LastHeartbeat { get; private set; }
+
+    private List<TrackerValue> _trackerValues = new List<TrackerValue>();
+
+    public IReadOnlyList<TrackerValue> TrackerValues => _trackerValues.ToList();
 
     protected Player()
     {
@@ -45,23 +31,36 @@ public class Player
     public Player(PlayerName name, Game game)
         :this()
     {
-        _id = Guid.NewGuid();
-        _active = true;
-        _isAdmin = false;
+        Id = Guid.NewGuid();
+        Active = true;
+        IsAdmin = false;
         
-        _name = name.Value;
-        _gameId = game.Id;
-        _joinedDate = DateTime.UtcNow;
+        Name = name;
+        GameId = game.Id;
+        JoinedDate = DateTime.UtcNow;
+
+        if (game.Trackers.Count > 0)
+        {
+            foreach (var tracker in game.Trackers)
+            {
+                SetTracker(tracker.Id, tracker.StartingValue);
+            }
+        }
     }
     
     public void UpdateHeartbeat()
     {
-        _lastHeartbeat = DateTime.UtcNow;
+        LastHeartbeat = DateTime.UtcNow;
     }
 
     public void Promote()
     {
-        _isAdmin = true;
+        IsAdmin = true;
+    }
+
+    public void SetName(PlayerName name)
+    {
+        Name = name;
     }
 
     public void SetOrder(int newOrder)
@@ -69,12 +68,38 @@ public class Player
         if (newOrder < 0)
             throw new ArgumentOutOfRangeException(nameof(newOrder), "Order cannot be negative");
 
-        _order = newOrder;
+        Order = newOrder;
+    }
+
+    public Result SetTracker(Guid trackerId, int value)
+    {
+        var tracker = _trackerValues.FirstOrDefault(t => t.TrackerId == trackerId);
+
+        if (tracker == null)
+        {
+            _trackerValues.Add(new TrackerValue()
+            {
+                Id = Guid.NewGuid(),
+                PlayerId = Id,
+                TrackerId = trackerId,
+                Value = value
+            });
+        }
+        else if (tracker.Value == value)
+        {
+            return Result.Failure("Tracker value did not change");
+        }
+        else
+        {
+            tracker.Value = value;
+        }
+
+        return Result.Success();
     }
 
     public void SoftDelete()
     {
-        _active = false;
-        _order = 0;
+        Active = false;
+        Order = 0;
     }
 }

@@ -16,8 +16,7 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = new Game(fixture.Create<string>(), new GameOptions());
-        var players = fixture.Build<Player>()
-            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+        var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();
         var player1 = players[0];
@@ -27,12 +26,12 @@ public class EndTurnCommandTests
         game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
-        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)))
+        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -48,7 +47,7 @@ public class EndTurnCommandTests
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)), Times.Once);
+        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None), Times.Once);
     }
     
     [Fact]
@@ -58,8 +57,7 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = new Game(fixture.Create<string>(), new GameOptions());
-        var players = fixture.Build<Player>()
-            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+        var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();
         var player1 = players[0];
@@ -70,12 +68,12 @@ public class EndTurnCommandTests
         game.Start(player2);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
-        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)))
+        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -91,7 +89,7 @@ public class EndTurnCommandTests
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)), Times.Once);
+        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None), Times.Once);
     }
     
     [Fact]
@@ -101,8 +99,7 @@ public class EndTurnCommandTests
         var fixture = TestUtils.GetTestFixture();
 
         var game = new Game(fixture.Create<string>(), new GameOptions());
-        var players = fixture.Build<Player>()
-            .FromFactory(() => new Player(fixture.Create<PlayerName>(), game))
+        var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();
         var player1 = players[0];
@@ -112,10 +109,10 @@ public class EndTurnCommandTests
         game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -132,6 +129,6 @@ public class EndTurnCommandTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.ErrorType.Should().Be(CommandErrorType.AuthorizationError);
-        gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>()), Times.Never());
+        gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>(), CancellationToken.None), Times.Never());
     }
 }

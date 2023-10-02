@@ -30,7 +30,9 @@ public class DtoProfile : Profile
                         Value = kv.Value
                     })
                     .ToList()));
-        CreateMap<Player, PlayerSummaryDTO>();
+        CreateMap<Player, PlayerSummaryDTO>()
+            .ForMember(t => t.Turns, opt => opt.Ignore())
+            .ForMember(t => t.TrackerHistory, opt => opt.Ignore());
         CreateMap<Tracker, TrackerDTO>()
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())

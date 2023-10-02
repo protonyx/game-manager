@@ -1,6 +1,5 @@
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.DTO;
-using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
@@ -30,7 +29,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
             game.AddTracker(tracker);
         }
 
-        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode!.Value))
+        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode, cancellationToken))
         {
             // Generate a new entry code until we find a unique code
             game.RegenerateEntryCode();
@@ -44,7 +43,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
             return CommandError.Validation<Game>(validationResult);
         }
 
-        game = await _gameRepository.CreateAsync(game);
+        game = await _gameRepository.CreateAsync(game, cancellationToken);
 
         var dto = _mapper.Map<GameDTO>(game);
 

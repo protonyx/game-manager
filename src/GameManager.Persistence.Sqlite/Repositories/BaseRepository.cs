@@ -12,39 +12,50 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class
         _context = context;
     }
 
-    public virtual async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         T? t = await _context.Set<T>().FindAsync(id);
         
         return t;
     }
 
-    public virtual async Task<T> CreateAsync(T entity)
+    public virtual async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)
     {
-        await _context.Set<T>().AddAsync(entity);
-        await _context.SaveChangesAsync();
+        _context.Set<T>().Add(entity);
+        
+        await _context.SaveChangesAsync(cancellationToken);
 
         return entity;
     }
 
-    public virtual async Task<T> UpdateAsync(T entity)
+    public virtual async Task<T> UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         _context.Entry(entity).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
         
         return entity;
     }
 
-    public virtual async Task DeleteAsync(T entity)
+    public Task UpdateManyAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
-        _context.Set<T>().Remove(entity);
-        await _context.SaveChangesAsync();
+        foreach (var entity in entities)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+        
+        return _context.SaveChangesAsync(cancellationToken);
     }
 
-    public virtual async Task DeleteByIdAsync(Guid id)
+    public virtual async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
-        T? t = await GetByIdAsync(id);
+        _context.Set<T>().Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public virtual async Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        T? t = await GetByIdAsync(id, cancellationToken);
         if (t != null)
-            await DeleteAsync(t);
+            await DeleteAsync(t, cancellationToken);
     }
 }

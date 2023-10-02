@@ -2,7 +2,9 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Contracts.Commands;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.Notifications.PlayerTrackerUpdated;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 
@@ -34,7 +36,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
 
     public async Task<Result<PlayerDTO, CommandError>> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId);
+        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
@@ -47,9 +49,34 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
         {
             return GameErrors.Commands.PlayerNotAuthorized("update player");
         }
+        
+        // Update Name
+        if (!string.IsNullOrWhiteSpace(request.Player.Name))
+        {
+            var playerNameOrError = PlayerName.From(request.Player.Name);
 
-        // Map changes onto entity
-        _mapper.Map(request.Player, player);
+            if (playerNameOrError.IsFailure)
+                return GameErrors.Commands.PlayerInvalidName(playerNameOrError.Error);
+            
+            player.SetName(playerNameOrError.Value);
+        }
+        
+        // Update trackers
+        var pendingTrackerNotifications = new List<PlayerTrackerUpdatedNotification>();
+        foreach (var tracker in request.Player.TrackerValues)
+        {
+            var trackerResult = player.SetTracker(tracker.Key, tracker.Value);
+
+            if (trackerResult.IsSuccess)
+            {
+                pendingTrackerNotifications.Add(new PlayerTrackerUpdatedNotification()
+                {
+                    PlayerId = player.Id,
+                    TrackerId = tracker.Key,
+                    NewValue = tracker.Value
+                });
+            }
+        }
         
         // Validate
         var result = await _playerValidator.ValidateAsync(player, cancellationToken);
@@ -58,11 +85,16 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
         {
             return CommandError.Validation<Player>(result);
         }
-
-        var updatedPlayer = await _playerRepository.UpdateAsync(player);
+        
+        var updatedPlayer = await _playerRepository.UpdateAsync(player, cancellationToken);
         
         await _mediator.Publish(new PlayerUpdatedNotification(updatedPlayer), cancellationToken);
 
+        foreach (var pendingNotification in pendingTrackerNotifications)
+        {
+            await _mediator.Publish(pendingNotification, cancellationToken);
+        }
+        
         var dto = _mapper.Map<PlayerDTO>(updatedPlayer);
 
         return dto;

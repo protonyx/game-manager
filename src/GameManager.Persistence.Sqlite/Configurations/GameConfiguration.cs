@@ -18,7 +18,7 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(t => t.EntryCode)
             .HasConversion(
                 v => v.Value,
-                v => EntryCode.Of(v))
+                v => EntryCode.From(v).Value)
             .HasMaxLength(10);
         
         builder.OwnsOne(t => t.Options, build =>

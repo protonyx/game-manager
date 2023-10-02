@@ -2,9 +2,10 @@
 
 public interface IAsyncRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(Guid id);
-    Task<T> CreateAsync(T entity);
-    Task<T> UpdateAsync(T entity);
-    Task DeleteAsync(T entity);
-    Task DeleteByIdAsync(Guid id);
+    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default);
+    Task<T> UpdateAsync(T entity, CancellationToken cancellationToken = default);
+    Task UpdateManyAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+    Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
+    Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

@@ -66,7 +66,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
             player?.SetOrder(nextOrder++);
         }
 
-        await _playerRepository.UpdatePlayersAsync(players.ToList());
+        await _playerRepository.UpdateManyAsync(players.ToList(), cancellationToken);
 
         foreach (var player in players)
         {

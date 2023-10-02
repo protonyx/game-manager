@@ -11,4 +11,6 @@ public class Turn
     public DateTime EndTime { get; set; }
 
     public TimeSpan Duration { get; set; }
+    
+    public virtual Player Player { get; set; }
 }

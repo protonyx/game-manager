@@ -29,24 +29,29 @@ public class EntryCode
         return new EntryCode(sb.ToString());
     }
 
-    public static EntryCode Of(string value)
+    public static Result<EntryCode> From(string value)
     {
-        return new EntryCode(value.ToUpper());
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure<EntryCode>("Entry code is empty");
+        if (value.Length > 10)
+            return Result.Failure<EntryCode>("Entry code is too long");
+        
+        return new EntryCode(value);
     }
 
     private EntryCode(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value));
-        if (value.Length > 10)
-            throw new ArgumentOutOfRangeException(nameof(value), "Entry code is too long");
-
-        Value = value;
+        Value = value.ToUpper();
     }
 
     public static implicit operator EntryCode(string value)
     {
-        return EntryCode.Of(value);
+        return EntryCode.From(value).Value;
+    }
+
+    public static implicit operator string(EntryCode code)
+    {
+        return code.Value;
     }
 
     private bool Equals(EntryCode other)
