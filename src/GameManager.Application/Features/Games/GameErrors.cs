@@ -1,5 +1,5 @@
 using FluentValidation.Results;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Features.Games;
@@ -17,43 +17,44 @@ public static class GameErrors
         public const string PlayerNotAuthorized = "player.not_authorized";
     }
     
-    public static class Commands
-    {
-        public static CommandError InvalidEntryCode()
-            => CommandError.Failure("Invalid entry code",
-                errorCode: ErrorCodes.GameInvalidEntryCode);
+    public static ApplicationError InvalidEntryCode()
+        => ApplicationError.Failure("Invalid entry code",
+            errorCode: ErrorCodes.GameInvalidEntryCode);
         
-        public static CommandError GameNotFound(Guid? gameId)
-            => CommandError.NotFound<Game>(gameId?.ToString(),
-                errorCode: ErrorCodes.GameInvalidId);
+    public static ApplicationError GameNotFound(Guid? gameId)
+        => ApplicationError.NotFound<Game>(gameId?.ToString(),
+            errorCode: ErrorCodes.GameInvalidId);
         
-        public static CommandError GameNotInProgress(Guid gameId)
-            => CommandError.Failure("Game not in progress",
-                errorCode: ErrorCodes.GameInvalidState);
+    public static ApplicationError GameNotInProgress(Guid gameId)
+        => ApplicationError.Failure("Game not in progress",
+            errorCode: ErrorCodes.GameInvalidState);
 
-        public static CommandError GameAlreadyInProgress() =>
-            CommandError.Failure("Game already in progress",
-                errorCode: ErrorCodes.GameInvalidState);
+    public static ApplicationError GameAlreadyInProgress() =>
+        ApplicationError.Failure("Game already in progress",
+            errorCode: ErrorCodes.GameInvalidState);
 
-        public static CommandError PlayerNotFound(Guid? playerId)
-            => CommandError.NotFound<Player>(playerId?.ToString(),
-                errorCode: ErrorCodes.PlayerInvalidId);
+    public static ApplicationError GameNotComplete() =>
+        ApplicationError.Failure("Game not complete",
+            errorCode: ErrorCodes.GameInvalidState);
 
-        public static CommandError PlayerNotAuthorized(string? action = null) =>
-            CommandError.Authorization(string.IsNullOrWhiteSpace(action)
-                    ? "Player is not authorized to perform this action"
-                    : $"Player is not authorized to {action}",
-                errorCode: ErrorCodes.PlayerNotAuthorized);
+    public static ApplicationError PlayerNotFound(Guid? playerId)
+        => ApplicationError.NotFound<Player>(playerId?.ToString(),
+            errorCode: ErrorCodes.PlayerInvalidId);
 
-        public static CommandError PlayerNotInGame() =>
-            CommandError.Authorization("Player is not in the game",
-                errorCode: ErrorCodes.PlayerNotAuthorized);
+    public static ApplicationError PlayerNotAuthorized(string? action = null) =>
+        ApplicationError.Authorization(string.IsNullOrWhiteSpace(action)
+                ? "Player is not authorized to perform this action"
+                : $"Player is not authorized to {action}",
+            errorCode: ErrorCodes.PlayerNotAuthorized);
 
-        public static CommandError PlayerInvalidName(string? reason = null) =>
-            CommandError.Validation(
-                string.IsNullOrWhiteSpace(reason)
-                    ? "Player name is invalid"
-                    : $"Player name is invalid: {reason}",
-                errorCode: ErrorCodes.PlayerInvalidName);
-    }
+    public static ApplicationError PlayerNotInGame() =>
+        ApplicationError.Authorization("Player is not in the game",
+            errorCode: ErrorCodes.PlayerNotAuthorized);
+
+    public static ApplicationError PlayerInvalidName(string? reason = null) =>
+        ApplicationError.Validation(
+            string.IsNullOrWhiteSpace(reason)
+                ? "Player name is invalid"
+                : $"Player name is invalid: {reason}",
+            errorCode: ErrorCodes.PlayerInvalidName);
 }

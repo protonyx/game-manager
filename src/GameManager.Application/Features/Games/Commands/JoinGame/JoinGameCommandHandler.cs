@@ -1,13 +1,13 @@
 ﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerCreated;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<PlayerCredentialsDTO, CommandError>>
+public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<PlayerCredentialsDTO, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -33,22 +33,22 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
         _mediator = mediator;
     }
 
-    public async Task<Result<PlayerCredentialsDTO, CommandError>> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PlayerCredentialsDTO, ApplicationError>> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
         var entryCodeOrError = EntryCode.From(request.EntryCode);
 
         if (entryCodeOrError.IsFailure)
-            return GameErrors.Commands.InvalidEntryCode();
+            return GameErrors.InvalidEntryCode();
         
         var playerNameOrError = PlayerName.From(request.Name);
 
         if (playerNameOrError.IsFailure)
-            return GameErrors.Commands.PlayerInvalidName(playerNameOrError.Error);
+            return GameErrors.PlayerInvalidName(playerNameOrError.Error);
         
         var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
         
         if (game == null)
-            return GameErrors.Commands.InvalidEntryCode();
+            return GameErrors.InvalidEntryCode();
 
         var newPlayer = new Player(playerNameOrError.Value, game);
         
@@ -67,7 +67,7 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
 
         if (!validationResult.IsValid)
         {
-            return CommandError.Validation<Player>(validationResult);
+            return ApplicationError.Validation<Player>(validationResult);
         }
 
         newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);

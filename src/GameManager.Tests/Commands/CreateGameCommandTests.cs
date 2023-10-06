@@ -1,5 +1,5 @@
-﻿using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Domain.Entities;
 
@@ -49,7 +49,7 @@ public class CreateGameCommandTests
         
         // Assert
         response.IsFailure.Should().BeTrue();
-        response.Error.ErrorType.Should().Be(CommandErrorType.ValidationError);
+        response.Error.ErrorType.Should().Be(ApplicationErrorType.ValidationError);
         response.Error.ValidationResult.IsValid.Should().BeFalse();
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>(), CancellationToken.None), Times.Never);
     }

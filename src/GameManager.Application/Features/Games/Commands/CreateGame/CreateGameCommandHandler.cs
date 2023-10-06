@@ -1,9 +1,9 @@
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Result<GameDTO, CommandError>>
+public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Result<GameDTO, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -18,7 +18,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
         _mapper = mapper;
     }
 
-    public async Task<Result<GameDTO, CommandError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GameDTO, ApplicationError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
         var options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions();
         var game = new Game(request.Name, options);
@@ -40,7 +40,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
 
         if (!validationResult.IsValid)
         {
-            return CommandError.Validation<Game>(validationResult);
+            return ApplicationError.Validation<Game>(validationResult);
         }
 
         game = await _gameRepository.CreateAsync(game, cancellationToken);

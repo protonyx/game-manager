@@ -1,6 +1,5 @@
 using GameManager.Application;
 using GameManager.Application.Contracts;
-using GameManager.Application.Services;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;

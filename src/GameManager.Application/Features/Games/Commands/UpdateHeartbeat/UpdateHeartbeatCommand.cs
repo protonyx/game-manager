@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 
-public class UpdateHeartbeatCommand : IRequest<UnitResult<CommandError>>
+public class UpdateHeartbeatCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid PlayerId { get; }
 

@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommand : IRequest<UnitResult<CommandError>>
+public class DeletePlayerCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid PlayerId { get; }
 

@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommand : IRequest<Result<PlayerCredentialsDTO, CommandError>>
+public class JoinGameCommand : IRequest<Result<PlayerCredentialsDTO, ApplicationError>>
 {
     public string EntryCode { get; set; } = string.Empty;
 

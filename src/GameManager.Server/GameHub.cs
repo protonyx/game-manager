@@ -1,7 +1,7 @@
 using GameManager.Application.Authorization;
+using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
-using GameManager.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;

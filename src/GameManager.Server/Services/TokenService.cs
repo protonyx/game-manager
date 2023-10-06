@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Text;
 using GameManager.Application.Contracts;
-using GameManager.Application.Services;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GameManager.Server.Services;

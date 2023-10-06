@@ -20,12 +20,25 @@ public class Player
 
     public DateTime? LastHeartbeat { get; private set; }
 
-    private List<TrackerValue> _trackerValues = new List<TrackerValue>();
+    internal List<TrackerValue> _trackerValues = new List<TrackerValue>();
 
     public IReadOnlyList<TrackerValue> TrackerValues => _trackerValues.ToList();
 
     protected Player()
     {
+    }
+
+    protected Player(Player player)
+    {
+        Id = player.Id;
+        GameId = player.GameId;
+        Order = player.Order;
+        Name = player.Name;
+        Active = player.Active;
+        IsAdmin = player.IsAdmin;
+        JoinedDate = player.JoinedDate;
+        LastHeartbeat = player.LastHeartbeat;
+        _trackerValues = player._trackerValues;
     }
     
     public Player(PlayerName name, Game game)

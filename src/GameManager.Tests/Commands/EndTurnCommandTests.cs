@@ -1,5 +1,5 @@
-﻿using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Common;
 using GameManager.Domain.Entities;
@@ -128,7 +128,7 @@ public class EndTurnCommandTests
         
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.ErrorType.Should().Be(CommandErrorType.AuthorizationError);
+        result.Error.ErrorType.Should().Be(ApplicationErrorType.AuthorizationError);
         gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>(), CancellationToken.None), Times.Never());
     }
 }

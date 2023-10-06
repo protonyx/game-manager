@@ -1,10 +1,8 @@
-﻿using GameManager.Application.Contracts.Queries;
-using GameManager.Application.Features.Games.DTO;
-using MediatR;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
-public class GetGameSummaryQuery : IRequest<IQueryResponse<GameSummaryDTO>>
+public class GetGameSummaryQuery : IRequest<Result<GameSummaryDTO, ApplicationError>>
 {
     public Guid GameId { get; }
 

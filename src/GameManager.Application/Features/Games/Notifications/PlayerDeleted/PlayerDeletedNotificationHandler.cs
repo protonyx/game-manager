@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using GameManager.Application.Contracts;
 using GameManager.Application.Messages;
-using GameManager.Application.Services;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Notifications.PlayerDeleted;

@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.StartGame;
 
-public class StartGameCommand : IRequest<UnitResult<CommandError>>
+public class StartGameCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid GameId { get; }
 

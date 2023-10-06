@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 
-public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatCommand, UnitResult<CommandError>>
+public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatCommand, UnitResult<ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -11,19 +11,19 @@ public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatComm
         _playerRepository = playerRepository;
     }
 
-    public async Task<UnitResult<CommandError>> Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId);
+        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
-            return GameErrors.Commands.PlayerNotFound(request.PlayerId);
+            return GameErrors.PlayerNotFound(request.PlayerId);
         }
         
         player.UpdateHeartbeat();
 
-        await _playerRepository.UpdateAsync(player);
+        await _playerRepository.UpdateAsync(player, cancellationToken);
 
-        return UnitResult.Success<CommandError>();
+        return UnitResult.Success<ApplicationError>();
     }
 }

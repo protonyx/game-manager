@@ -1,11 +1,11 @@
 using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.StartGame;
 
-public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<CommandError>>
+public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -27,34 +27,34 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
         _mediator = mediator;
     }
 
-    public async Task<UnitResult<CommandError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         if (game == null)
         {
-            return GameErrors.Commands.GameNotFound(request.GameId);
+            return GameErrors.GameNotFound(request.GameId);
         }
         
         if (!_userContext.User!.IsAdminForGame(game.Id))
         {
-            return GameErrors.Commands.GameAlreadyInProgress();
+            return GameErrors.GameAlreadyInProgress();
         }
         
         if (!_userContext.User!.IsAdminForGame(game.Id))
         {
-            return GameErrors.Commands.PlayerNotAuthorized("start the game");
+            return GameErrors.PlayerNotAuthorized("start the game");
         }
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
         var firstPlayer = players.OrderBy(t => t.Order).First();
 
         game.Start(firstPlayer);
         
-        var updatedGame = await _gameRepository.UpdateAsync(game);
+        var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
         
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
-        return UnitResult.Success<CommandError>();
+        return UnitResult.Success<ApplicationError>();
     }
 }

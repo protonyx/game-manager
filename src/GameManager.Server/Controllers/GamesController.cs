@@ -8,7 +8,6 @@ using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
 using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,14 +46,9 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGame([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new GetGameQuery(id));
+        var result = await _mediator.Send(new GetGameQuery(id));
 
-        if (response == null)
-        {
-            return NotFound();
-        }
-        
-        return Ok(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Players")]
@@ -62,9 +56,9 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new GetPlayerListQuery(id));
-        
-        return Ok(response);
+        var result = await _mediator.Send(new GetPlayerListQuery(id));
+
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("{id}/Actions/Reorder")]
@@ -135,15 +129,18 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id}/Summary")]
+    [ProducesResponseType(typeof(GameSummaryDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetGameSummary(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         var query = new GetGameSummaryQuery(id);
         
-        var response = await _mediator.Send(query, cancellationToken);
-        
-        return this.GetActionResult(response);
+        var result = await _mediator.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
 }

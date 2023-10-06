@@ -1,11 +1,11 @@
 using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
-public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand, UnitResult<CommandError>>
+public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -27,21 +27,21 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
         _userContext = userContext;
     }
 
-    public async Task<UnitResult<CommandError>> Handle(ReorderPlayersCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(ReorderPlayersCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         if (game == null)
         {
-            return GameErrors.Commands.GameNotFound(request.GameId);
+            return GameErrors.GameNotFound(request.GameId);
         }
         
         if (!_userContext.User!.IsAuthorizedForGame(game.Id))
         {
-            return GameErrors.Commands.PlayerNotAuthorized();
+            return GameErrors.PlayerNotAuthorized();
         }
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId, cancellationToken);
 
         var newIdList = request.PlayerIds;
         var existingIdSet = players.Where(p => p.Active).Select(p => p.Id).ToHashSet();
@@ -73,6 +73,6 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
             await _mediator.Publish(new PlayerUpdatedNotification(player), cancellationToken);
         }
         
-        return UnitResult.Success<CommandError>();
+        return UnitResult.Success<ApplicationError>();
     }
 }

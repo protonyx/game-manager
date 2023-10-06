@@ -1,8 +1,8 @@
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
-public class ReorderPlayersCommand : IRequest<UnitResult<CommandError>>
+public class ReorderPlayersCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid GameId { get; }
 

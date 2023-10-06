@@ -1,10 +1,9 @@
-﻿using GameManager.Application.Contracts.Queries;
+﻿using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
-using GameManager.Application.Queries;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
-public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, IQueryResponse<GameSummaryDTO>>
+public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, Result<GameSummaryDTO, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -22,17 +21,17 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
         _mapper = mapper;
     }
 
-    public async Task<IQueryResponse<GameSummaryDTO>> Handle(GetGameSummaryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GameSummaryDTO, ApplicationError>> Handle(GetGameSummaryQuery request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         if (game == null)
         {
-            return QueryResponses.NotFound<GameSummaryDTO>();
+            return GameErrors.GameNotFound(request.GameId);
         }
         else if (game.State != GameState.Complete)
         {
-            return QueryResponses.AuthorizationError<GameSummaryDTO>("Summary only available for completed games");
+            return GameErrors.GameNotComplete();
         }
 
         var players = await _playerRepository.GetSummariesByGameIdAsync(game.Id, cancellationToken);
@@ -60,6 +59,6 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, I
             }).ToList()
         };
 
-        return QueryResponses.Object(ret);
+        return ret;
     }
 }

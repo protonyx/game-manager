@@ -1,6 +1,6 @@
 ﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerTrackerUpdated;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
@@ -8,7 +8,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 
-public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, Result<PlayerDTO, CommandError>>
+public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, Result<PlayerDTO, ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -34,20 +34,20 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
         _mediator = mediator;
     }
 
-    public async Task<Result<PlayerDTO, CommandError>> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PlayerDTO, ApplicationError>> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
     {
         var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
-            return GameErrors.Commands.PlayerNotFound(request.PlayerId);
+            return GameErrors.PlayerNotFound(request.PlayerId);
         }
         
         if (_userContext.User == null
             || !_userContext.User.IsAuthorizedForGame(player.GameId)
             || !_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
-            return GameErrors.Commands.PlayerNotAuthorized("update player");
+            return GameErrors.PlayerNotAuthorized("update player");
         }
         
         // Update Name
@@ -56,7 +56,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
             var playerNameOrError = PlayerName.From(request.Player.Name);
 
             if (playerNameOrError.IsFailure)
-                return GameErrors.Commands.PlayerInvalidName(playerNameOrError.Error);
+                return GameErrors.PlayerInvalidName(playerNameOrError.Error);
             
             player.SetName(playerNameOrError.Value);
         }
@@ -83,7 +83,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
 
         if (!result.IsValid)
         {
-            return CommandError.Validation<Player>(result);
+            return ApplicationError.Validation<Player>(result);
         }
         
         var updatedPlayer = await _playerRepository.UpdateAsync(player, cancellationToken);

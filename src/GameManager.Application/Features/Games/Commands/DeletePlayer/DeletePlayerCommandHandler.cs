@@ -1,13 +1,12 @@
 ﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
-using GameManager.Application.Services;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<CommandError>>
+public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
     
@@ -33,20 +32,20 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
         _notificationService = notificationService;
     }
 
-    public async Task<UnitResult<CommandError>> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
     {
         var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
-            return GameErrors.Commands.PlayerNotFound(request.PlayerId);
+            return GameErrors.PlayerNotFound(request.PlayerId);
         }
         
         if (_userContext.User == null 
             || !_userContext.User.IsAuthorizedForGame(player.GameId)
             || !_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
-            return CommandError.Authorization("Not authorized to update this player");
+            return ApplicationError.Authorization("Not authorized to update this player");
         }
         
         player.SoftDelete();
@@ -93,6 +92,6 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
 
         await _playerRepository.UpdateManyAsync(players, cancellationToken);
 
-        return UnitResult.Success<CommandError>();
+        return UnitResult.Success<ApplicationError>();
     }
 }

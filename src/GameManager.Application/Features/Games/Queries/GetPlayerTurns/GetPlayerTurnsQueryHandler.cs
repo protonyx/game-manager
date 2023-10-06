@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 
-public class GetPlayerTurnsQueryHandler : IRequestHandler<GetPlayerTurnsQuery, ICollection<TurnDTO>>
+public class GetPlayerTurnsQueryHandler : IRequestHandler<GetPlayerTurnsQuery, Result<IReadOnlyList<TurnDTO>, ApplicationError>>
 {
     private readonly ITurnRepository _turnRepository;
 
@@ -17,9 +15,9 @@ public class GetPlayerTurnsQueryHandler : IRequestHandler<GetPlayerTurnsQuery, I
         _mapper = mapper;
     }
 
-    public async Task<ICollection<TurnDTO>> Handle(GetPlayerTurnsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<TurnDTO>, ApplicationError>> Handle(GetPlayerTurnsQuery request, CancellationToken cancellationToken)
     {
-        var turns = await _turnRepository.GetTurnsByPlayerId(request.PlayerId);
+        var turns = await _turnRepository.GetTurnsByPlayerId(request.PlayerId, cancellationToken);
 
         return turns.Select(_mapper.Map<TurnDTO>).ToList();
     }

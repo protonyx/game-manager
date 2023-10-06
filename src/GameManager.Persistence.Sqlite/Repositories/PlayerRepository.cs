@@ -41,12 +41,18 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return players;
     }
     
-    public async Task<IReadOnlyList<Player>> GetSummariesByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PlayerSummary>> GetSummariesByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         var players = await _context.Set<Player>()
             .AsQueryable()
             .AsNoTracking()
             .AsSplitQuery()
+            .GroupJoin(_context.Set<Turn>(), p => p.Id, t => t.PlayerId, (player, turns) => new {player, turns})
+            .GroupJoin(_context.Set<TrackerHistory>(), p => p.player.Id, h => h.PlayerId, (x, history) => new PlayerSummary(x.player)
+            {
+                Turns = x.turns.ToList(),
+                TrackerHistory = history.ToList()
+            })
             //.Include(t => t.Turns)
             //.Include(t => t.TrackerHistory)
             .Where(p => p.GameId == gameId)

@@ -1,9 +1,9 @@
-﻿using GameManager.Application.Contracts.Commands;
+﻿using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.EndGame;
 
-public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<CommandError>>
+public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -17,18 +17,18 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
         _mediator = mediator;
     }
 
-    public async Task<UnitResult<CommandError>> Handle(EndGameCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(EndGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         if (game == null)
         {
-            return GameErrors.Commands.GameNotFound(request.GameId);
+            return GameErrors.GameNotFound(request.GameId);
         }
         
         if (game.State != GameState.InProgress)
         {
-            return GameErrors.Commands.GameNotInProgress(game.Id);
+            return GameErrors.GameNotInProgress(game.Id);
         }
         
         game.Complete();
@@ -37,6 +37,6 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
 
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
-        return UnitResult.Success<CommandError>();
+        return UnitResult.Success<ApplicationError>();
     }
 }
