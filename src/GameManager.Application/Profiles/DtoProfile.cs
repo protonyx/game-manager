@@ -18,6 +18,7 @@ public class DtoProfile : Profile
         CreateMap<GameOptions, GameOptionsDTO>()
             .ReverseMap();
         CreateMap<Player, PlayerDTO>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.TrackerValues, opt =>
                 opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.TrackerId, tv => tv.Value)))
             .ReverseMap()
@@ -31,6 +32,7 @@ public class DtoProfile : Profile
                     })
                     .ToList()));
         CreateMap<Player, PlayerSummaryDTO>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.Turns, opt => opt.Ignore())
             .ForMember(t => t.TrackerHistory, opt => opt.Ignore());
         CreateMap<Tracker, TrackerDTO>()

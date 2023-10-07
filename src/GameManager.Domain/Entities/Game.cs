@@ -42,14 +42,17 @@ public class Game
         CreatedDate = DateTime.UtcNow;
     }
 
-    public void RegenerateEntryCode()
+    public Result RegenerateEntryCode()
     {
         if (State != GameState.Preparing)
         {
-            throw new InvalidOperationException("Invalid game state");
+            return Result.Failure("Invalid game state");
         }
 
-        EntryCode = EntryCode.New();
+        var codeLength = EntryCode?.Value.Length ?? 4;
+        EntryCode = EntryCode.New(codeLength);
+
+        return Result.Success();
     }
 
     public void Start(Player startingPlayer)

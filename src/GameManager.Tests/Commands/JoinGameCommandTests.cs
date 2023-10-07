@@ -17,9 +17,7 @@ public class JoinGameCommandTests
         gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>(), CancellationToken.None))
             .ReturnsAsync(default(Game));
         
-        var cmd = fixture.Build<JoinGameCommand>()
-            .With(t => t.EntryCode, EntryCode.New(4).Value)
-            .Create();
+        var cmd = new JoinGameCommand(EntryCode.New(4).Value, "Player 1");
         var handler = fixture.Create<JoinGameCommandHandler>();
 
         // Act
@@ -45,10 +43,7 @@ public class JoinGameCommandTests
         fixture.Inject<IValidator<Player>>(playerValidator);
         
         var handler = fixture.Create<JoinGameCommandHandler>();
-        var cmd = fixture.Build<JoinGameCommand>()
-            .With(t => t.EntryCode, EntryCode.New(4).Value)
-            .With(t => t.Name, "Player 1")
-            .Create();
+        var cmd = new JoinGameCommand(EntryCode.New(4).Value, "Player 1");
         
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);

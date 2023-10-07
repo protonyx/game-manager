@@ -28,10 +28,12 @@ public class GamesController : ControllerBase
     [ProducesResponseType(typeof(GameDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateGame(
-        [FromBody] CreateGameCommand game,
+        [FromBody] CreateGameDTO game,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(game, cancellationToken);
+        var request = new CreateGameCommand(game);
+        
+        var result = await _mediator.Send(request, cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetGame),
@@ -120,10 +122,12 @@ public class GamesController : ControllerBase
     [ProducesResponseType(typeof(PlayerCredentialsDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinGame(
-        [FromBody] JoinGameCommand player,
+        [FromBody] JoinGameDTO player,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(player, cancellationToken);
+        var request = new JoinGameCommand(player.EntryCode, player.Name);
+        
+        var result = await _mediator.Send(request, cancellationToken);
 
         return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }

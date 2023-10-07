@@ -1,5 +1,4 @@
 ﻿using GameManager.Application.Features.Games.Commands.PruneGames;
-using MediatR;
 
 namespace GameManager.Server.HostedServices;
 

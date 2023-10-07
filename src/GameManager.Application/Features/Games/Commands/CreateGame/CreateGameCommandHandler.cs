@@ -20,10 +20,10 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
 
     public async Task<Result<GameDTO, ApplicationError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
-        var options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions();
-        var game = new Game(request.Name, options);
+        var options = _mapper.Map<GameOptions>(request.Game.Options) ?? new GameOptions();
+        var game = new Game(request.Game.Name, options);
 
-        foreach (var trackerDto in request.Trackers)
+        foreach (var trackerDto in request.Game.Trackers)
         {
             var tracker = _mapper.Map<Tracker>(trackerDto);
             game.AddTracker(tracker);
@@ -32,7 +32,10 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
         while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode, cancellationToken))
         {
             // Generate a new entry code until we find a unique code
-            game.RegenerateEntryCode();
+            var result = game.RegenerateEntryCode();
+
+            if (result.IsFailure)
+                return ApplicationError.Failure(result.Error);
         }
         
         // Validate

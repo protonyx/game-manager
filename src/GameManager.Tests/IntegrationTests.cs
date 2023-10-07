@@ -25,7 +25,7 @@ public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var client = _factory.CreateClient();
 
-        var newGame = new CreateGameCommand()
+        var newGame = new CreateGameDTO()
         {
             Name = "Test",
             Options = new GameOptionsDTO()
@@ -54,7 +54,7 @@ public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.True(game!.EntryCode.Length == 4);
         
         // Join the new game
-        var newPlayer = new JoinGameCommand()
+        var newPlayer = new JoinGameDTO()
         {
             EntryCode = game.EntryCode,
             Name = "Test Player"

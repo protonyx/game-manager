@@ -8,16 +8,24 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
     private readonly IGameRepository _gameRepository;
 
     private readonly IPlayerRepository _playerRepository;
+    
+    private readonly ITurnRepository _turnRepository;
+
+    private readonly ITrackerHistoryRepository _trackerHistoryRepository;
 
     private readonly IMapper _mapper;
 
     public GetGameSummaryQueryHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
+        ITurnRepository turnRepository,
+        ITrackerHistoryRepository trackerHistoryRepository,
         IMapper mapper)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
+        _turnRepository = turnRepository;
+        _trackerHistoryRepository = trackerHistoryRepository;
         _mapper = mapper;
     }
 
@@ -34,26 +42,35 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
             return GameErrors.GameNotComplete();
         }
 
-        var players = await _playerRepository.GetSummariesByGameIdAsync(game.Id, cancellationToken);
-
+        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
+        var turns = await _turnRepository.GetTurnsByGameId(request.GameId, cancellationToken);
+        var trackerHistory = await _trackerHistoryRepository.GetHistoryByGameId(request.GameId, cancellationToken);
+        
         var ret = new GameSummaryDTO()
         {
             Id = game.Id,
             Name = game.Name,
             CreatedDate = game.CreatedDate,
+            StartedDate = game.StartedDate,
             CompletedDate = game.CompletedDate,
             Trackers = game.Trackers.Select(_mapper.Map<TrackerDTO>).ToList(),
             Players = players.Select(p =>
             {
                 var dto = _mapper.Map<PlayerSummaryDTO>(p);
                 
-                // TODO: Get Turns and TrackerHistory
+                dto.Turns = turns.Where(t => t.PlayerId == p.Id)
+                    .Select(_mapper.Map<TurnDTO>)
+                    .ToList();
+                dto.TrackerHistory = trackerHistory.Where(t => t.PlayerId == p.Id)
+                    .Select(t =>
+                    {
+                        var thDto = _mapper.Map<TrackerHistoryDTO>(t);
+                        var timeDiff = thDto.ChangedTime - (game.StartedDate ?? game.CreatedDate);
+                        thDto.SecondsSinceGameStart = (int) Math.Abs(timeDiff.TotalSeconds);
 
-                foreach (var trackerHistory in dto.TrackerHistory)
-                {
-                    var timeDiff = trackerHistory.ChangedTime - (game.StartedDate ?? game.CreatedDate);
-                    trackerHistory.SecondsSinceGameStart = (int)Math.Abs(timeDiff.TotalSeconds);
-                }
+                        return thDto;
+                    })
+                    .ToList();
                 
                 return dto;
             }).ToList()

@@ -28,6 +28,13 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         return games;
     }
 
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<Game>()
+            .Where(t => t.Id == id)
+            .AnyAsync(cancellationToken);
+    }
+
     public override Task<Game> UpdateAsync(Game entity, CancellationToken cancellationToken = default)
     {
         if (entity.CurrentTurn != null)

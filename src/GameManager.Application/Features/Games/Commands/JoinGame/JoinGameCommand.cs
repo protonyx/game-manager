@@ -6,8 +6,13 @@ namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
 public class JoinGameCommand : IRequest<Result<PlayerCredentialsDTO, ApplicationError>>
 {
-    public string EntryCode { get; set; } = string.Empty;
+    public string EntryCode { get; }
 
-    [Required]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; }
+
+    public JoinGameCommand(string entryCode, string name)
+    {
+        EntryCode = entryCode;
+        Name = name;
+    }
 }
