@@ -55,29 +55,33 @@ public class Game
         return Result.Success();
     }
 
-    public void Start(Player startingPlayer)
+    public Result Start(Player startingPlayer)
     {
         if (State != GameState.Preparing)
         {
-            throw new InvalidOperationException("Invalid game state");
+            return Result.Failure("Invalid game state");
         }
 
         State = GameState.InProgress;
         StartedDate = DateTime.UtcNow;
         SetCurrentTurn(startingPlayer);
+
+        return Result.Success();
     }
 
-    public void Complete()
+    public Result Complete()
     {
         if (State != GameState.InProgress)
         {
-            throw new InvalidOperationException("Invalid game state");
+            return Result.Failure("Invalid game state");
         }
 
         State = GameState.Complete;
         CompletedDate = DateTime.UtcNow;
         CurrentTurn = null;
         EntryCode = null;
+
+        return Result.Success();
     }
 
     public void SetCurrentTurn(Player currentPlayer)
