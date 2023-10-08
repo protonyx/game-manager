@@ -27,37 +27,24 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
-        if (game == null)
-        {
-            return GameErrors.GameNotFound(request.GameId);
-        }
-        
-        if (!_userContext.User!.IsAuthorizedForGame(game.Id))
-        {
-            return GameErrors.PlayerNotAuthorized();
-        }
-        
-        if (!_userContext.User!.IsAdminForGame(game.Id))
-        {
-            return GameErrors.PlayerNotAuthorized("start the game");
-        }
-        
-        if (game.State != GameState.InProgress)
-        {
-            return GameErrors.GameNotInProgress(game.Id);
-        }
-        
-        var result = game.Complete();
+        var result = await game.ToResult(GameErrors.GameNotFound(request.GameId))
+            .Ensure(g => _userContext.User!.IsAuthorizedForGame(g.Id),
+                GameErrors.PlayerNotAuthorized())
+            .Ensure(g => _userContext.User!.IsAdminForGame(g.Id),
+                GameErrors.PlayerNotAdmin())
+            .Ensure(g => g.State == GameState.InProgress,
+                GameErrors.GameNotInProgress(request.GameId))
+            .Tap(async g =>
+            {
+                g.Complete();
 
-        if (result.IsFailure)
-        {
-            return ApplicationError.Failure(result.Error);
-        }
-        
-        var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
-
-        await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
-
-        return UnitResult.Success<ApplicationError>();
+                await _gameRepository.UpdateAsync(g, cancellationToken);
+            })
+            .Tap(async g =>
+            {
+                await _mediator.Publish(new GameUpdatedNotification(g), cancellationToken);
+            });
+            
+        return result.IsSuccess ? UnitResult.Success<ApplicationError>() : UnitResult.Failure(result.Error);
     }
 }

@@ -24,8 +24,8 @@ public class PlayerValidatorTests
             .Create();
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(It.IsAny<Guid>(), CancellationToken.None))
-            .ReturnsAsync(game);
+        gameRepo.Setup(t => t.ExistsAsync(It.IsAny<Guid>(), CancellationToken.None))
+            .ReturnsAsync(true);
         var repo = fixture.Freeze<Mock<IPlayerRepository>>();
         repo.Setup(t => t.NameIsUniqueAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), CancellationToken.None))
             .ReturnsAsync(false);

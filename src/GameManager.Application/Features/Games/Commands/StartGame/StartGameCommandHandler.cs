@@ -30,31 +30,28 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
     public async Task<UnitResult<ApplicationError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
-
-        if (game == null)
-        {
-            return GameErrors.GameNotFound(request.GameId);
-        }
         
-        if (!_userContext.User!.IsAdminForGame(game.Id))
-        {
-            return GameErrors.GameAlreadyInProgress();
-        }
-        
-        if (!_userContext.User!.IsAdminForGame(game.Id))
-        {
-            return GameErrors.PlayerNotAuthorized("start the game");
-        }
+        var result = await game.ToResult(GameErrors.GameNotFound(request.GameId))
+            .Ensure(g => _userContext.User!.IsAuthorizedForGame(g.Id),
+                GameErrors.PlayerNotAuthorized())
+            .Ensure(g => _userContext.User!.IsAdminForGame(g.Id),
+                GameErrors.PlayerNotAdmin())
+            .Ensure(g => g.State == GameState.Preparing,
+                GameErrors.GameAlreadyInProgress())
+            .Tap(async g =>
+            {
+                var players = await _playerRepository.GetPlayersByGameIdAsync(g.Id, cancellationToken);
+                var firstPlayer = players.OrderBy(t => t.Order).First();
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
-        var firstPlayer = players.OrderBy(t => t.Order).First();
+                g.Start(firstPlayer);
 
-        game.Start(firstPlayer);
-        
-        var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
-        
-        await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
+                await _gameRepository.UpdateAsync(g, cancellationToken);
+            })
+            .Tap(async g =>
+            {
+                await _mediator.Publish(new GameUpdatedNotification(g), cancellationToken);
+            });
 
-        return UnitResult.Success<ApplicationError>();
+        return result.IsSuccess ? UnitResult.Success<ApplicationError>() : UnitResult.Failure(result.Error);
     }
 }
