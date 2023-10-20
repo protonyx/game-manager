@@ -9,6 +9,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
     {
+        builder.ToTable("Games");
+        
         builder.HasKey(t => t.Id);
         
         builder.Property(t => t.Name)
@@ -34,5 +36,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 
         builder.HasIndex(t => t.EntryCode)
             .IsUnique();
+
+        builder.Navigation(t => t.Trackers)
+            .AutoInclude();
     }
 }

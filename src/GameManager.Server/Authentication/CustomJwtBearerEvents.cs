@@ -1,22 +1,12 @@
-﻿using GameManager.Application;
-using GameManager.Application.Authorization;
-using GameManager.Application.Contracts.Persistence;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GameManager.Server.Authentication;
 
 public class CustomJwtBearerEvents : JwtBearerEvents
 {
-
-    private readonly IGameRepository _gameRepository;
-
-    public CustomJwtBearerEvents(IGameRepository gameRepository)
-    {
-        _gameRepository = gameRepository;
-    }
-
     public override Task MessageReceived(MessageReceivedContext context)
     {
+        // SignalR shim for tokens passed via query parameters
         var accessToken = context.Request.Query["access_token"];
 
         // If the request is for our hub...
@@ -31,25 +21,5 @@ public class CustomJwtBearerEvents : JwtBearerEvents
         }
         
         return base.MessageReceived(context);
-    }
-
-    public override async Task TokenValidated(TokenValidatedContext context)
-    {
-        var gameId = context.Principal?.GetGameId();
-
-        if (gameId.HasValue)
-        {
-            // Game must still be valid
-            var game = await _gameRepository.GetByIdAsync(gameId.Value);
-
-            if (game == null)
-            {
-                context.Fail("Game is no longer valid");
-
-                return;
-            }
-        }
-        
-        await base.TokenValidated(context);
     }
 }

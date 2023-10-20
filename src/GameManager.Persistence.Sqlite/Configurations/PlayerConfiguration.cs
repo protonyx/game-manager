@@ -9,9 +9,9 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
 {
     public void Configure(EntityTypeBuilder<Player> builder)
     {
+        builder.ToTable("Players");
+        
         builder.HasKey(t => t.Id);
-
-        builder.UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         builder.HasIndex(t => t.GameId);
 
@@ -31,5 +31,8 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.HasOne<Game>()
             .WithMany()
             .HasForeignKey(t => t.GameId);
+
+        builder.Navigation(t => t.TrackerValues)
+            .AutoInclude();
     }
 }

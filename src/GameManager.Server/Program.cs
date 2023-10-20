@@ -24,6 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(opt =>
     {
         opt.Filters.Add<RequireActivePlayerFilter>();
+        opt.Filters.Add<RequireValidGameFilter>();
     })
     .AddNewtonsoftJson(opt =>
     {

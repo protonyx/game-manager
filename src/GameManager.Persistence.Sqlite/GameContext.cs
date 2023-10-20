@@ -1,29 +1,42 @@
-using GameManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Logging;
 
 namespace GameManager.Persistence.Sqlite;
 
 public class GameContext : DbContext
 {
-    public DbSet<Game> Games { get; set; }
-    
-    public DbSet<Player> Players { get; set; }
-    
-    public DbSet<Tracker> Trackers { get; set; }
-    
-    public DbSet<TrackerValue> TrackerValues { get; set; }
-    
-    public DbSet<TrackerHistory> TrackerHistories { get; set; }
+    private readonly string _connectionString;
 
-    public DbSet<Turn> Turns { get; set; }
+    private readonly bool _enableCommandLogging;
 
-    public GameContext(DbContextOptions<GameContext> options)
-        : base(options)
+    public GameContext(string connectionString, bool enableCommandLogging)
     {
-        
+        _connectionString = connectionString;
+        _enableCommandLogging = enableCommandLogging;
     }
-    
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite(_connectionString);
+
+        if (_enableCommandLogging)
+        {
+            optionsBuilder.UseLoggerFactory(BuildLoggerFactory());
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
+    }
+
+    private ILoggerFactory BuildLoggerFactory()
+    {
+        return LoggerFactory.Create(logger =>
+        {
+            logger.AddFilter((category, level) =>
+                category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information);
+            logger.AddConsole();
+        });
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);

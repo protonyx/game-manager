@@ -20,7 +20,7 @@ public class Player
 
     public DateTime? LastHeartbeat { get; private set; }
 
-    internal List<TrackerValue> _trackerValues = new List<TrackerValue>();
+    private List<TrackerValue> _trackerValues = new();
 
     public IReadOnlyList<TrackerValue> TrackerValues => _trackerValues.ToList();
 

@@ -7,39 +7,39 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace GameManager.Server.Filters;
 
-public class RequireActivePlayerFilter : IAsyncAuthorizationFilter
+public class RequireValidGameFilter : IAsyncAuthorizationFilter
 {
-    private readonly IPlayerRepository _playerRepository;
+    private readonly IGameRepository _gameRepository;
 
     private readonly ProblemDetailsFactory _problemDetailsFactory;
 
-    public RequireActivePlayerFilter(
-        IPlayerRepository playerRepository,
+    public RequireValidGameFilter(
+        IGameRepository gameRepository,
         ProblemDetailsFactory problemDetailsFactory)
     {
-        _playerRepository = playerRepository;
+        _gameRepository = gameRepository;
         _problemDetailsFactory = problemDetailsFactory;
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // Check that the user represents an active player
-        var playerId = context.HttpContext.User.GetPlayerId();
+        var gameId = context.HttpContext.User.GetGameId();
 
-        if (!playerId.HasValue)
+        if (!gameId.HasValue)
         {
             return;
         }
+        
+        // Game must still be valid
+        var gameExists = await _gameRepository.ExistsAsync(gameId.Value);
 
-        var playerIsActive = await _playerRepository.PlayerIsActiveAsync(playerId.Value);
-
-        if (!playerIsActive)
+        if (!gameExists)
         {
             var pd = _problemDetailsFactory.CreateProblemDetails(
                 context.HttpContext,
                 statusCode: StatusCodes.Status403Forbidden,
-                type: GameErrors.ErrorCodes.PlayerInvalidState,
-                detail: "Player is not active");
+                type: GameErrors.ErrorCodes.GameInvalidState,
+                detail: "Game is no longer valid");
                 
             context.Result = new ObjectResult(pd)
             {

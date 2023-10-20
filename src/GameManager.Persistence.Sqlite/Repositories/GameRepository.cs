@@ -52,16 +52,7 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
 
     public override async Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
-        IQueryable<Game> queryable = _context.Set<Game>()
-            .AsQueryable()
-            .AsNoTracking()
-            .Include(t => t.Options)
-            .Include(t => t.Trackers);
-
-        var game = await queryable.Where(t => t.Id == gameId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return game;
+        return await _context.Set<Game>().FindAsync(new object?[] {gameId}, cancellationToken);
     }
 
     public async Task<Game?> GetGameByEntryCodeAsync(EntryCode entryCode, CancellationToken cancellationToken = default)
