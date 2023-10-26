@@ -1,3 +1,4 @@
+using GameManager.Domain.Common;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
@@ -12,7 +13,9 @@ public class Player
     
     public PlayerName Name { get; private set; }
 
-    public bool Active {get; private set; }
+    public bool Active { get; private set; }
+    
+    public PlayerState State { get; private set; }
 
     public bool IsAdmin { get; private set; }
     
@@ -63,6 +66,7 @@ public class Player
     
     public void UpdateHeartbeat()
     {
+        State = PlayerState.Connected;
         LastHeartbeat = DateTime.UtcNow;
     }
 
@@ -76,12 +80,19 @@ public class Player
         Name = name;
     }
 
-    public void SetOrder(int newOrder)
+    public Result SetOrder(int newOrder)
     {
         if (newOrder < 0)
-            throw new ArgumentOutOfRangeException(nameof(newOrder), "Order cannot be negative");
+            return Result.Failure("Order cannot be negative");
 
         Order = newOrder;
+
+        return Result.Success();
+    }
+
+    public void SetState(PlayerState newState)
+    {
+        State = newState;
     }
 
     public Result SetTracker(Guid trackerId, int value)
@@ -114,5 +125,6 @@ public class Player
     {
         Active = false;
         Order = 0;
+        State = PlayerState.Disconnected;
     }
 }

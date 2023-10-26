@@ -12,7 +12,7 @@ import {
   GameStateChangedMessage,
   PlayerJoinedMessage,
   PlayerLeftMessage,
-  PlayerStateChangedMessage,
+  PlayerUpdatedMessage,
 } from '../models/messages';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
 import { PlayerCredentials } from '../models/models';
@@ -48,7 +48,7 @@ export class GameHubService {
     connection.on('PlayerJoined', (data: PlayerJoinedMessage) => {
       this.store.dispatch(GameHubActions.playerJoined(data));
     });
-    connection.on('PlayerStateChanged', (data: PlayerStateChangedMessage) => {
+    connection.on('PlayerUpdated', (data: PlayerUpdatedMessage) => {
       this.store.dispatch(GameHubActions.playerUpdated(data));
     });
     connection.on('PlayerLeft', (data: PlayerLeftMessage) => {

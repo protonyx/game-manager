@@ -12,7 +12,7 @@ public interface IGameClientNotificationService
 
     Task GameStateChanged(GameStateChangedMessage message, CancellationToken cancellationToken);
 
-    Task PlayerStateChanged(PlayerStateChangedMessage message, CancellationToken cancellationToken);
+    Task PlayerUpdated(PlayerUpdatedMessage message, CancellationToken cancellationToken);
 
     Task PlayerLeft(PlayerLeftMessage message, CancellationToken cancellationToken);
     

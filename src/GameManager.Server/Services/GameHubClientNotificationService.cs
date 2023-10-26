@@ -29,11 +29,11 @@ public class GameHubClientNotificationService : IGameClientNotificationService
                 message,
                 cancellationToken: cancellationToken);
     }
-
-    public Task PlayerStateChanged(PlayerStateChangedMessage message, CancellationToken cancellationToken)
+    
+    public Task PlayerUpdated(PlayerUpdatedMessage message, CancellationToken cancellationToken)
     {
         return _hubContext.Clients.Group(message.GameId.ToString())
-            .SendAsync(nameof(IGameClientNotificationService.PlayerStateChanged),
+            .SendAsync(nameof(IGameClientNotificationService.PlayerUpdated),
                 message,
                 cancellationToken: cancellationToken);
     }

@@ -20,6 +20,7 @@ using OpenTelemetry.Trace;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
 builder.Services.AddControllers(opt =>
     {
@@ -34,11 +35,12 @@ builder.Services.AddControllers(opt =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSignalR()
+var signalr = builder.Services.AddSignalR()
     .AddNewtonsoftJsonProtocol(opt =>
     {
         opt.PayloadSerializerSettings.Converters.Add(new StringEnumConverter());
     });
+
 builder.Services.AddSingleton<IGameClientNotificationService, GameHubClientNotificationService>();
 
 builder.Services.AddCors(opt =>
@@ -82,10 +84,25 @@ builder.Services.AddAuthentication(opt =>
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
 
-
 builder.Services.AddScoped<CustomJwtBearerEvents>();
-
 builder.Services.AddSingleton<ITokenService>(tokenService);
+
+// Caching
+builder.Services.AddMemoryCache();
+
+if (string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    builder.Services.AddDistributedMemoryCache();
+}
+else
+{
+    builder.Services.AddStackExchangeRedisCache(opt =>
+    {
+        opt.Configuration = redisConnectionString;
+    });
+    signalr.AddStackExchangeRedis(redisConnectionString);
+}
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
 

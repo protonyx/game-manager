@@ -23,13 +23,13 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
         var player = notification.Player;
         var dto = _mapper.Map<PlayerDTO>(player);
         
-        var message = new PlayerStateChangedMessage()
+        var message = new PlayerUpdatedMessage()
         {
             GameId = player.GameId,
             PlayerId = player.Id,
             Player = dto
         };
 
-        return _gameClientNotificationService.PlayerStateChanged(message, cancellationToken);
+        return _gameClientNotificationService.PlayerUpdated(message, cancellationToken);
     }
 }
