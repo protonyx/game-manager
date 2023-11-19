@@ -16,6 +16,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,9 +97,11 @@ if (string.IsNullOrWhiteSpace(redisConnectionString))
 }
 else
 {
+    var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+    builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
     builder.Services.AddStackExchangeRedisCache(opt =>
     {
-        opt.Configuration = redisConnectionString;
+        opt.ConnectionMultiplexerFactory = async () => redisConnectionMultiplexer;
     });
     signalr.AddStackExchangeRedis(redisConnectionString);
 }
@@ -111,6 +114,7 @@ builder.Services.AddSqlitePersistenceServices();
 
 builder.Services.AddHostedService<GamePruningService>();
 
+// TODO: Switch to using OTEL_EXPORTER_OTLP_ENDPOINT
 var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
 
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
@@ -130,6 +134,12 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
                 })
                 .AddHttpClientInstrumentation()
                 .AddEntityFrameworkCoreInstrumentation();
+            
+            if (!string.IsNullOrWhiteSpace(redisConnectionString))
+            {
+                tb.AddRedisInstrumentation();
+            }
+            
             tb.AddOtlpExporter(otlp =>
             {
                 otlp.Endpoint = new Uri(otlpEndpoint);
