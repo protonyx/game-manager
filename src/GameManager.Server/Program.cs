@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Reflection;
 using GameManager.Application;
 using GameManager.Application.Contracts;
 using GameManager.Persistence.Sqlite;
@@ -8,7 +10,6 @@ using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using OpenTelemetry.Exporter;
@@ -196,6 +197,15 @@ app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
 app.MapFallbackToFile("index.html");
 app.MapSwagger();
+app.MapGet("/version", async ctx =>
+{
+    var assm = Assembly.GetEntryAssembly();
+    var versionInfo = FileVersionInfo.GetVersionInfo(assm.Location);
+    await ctx.Response.WriteAsJsonAsync(new
+    {
+        Version = versionInfo.ProductVersion
+    });
+});
 
 app.Run();
 

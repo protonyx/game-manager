@@ -1,11 +1,12 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-api
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-api
+ARG version=0.1-dev
 WORKDIR /src
 COPY ["src/GameManager.Server/GameManager.Server.csproj", "GameManager.Server/"]
 RUN dotnet restore "GameManager.Server/GameManager.Server.csproj"
 COPY ./src ./
-RUN dotnet build "GameManager.Server/GameManager.Server.csproj" -c Release -o /app/build
+RUN dotnet build "GameManager.Server/GameManager.Server.csproj" -c Release /p:InformationalVersion=$version -o /app/build
 
-RUN dotnet publish "GameManager.Server/GameManager.Server.csproj" -c Release -o /app/publish
+RUN dotnet publish "GameManager.Server/GameManager.Server.csproj" -c Release /p:InformationalVersion=$version -o /app/publish
 
 FROM node:16 as build-web
 WORKDIR /src
@@ -16,7 +17,7 @@ RUN npm install
 COPY ./web ./
 RUN npm run build --configuration=production
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
 COPY --from=build-api /app/publish .

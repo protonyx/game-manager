@@ -23,7 +23,7 @@ public class TokenService : ITokenService
         if (string.IsNullOrWhiteSpace(key))
         {
             // Generate a random key
-            keyBytes = new byte[16];
+            keyBytes = new byte[32];
             Random.Shared.NextBytes(keyBytes);
         }
         else
