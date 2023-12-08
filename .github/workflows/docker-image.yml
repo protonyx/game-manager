@@ -39,8 +39,8 @@ jobs:
     - name: Build the Docker image
       uses: docker/build-push-action@v3
       with:
-        build-args:
-          - version=${{ steps.gitversion.outputs.informationalVersion }}
+        build-args: |
+          version=${{ steps.gitversion.outputs.informationalVersion }}
         context: .
         push: true
         tags: ${{ steps.meta.outputs.tags }}
