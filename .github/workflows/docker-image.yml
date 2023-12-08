@@ -15,6 +15,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0
+      with:
+        versionSpec: '5.x'
+    - name: Determine Version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0
     - name: Docker Metadata
       id: meta
       uses: docker/metadata-action@v4
@@ -30,6 +39,8 @@ jobs:
     - name: Build the Docker image
       uses: docker/build-push-action@v3
       with:
+        build-args:
+          - version=${{ steps.gitversion.outputs.informationalVersion }}
         context: .
         push: true
         tags: ${{ steps.meta.outputs.tags }}
