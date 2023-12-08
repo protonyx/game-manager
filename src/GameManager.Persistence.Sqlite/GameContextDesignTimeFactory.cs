@@ -7,9 +7,8 @@ public class GameContextDesignTimeFactory : IDesignTimeDbContextFactory<GameCont
 {
     public GameContext CreateDbContext(string[] args)
     {
-        var builder = new DbContextOptionsBuilder<GameContext>()
-            .UseSqlite("Data Source=gm.db");
+        var cs = "Data Source=gm.db";
 
-        return new GameContext(builder.Options);
+        return new GameContext(cs, false);
     }
 }

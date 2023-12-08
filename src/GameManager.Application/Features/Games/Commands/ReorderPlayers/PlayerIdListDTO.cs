@@ -1,4 +1,4 @@
-namespace GameManager.Application.Features.Games.DTO;
+namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
 public class PlayerIdListDTO
 {

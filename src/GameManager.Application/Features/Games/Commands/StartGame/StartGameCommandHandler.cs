@@ -1,16 +1,11 @@
-﻿using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;
-using GameManager.Domain.Common;
-using GameManager.Domain.Entities;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.StartGame;
 
-public class StartGameCommandHandler : IRequestHandler<StartGameCommand, ICommandResponse>
+public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
     
@@ -32,39 +27,31 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, IComman
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(StartGameCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
-
-        if (game == null)
-        {
-            return CommandResponses.NotFound();
-        }
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
         
-        if (game.State != GameState.Preparing)
-        {
-            return CommandResponses.Failure("Game is already in progress");
-        }
-        else if (!_userContext.User!.IsAdminForGame(game.Id))
-        {
-            return CommandResponses.AuthorizationError("Only the game creator can start the game");
-        }
+        var result = await game.ToResult(GameErrors.GameNotFound(request.GameId))
+            .Ensure(g => _userContext.User!.IsAuthorizedForGame(g.Id),
+                GameErrors.PlayerNotAuthorized())
+            .Ensure(g => _userContext.User!.IsAdminForGame(g.Id),
+                GameErrors.PlayerNotAdmin())
+            .Ensure(g => g.State == GameState.Preparing,
+                GameErrors.GameAlreadyInProgress())
+            .Tap(async g =>
+            {
+                var players = await _playerRepository.GetPlayersByGameIdAsync(g.Id, cancellationToken);
+                var firstPlayer = players.OrderBy(t => t.Order).First();
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id);
-        var firstPlayer = players.OrderBy(t => t.Order).First();
+                g.Start(firstPlayer);
 
-        game.State = GameState.InProgress;
-        game.StartedDate = DateTime.UtcNow;
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = firstPlayer.Id,
-            StartTime = DateTime.UtcNow
-        };
-        
-        var updatedGame = await _gameRepository.UpdateAsync(game);
-        
-        await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
+                await _gameRepository.UpdateAsync(g, cancellationToken);
+            })
+            .Tap(async g =>
+            {
+                await _mediator.Publish(new GameUpdatedNotification(g), cancellationToken);
+            });
 
-        return CommandResponses.Success();
+        return result.IsSuccess ? UnitResult.Success<ApplicationError>() : UnitResult.Failure(result.Error);
     }
 }

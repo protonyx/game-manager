@@ -1,4 +1,3 @@
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.DTO;
@@ -15,18 +14,17 @@ public class JoinGameCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>(), CancellationToken.None))
             .ReturnsAsync(default(Game));
         
-        var cmd = fixture.Create<JoinGameCommand>();
+        var cmd = new JoinGameCommand(EntryCode.New(4).Value, "Player 1");
         var handler = fixture.Create<JoinGameCommandHandler>();
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<FailureCommandResponse>();
-        result.As<FailureCommandResponse>().Reason.Should().Be("The entry code is invalid.");
+        result.IsFailure.Should().BeTrue();
     }
 
     [Fact]
@@ -34,24 +32,24 @@ public class JoinGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>()))
-           .ReturnsAsync(fixture.Create<Game>());
+        gameRepo.Setup(t => t.GetGameByEntryCodeAsync(It.IsAny<EntryCode>(), It.IsAny<CancellationToken>()))
+           .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>()))
-          .ReturnsAsync(fixture.Create<Player>());
+        playerRepo.Setup(t => t.CreateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()))
+          .ReturnsAsync((Player p, CancellationToken ct) => p);
         var playerValidator = new InlineValidator<Player>();
         fixture.Inject<IValidator<Player>>(playerValidator);
         
         var handler = fixture.Create<JoinGameCommandHandler>();
-        var cmd = fixture.Create<JoinGameCommand>();
+        var cmd = new JoinGameCommand(EntryCode.New(4).Value, "Player 1");
         
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<EntityCommandResponse>();
-        result.As<EntityCommandResponse>().Value.Should().BeOfType<PlayerCredentialsDTO>();
-        playerRepo.Verify(t => t.CreateAsync(It.IsAny<Player>()), Times.Once);
+        result.IsSuccess.Should().BeTrue();
+        playerRepo.Verify(t => t.CreateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Messages;
 
-public class PlayerStateChangedMessage
+public class PlayerUpdatedMessage
 {
     public Guid GameId { get; set; }
 

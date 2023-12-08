@@ -1,9 +1,8 @@
-﻿using GameManager.Application.Contracts.Persistence;
-using MediatR;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.PruneGames;
 
-public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand>
+public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -12,7 +11,7 @@ public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand>
         _gameRepository = gameRepository;
     }
 
-    public async Task Handle(PruneGamesCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(PruneGamesCommand request, CancellationToken cancellationToken)
     {
         var olderThan = DateTime.UtcNow.Subtract(request.RetentionPeriod);
 
@@ -22,5 +21,7 @@ public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand>
         {
             await _gameRepository.DeleteAsync(game);
         }
+
+        return UnitResult.Success<ApplicationError>();
     }
 }

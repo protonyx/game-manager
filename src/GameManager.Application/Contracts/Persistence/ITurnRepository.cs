@@ -4,5 +4,7 @@ namespace GameManager.Application.Contracts.Persistence;
 
 public interface ITurnRepository : IAsyncRepository<Turn>
 {
-    Task<ICollection<Turn>> GetTurnsByPlayerId(Guid playerId);
+    Task<IReadOnlyList<Turn>> GetTurnsByPlayerId(Guid playerId, CancellationToken cancellationToken = default);
+    
+    Task<IReadOnlyList<Turn>> GetTurnsByGameId(Guid gameId, CancellationToken cancellationToken = default);
 }

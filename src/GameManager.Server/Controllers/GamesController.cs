@@ -1,4 +1,3 @@
-using GameManager.Application.Commands;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.EndGame;
 using GameManager.Application.Features.Games.Commands.EndTurn;
@@ -9,7 +8,6 @@ using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
 using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,19 +28,18 @@ public class GamesController : ControllerBase
     [ProducesResponseType(typeof(GameDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateGame(
-        [FromBody] CreateGameCommand game,
+        [FromBody] CreateGameDTO game,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(game, cancellationToken);
+        var request = new CreateGameCommand(game);
+        
+        var result = await _mediator.Send(request, cancellationToken);
 
-        if (response is EntityCommandResponse entity)
-        {
-            return CreatedAtAction(nameof(GetGame), 
-                new {id = entity.Id},
-                entity.Value);
-        }
-
-        return this.GetActionResult(response);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetGame),
+                new {id = result.Value.Id},
+                result.Value)
+            : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}")]
@@ -51,14 +48,9 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGame([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new GetGameQuery(id));
+        var result = await _mediator.Send(new GetGameQuery(id));
 
-        if (response == null)
-        {
-            return NotFound();
-        }
-        
-        return Ok(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Players")]
@@ -66,9 +58,9 @@ public class GamesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetGamePlayers([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new GetPlayerListQuery(id));
-        
-        return Ok(response);
+        var result = await _mediator.Send(new GetPlayerListQuery(id));
+
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("{id}/Actions/Reorder")]
@@ -79,9 +71,9 @@ public class GamesController : ControllerBase
         [FromBody] PlayerIdListDTO playerIdList,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
+        var result = await _mediator.Send(new ReorderPlayersCommand(id, playerIdList.PlayerIds), cancellationToken);
 
-        return NoContent();
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("{id}/Actions/EndTurn")]
@@ -93,9 +85,9 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new EndTurnCommand(id), cancellationToken);
+        var result = await _mediator.Send(new EndTurnCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
     
     [HttpPost("{id}/Actions/Start")]
@@ -107,9 +99,9 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new StartGameCommand(id), cancellationToken);
+        var result = await _mediator.Send(new StartGameCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
     
     [HttpPost("{id}/Actions/Complete")]
@@ -121,33 +113,38 @@ public class GamesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(new EndGameCommand(id), cancellationToken);
+        var result = await _mediator.Send(new EndGameCommand(id), cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPost("Join")]
     [ProducesResponseType(typeof(PlayerCredentialsDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinGame(
-        [FromBody] JoinGameCommand player,
+        [FromBody] JoinGameDTO player,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(player, cancellationToken);
+        var request = new JoinGameCommand(player.EntryCode, player.Name);
+        
+        var result = await _mediator.Send(request, cancellationToken);
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Summary")]
+    [ProducesResponseType(typeof(GameSummaryDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetGameSummary(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         var query = new GetGameSummaryQuery(id);
         
-        var response = await _mediator.Send(query, cancellationToken);
-        
-        return this.GetActionResult(response);
+        var result = await _mediator.Send(query, cancellationToken);
+
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
 }

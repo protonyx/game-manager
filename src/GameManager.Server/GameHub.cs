@@ -1,7 +1,9 @@
 using GameManager.Application.Authorization;
+using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
-using GameManager.Application.Services;
+using GameManager.Application.Features.Games.Notifications.PlayerConnected;
+using GameManager.Application.Features.Games.Notifications.PlayerDisconnected;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -27,7 +29,7 @@ public class GameHub : Hub<IGameClientNotificationService>
         
         if (gameId.HasValue)
         {
-            // Add the connection to a group named with the Group ID
+            // Add the connection to a group named with the Game ID
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId.Value.ToString());
         }
 
@@ -35,10 +37,12 @@ public class GameHub : Hub<IGameClientNotificationService>
 
         if (playerId.HasValue)
         {
+            // Add the connection to a group named with the Player ID
             await Groups.AddToGroupAsync(Context.ConnectionId, playerId.Value.ToString());
+            
+            var notification = new PlayerConnectedNotification(playerId.Value);
+            await _mediator.Publish(notification);
         }
-        
-        await base.OnConnectedAsync();
     }
 
     public async Task Heartbeat()
@@ -47,17 +51,19 @@ public class GameHub : Hub<IGameClientNotificationService>
 
         if (playerId.HasValue)
         {
-            await _mediator.Send(new UpdateHeartbeatCommand()
-            {
-                PlayerId = playerId.Value
-            });
+            await _mediator.Send(new UpdateHeartbeatCommand(playerId.Value));
         }
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         _logger.LogWarning(exception, "Player disconnected");
         
-        return base.OnDisconnectedAsync(exception);
+        var playerId = Context.User?.GetPlayerId();
+        if (playerId.HasValue)
+        {
+            var notification = new PlayerDisconnectedNotification(playerId.Value);
+            await _mediator.Publish(notification);
+        }
     }
 }

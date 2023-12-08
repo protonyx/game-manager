@@ -1,8 +1,9 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Commands.EndTurn;
 using GameManager.Domain.Common;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -14,38 +15,23 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.State, GameState.InProgress)
-            .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player1.Id
-        };
+        var game = new Game(fixture.Create<string>(), new GameOptions());
+        var players = fixture.BuildPlayer(game)
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        var player2 = players[1];
+        player2.SetOrder(2);
+        game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
-        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)))
-            .ReturnsUsingFixture(fixture.Build<Game>()
-                .With(g => g.Id, game.Id)
-                .With(g => g.CurrentTurn, new CurrentTurnDetails()
-                {
-                    PlayerId = player2.Id
-                }));
+        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None))
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -60,8 +46,8 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<SuccessfulCommandResponse>();
-        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id)), Times.Once);
+        result.IsSuccess.Should().BeTrue();
+        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None), Times.Once);
     }
     
     [Fact]
@@ -70,38 +56,24 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.State, GameState.InProgress)
-            .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, true)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player2.Id
-        };
+        var game = new Game(fixture.Create<string>(), new GameOptions());
+        var players = fixture.BuildPlayer(game)
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        player1.Promote();
+        var player2 = players[1];
+        player2.SetOrder(2);
+        game.Start(player2);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
-        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)))
-            .ReturnsUsingFixture(fixture.Build<Game>()
-                .With(g => g.Id, game.Id)
-                .With(g => g.CurrentTurn,  new CurrentTurnDetails()
-            {
-                PlayerId = player1.Id
-            }));
+        gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None))
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -116,8 +88,8 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<SuccessfulCommandResponse>();
-        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id)), Times.Once);
+        result.IsSuccess.Should().BeTrue();
+        gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None), Times.Once);
     }
     
     [Fact]
@@ -126,31 +98,21 @@ public class EndTurnCommandTests
         // Arrange
         var fixture = TestUtils.GetTestFixture();
 
-        var game = fixture.Build<Game>()
-            .With(t => t.State, GameState.InProgress)
-            .Create();
-        var player1 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 1)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        var player2 = fixture.Build<Player>()
-            .With(t => t.GameId, game.Id)
-            .With(t => t.Order, 2)
-            .With(t => t.IsAdmin, false)
-            .With(t => t.Active, true)
-            .Create();
-        game.CurrentTurn = new CurrentTurnDetails()
-        {
-            PlayerId = player1.Id
-        };
+        var game = new Game(fixture.Create<string>(), new GameOptions());
+        var players = fixture.BuildPlayer(game)
+            .CreateMany(2)
+            .ToList();
+        var player1 = players[0];
+        player1.SetOrder(1);
+        var player2 = players[1];
+        player2.SetOrder(2);
+        game.Start(player1);
 
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(t => t.GetByIdAsync(game.Id))
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() {player1, player2});
         fixture.SetUser(user =>
         {
@@ -165,7 +127,8 @@ public class EndTurnCommandTests
         var result = await sut.Handle(cmd, CancellationToken.None);
         
         // Assert
-        result.Should().BeOfType<AuthorizationErrorCommandResponse>();
-        gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>()), Times.Never());
+        result.IsFailure.Should().BeTrue();
+        result.Error.ErrorType.Should().Be(ApplicationErrorType.AuthorizationError);
+        gameRepo.Verify(t => t.UpdateAsync(It.IsAny<Game>(), CancellationToken.None), Times.Never());
     }
 }

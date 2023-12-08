@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.PruneGames;
 
-public class PruneGamesCommand : IRequest
+public class PruneGamesCommand : IRequest<UnitResult<ApplicationError>>
 {
     public TimeSpan RetentionPeriod { get; }
 

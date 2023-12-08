@@ -1,19 +1,13 @@
-﻿using FluentValidation;
-using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
+﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerCreated;
-using GameManager.Application.Services;
-using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandResponse>
+public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<PlayerCredentialsDTO, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -39,30 +33,44 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
         _mediator = mediator;
     }
 
-    public async Task<ICommandResponse> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PlayerCredentialsDTO, ApplicationError>> Handle(JoinGameCommand request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetGameByEntryCodeAsync(EntryCode.Of(request.EntryCode));
+        var entryCodeOrError = EntryCode.From(request.EntryCode);
+
+        if (entryCodeOrError.IsFailure)
+            return GameErrors.InvalidEntryCode();
+        
+        var playerNameOrError = PlayerName.From(request.Name);
+
+        if (playerNameOrError.IsFailure)
+            return GameErrors.PlayerInvalidName(playerNameOrError.Error);
+        
+        var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
         
         if (game == null)
-        {
-            return CommandResponses.Failure("The entry code is invalid.");
-        }
+            return GameErrors.InvalidEntryCode();
 
-        var newPlayer = new Player()
+        var newPlayer = new Player(playerNameOrError.Value, game);
+        
+        // Promote the player if they are the first
+        var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
+
+        newPlayer.SetOrder(existingPlayerCount + 1);
+        
+        if (existingPlayerCount == 0)
         {
-            GameId = game.Id,
-            Name = request.Name
-        };
+            newPlayer.Promote();
+        }
         
         // Validate
         var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
 
         if (!validationResult.IsValid)
         {
-            return CommandResponses.ValidationError(validationResult);
+            return ApplicationError.Validation<Player>(validationResult);
         }
 
-        newPlayer = await _playerRepository.CreateAsync(newPlayer);
+        newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);
         
         await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
 
@@ -84,6 +92,6 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, ICommandR
             IsAdmin = newPlayer.IsAdmin
         };
 
-        return CommandResponses.Data(game.Id, dto);
+        return dto;
     }
 }

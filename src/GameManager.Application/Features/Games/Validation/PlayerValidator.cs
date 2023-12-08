@@ -9,22 +9,12 @@ public class PlayerValidator : AbstractValidator<Player>
     public PlayerValidator(IGameRepository gameRepository, IPlayerRepository playerRepository)
     {
         RuleFor(t => t.GameId)
-            .MustAsync(async (gameId, cancellationToken) =>
-            {
-                var game = await gameRepository.GetByIdAsync(gameId);
-
-                return game != null;
-            })
+            .MustAsync(async (gameId, cancellationToken) => await gameRepository.ExistsAsync(gameId, cancellationToken))
             .WithMessage("Game must exist");
 
         RuleFor(t => t.Name)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull()
-            .Length(3, 20);
-
-        RuleFor(t => t.Name)
             .MustAsync((player, name, cancellationToken) =>
-                playerRepository.NameIsUniqueAsync(player.GameId, name, player.Id))
+                playerRepository.NameIsUniqueAsync(player.GameId, name.Value, player.Id, cancellationToken))
             .WithMessage("{PropertyName} must be unique");
     }
 }

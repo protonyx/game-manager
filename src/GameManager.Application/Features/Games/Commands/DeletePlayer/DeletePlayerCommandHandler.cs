@@ -1,16 +1,12 @@
 ﻿using GameManager.Application.Authorization;
-using GameManager.Application.Commands;
 using GameManager.Application.Contracts;
-using GameManager.Application.Contracts.Commands;
-using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
-using GameManager.Application.Services;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, ICommandResponse>
+public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
     
@@ -36,38 +32,44 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, I
         _notificationService = notificationService;
     }
 
-    public async Task<ICommandResponse> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
+    public async Task<UnitResult<ApplicationError>> Handle(DeletePlayerCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId);
+        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
-            return CommandResponses.NotFound();
+            return GameErrors.PlayerNotFound(request.PlayerId);
         }
         
-        if (_userContext.User == null || !_userContext.User.IsAuthorizedForGame(player.GameId))
+        if (_userContext.User == null 
+            || !_userContext.User.IsAuthorizedForGame(player.GameId)
+            || !_userContext.User.IsAuthorizedForPlayer(player.Id))
         {
-            return CommandResponses.AuthorizationError("Player is not part of this game");
-        }
-        else if (!_userContext.User.IsAuthorizedForPlayer(player.Id))
-        {
-            return CommandResponses.AuthorizationError("Not authorized to update this player");
+            return ApplicationError.Authorization("Not authorized to update this player");
         }
         
-        await _playerRepository.DeleteByIdAsync(request.PlayerId);
+        player.SoftDelete();
+        
+        await _playerRepository.UpdateAsync(player, cancellationToken);
         
         await _mediator.Publish(new PlayerDeletedNotification(player), cancellationToken);
+        
+        // Update player order for remaining players
+        var players = await _playerRepository.GetPlayersByGameIdAsync(player.GameId, cancellationToken);
+            
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].SetOrder(i + 1);
+        }
         
         // If the deleted player was an admin and there are any remaining players, promote the next player to admin
         if (player.IsAdmin)
         {
-            var players = await _playerRepository.GetPlayersByGameIdAsync(player.GameId);
-
-            var nextPlayer = players.Where(t => t.Active).MinBy(t => t.Order);
+            var nextPlayer = players.Where(t => t.Active).MinBy(t => t.JoinedDate);
 
             if (nextPlayer != null)
             {
-                await _playerRepository.UpdateAsync(nextPlayer);
+                nextPlayer.Promote();
                 
                 // Generate player token
                 var identityBuilder = new PlayerIdentityBuilder();
@@ -88,6 +90,8 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, I
             }
         }
 
-        return CommandResponses.Success();
+        await _playerRepository.UpdateManyAsync(players, cancellationToken);
+
+        return UnitResult.Success<ApplicationError>();
     }
 }

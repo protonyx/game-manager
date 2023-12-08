@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using AutoFixture.AutoMoq;
+using AutoFixture.Dsl;
 using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
+using GameManager.Domain.Entities;
 
 namespace GameManager.Tests;
 

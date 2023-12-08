@@ -9,6 +9,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
     {
+        builder.ToTable("Games");
+        
         builder.HasKey(t => t.Id);
         
         builder.Property(t => t.Name)
@@ -18,8 +20,7 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(t => t.EntryCode)
             .HasConversion(
                 v => v.Value,
-                v => EntryCode.Of(v))
-            .IsRequired()
+                v => EntryCode.From(v).Value)
             .HasMaxLength(10);
         
         builder.OwnsOne(t => t.Options, build =>
@@ -35,5 +36,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 
         builder.HasIndex(t => t.EntryCode)
             .IsUnique();
+
+        builder.Navigation(t => t.Trackers)
+            .AutoInclude();
     }
 }

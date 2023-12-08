@@ -30,7 +30,6 @@ namespace GameManager.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("EntryCode")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
@@ -50,7 +49,7 @@ namespace GameManager.Server.Migrations
                     b.HasIndex("EntryCode")
                         .IsUnique();
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.Player", b =>
@@ -68,6 +67,9 @@ namespace GameManager.Server.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("JoinedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("LastHeartbeat")
                         .HasColumnType("TEXT");
 
@@ -79,11 +81,14 @@ namespace GameManager.Server.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("Players");
+                    b.ToTable("Players", (string)null);
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.Tracker", b =>
@@ -106,7 +111,7 @@ namespace GameManager.Server.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("Trackers");
+                    b.ToTable("Trackers", (string)null);
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.TrackerHistory", b =>
@@ -157,7 +162,7 @@ namespace GameManager.Server.Migrations
 
                     b.HasIndex("TrackerId");
 
-                    b.ToTable("TrackerValues");
+                    b.ToTable("TrackerValues", (string)null);
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.Turn", b =>
@@ -182,7 +187,7 @@ namespace GameManager.Server.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("Turns");
+                    b.ToTable("Turns", (string)null);
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
@@ -250,17 +255,21 @@ namespace GameManager.Server.Migrations
 
             modelBuilder.Entity("GameManager.Domain.Entities.TrackerHistory", b =>
                 {
-                    b.HasOne("GameManager.Domain.Entities.Player", null)
-                        .WithMany("TrackerHistory")
+                    b.HasOne("GameManager.Domain.Entities.Player", "Player")
+                        .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GameManager.Domain.Entities.Tracker", null)
+                    b.HasOne("GameManager.Domain.Entities.Tracker", "Tracker")
                         .WithMany()
                         .HasForeignKey("TrackerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Tracker");
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.TrackerValue", b =>
@@ -280,11 +289,13 @@ namespace GameManager.Server.Migrations
 
             modelBuilder.Entity("GameManager.Domain.Entities.Turn", b =>
                 {
-                    b.HasOne("GameManager.Domain.Entities.Player", null)
-                        .WithMany("Turns")
+                    b.HasOne("GameManager.Domain.Entities.Player", "Player")
+                        .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
@@ -294,11 +305,7 @@ namespace GameManager.Server.Migrations
 
             modelBuilder.Entity("GameManager.Domain.Entities.Player", b =>
                 {
-                    b.Navigation("TrackerHistory");
-
                     b.Navigation("TrackerValues");
-
-                    b.Navigation("Turns");
                 });
 #pragma warning restore 612, 618
         }

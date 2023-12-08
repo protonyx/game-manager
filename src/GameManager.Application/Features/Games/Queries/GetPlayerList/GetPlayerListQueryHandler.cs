@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayerList;
 
-public class GetPlayerListQueryHandler : IRequestHandler<GetPlayerListQuery, ICollection<PlayerDTO>>
+public class GetPlayerListQueryHandler : IRequestHandler<GetPlayerListQuery, Result<IReadOnlyList<PlayerDTO>, ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
 
@@ -17,11 +15,11 @@ public class GetPlayerListQueryHandler : IRequestHandler<GetPlayerListQuery, ICo
         _mapper = mapper;
     }
 
-    public async Task<ICollection<PlayerDTO>> Handle(GetPlayerListQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<PlayerDTO>, ApplicationError>> Handle(GetPlayerListQuery request, CancellationToken cancellationToken)
     {
-        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId);
+        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId, cancellationToken);
 
-        var ret = _mapper.Map<ICollection<PlayerDTO>>(players);
+        var ret = players.Select(_mapper.Map<PlayerDTO>).ToList();
 
         return ret;
     }

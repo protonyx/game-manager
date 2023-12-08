@@ -1,5 +1,6 @@
 using AutoMapper;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Profiles;
@@ -9,6 +10,7 @@ public class DtoProfile : Profile
     public DtoProfile()
     {
         CreateMap<Game, GameDTO>()
+            .ForMember(t => t.EntryCode, opt => opt.MapFrom(t => t.EntryCode.Value))
             .ForMember(t => t.LastTurnStartTime, opt => opt.MapFrom(t => t.CurrentTurn.StartTime))
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())
@@ -16,6 +18,7 @@ public class DtoProfile : Profile
         CreateMap<GameOptions, GameOptionsDTO>()
             .ReverseMap();
         CreateMap<Player, PlayerDTO>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.TrackerValues, opt =>
                 opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.TrackerId, tv => tv.Value)))
             .ReverseMap()
@@ -28,7 +31,10 @@ public class DtoProfile : Profile
                         Value = kv.Value
                     })
                     .ToList()));
-        CreateMap<Player, PlayerSummaryDTO>();
+        CreateMap<Player, PlayerSummaryDTO>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
+            .ForMember(t => t.Turns, opt => opt.Ignore())
+            .ForMember(t => t.TrackerHistory, opt => opt.Ignore());
         CreateMap<Tracker, TrackerDTO>()
             .ReverseMap()
             .ForMember(t => t.Id, opt => opt.Ignore())

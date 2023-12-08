@@ -1,14 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Commands;
-using MediatR;
+using GameManager.Application.Errors;
+using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommand : IRequest<ICommandResponse>
+public class JoinGameCommand : IRequest<Result<PlayerCredentialsDTO, ApplicationError>>
 {
-    public string EntryCode { get; set; } = string.Empty;
+    public string EntryCode { get; }
 
-    [Required]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; }
+
+    public JoinGameCommand(string entryCode, string name)
+    {
+        EntryCode = entryCode;
+        Name = name;
+    }
 }

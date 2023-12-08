@@ -10,8 +10,9 @@ export interface PlayerJoinedMessage {
   player: Player;
 }
 
-export interface PlayerStateChangedMessage {
+export interface PlayerUpdatedMessage {
   gameId: string;
+  playerId: string;
   player: Player;
 }
 

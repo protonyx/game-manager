@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using GameManager.Application.Contracts;
 
@@ -5,37 +6,41 @@ namespace GameManager.Application.Authorization;
 
 public class PlayerIdentityBuilder : IPlayerIdentityBuilder
 {
-    private readonly ClaimsIdentity _identity;
+
+    private const string RoleClaim = "role";
+
+    private readonly ConcurrentBag<Claim> _claims = new();
     
     public PlayerIdentityBuilder()
     {
-        _identity = new ClaimsIdentity();
+        
     }
 
     public IPlayerIdentityBuilder AddGameId(Guid gameId)
     {
-        _identity.AddClaim(new Claim(GameManagerClaimTypes.GameId, gameId.ToString()));
+        _claims.Add(new Claim(GameManagerClaimTypes.GameId, gameId.ToString()));
         
         return this;
     }
 
     public IPlayerIdentityBuilder AddPlayerId(Guid playerId)
     {
-        _identity.AddClaim(new Claim(GameManagerClaimTypes.PlayerId, playerId.ToString()));
+        _claims.Add(new Claim(GameManagerClaimTypes.PlayerId, playerId.ToString()));
         
         return this;
     }
 
     public IPlayerIdentityBuilder AddAdminRole()
     {
-        _identity.AddClaim(new Claim("role", GameManagerClaimTypes.AdminRole));
+        _claims.Add(new Claim(RoleClaim, GameManagerClaimTypes.AdminRole));
         
         return this;
     }
     
     public ClaimsIdentity Build()
     {
-        return _identity;
+        return new ClaimsIdentity(_claims, roleType: RoleClaim, nameType: ClaimTypes.Name,
+            authenticationType: "internal");
     }
 
     public static ClaimsPrincipal CreatePrincipal(Action<IPlayerIdentityBuilder> builderAction)

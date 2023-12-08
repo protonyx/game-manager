@@ -1,10 +1,13 @@
-﻿using GameManager.Application.Commands;
-using GameManager.Application.Contracts.Commands;
-using MediatR;
+﻿using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 
-public class UpdateHeartbeatCommand : IRequest<ICommandResponse>
+public class UpdateHeartbeatCommand : IRequest<UnitResult<ApplicationError>>
 {
-    public Guid PlayerId { get; set; }
+    public Guid PlayerId { get; }
+
+    public UpdateHeartbeatCommand(Guid playerId)
+    {
+        PlayerId = playerId;
+    }
 }

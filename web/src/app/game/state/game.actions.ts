@@ -17,7 +17,7 @@ import {
   GameStateChangedMessage,
   PlayerJoinedMessage,
   PlayerLeftMessage,
-  PlayerStateChangedMessage,
+  PlayerUpdatedMessage,
 } from '../models/messages';
 
 export const GameActions = createActionGroup({
@@ -47,7 +47,7 @@ export const GameHubActions = createActionGroup({
     'Hub Disconnected': emptyProps(),
     'Game Updated': props<GameStateChangedMessage>(),
     'Player Joined': props<PlayerJoinedMessage>(),
-    'Player Updated': props<PlayerStateChangedMessage>(),
+    'Player Updated': props<PlayerUpdatedMessage>(),
     'Player Left': props<PlayerLeftMessage>(),
     'Credentials Updated': props<{ credentials: PlayerCredentials }>(),
   },

@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
-public class GetGameQueryHandler : IRequestHandler<GetGameQuery, GameDTO?>
+public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GameDTO, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -17,9 +15,14 @@ public class GetGameQueryHandler : IRequestHandler<GetGameQuery, GameDTO?>
         _mapper = mapper;
     }
 
-    public async Task<GameDTO?> Handle(GetGameQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GameDTO, ApplicationError>> Handle(GetGameQuery request, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(request.GameId);
+        var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
+
+        if (game == null)
+        {
+            return GameErrors.GameNotFound(request.GameId);
+        }
 
         var dto = _mapper.Map<GameDTO>(game);
 

@@ -27,6 +27,7 @@
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let element">
       {{ element.name }} <span *ngIf="checkIsMe(element)">(me)</span>
+      <mat-icon *ngIf="element.state === 'Disconnected'"> signal_wifi_off </mat-icon>
     </td>
   </ng-container>
 

@@ -9,6 +9,6 @@ public class GameValidator : AbstractValidator<Game>
     {
         RuleFor(t => t.Name)
             .NotEmpty()
-            .MaximumLength(100);
+            .MaximumLength(50);
     }    
 }

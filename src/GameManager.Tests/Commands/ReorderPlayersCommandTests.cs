@@ -1,6 +1,7 @@
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.ReorderPlayers;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -11,30 +12,31 @@ public class ReorderPlayersCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        var gameId = fixture.Create<Guid>();
-        var players = new[]
-        {
-            fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-            fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-            fixture.Build<Player>().With(p => p.GameId, gameId).Create(),
-        };
-        IEnumerable<Player> reorderedPlayers = Enumerable.Empty<Player>();
+        var game = new Game(fixture.Create<string>(), new GameOptions());
+        var players = fixture.BuildPlayer(game)
+            .CreateMany(3)
+            .ToList();
+        
+        ICollection<Player> reorderedPlayers = null;
+        var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
+        gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
+            .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(gameId))
+        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(players);
-        playerRepo.Setup(t => t.UpdatePlayersAsync(It.IsAny<IEnumerable<Player>>()))
-            .Callback((IEnumerable<Player> p) => reorderedPlayers = p)
+        playerRepo.Setup(t => t.UpdateManyAsync(It.IsAny<IEnumerable<Player>>(), CancellationToken.None))
+            .Callback((IEnumerable<Player> p, CancellationToken ct) => reorderedPlayers = p.ToList())
             .Returns(Task.CompletedTask);
 
         fixture.SetUser(user =>
         {
-            user.AddGameId(gameId)
+            user.AddGameId(game.Id)
                 .AddPlayerId(players[0].Id)
                 .AddAdminRole();
         });
 
         var sut = fixture.Create<ReorderPlayersCommandHandler>();
-        var command = new ReorderPlayersCommand(gameId, new[]
+        var command = new ReorderPlayersCommand(game.Id, new[]
         {
             players[1].Id,
             players[0].Id,
@@ -42,9 +44,11 @@ public class ReorderPlayersCommandTests
         });
 
         // Act
-        await sut.Handle(command, CancellationToken.None);
+        var result = await sut.Handle(command, CancellationToken.None);
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        reorderedPlayers.Should().NotBeNull();
         reorderedPlayers.Select(t => t.Id).Should().BeEquivalentTo(command.PlayerIds);
     }
 }

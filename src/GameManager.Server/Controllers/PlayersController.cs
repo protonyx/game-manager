@@ -4,7 +4,6 @@ using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayer;
 using GameManager.Application.Features.Games.Queries.GetPlayerTurns;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -28,14 +27,9 @@ public class PlayersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPlayer([FromRoute] Guid id)
     {
-        var player = await _mediator.Send(new GetPlayerQuery(id));
+        var result = await _mediator.Send(new GetPlayerQuery(id));
 
-        if (player == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(player);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPut("{id}")]
@@ -46,13 +40,9 @@ public class PlayersController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] PlayerDTO dto)
     {
-        var response = await _mediator.Send(new UpdatePlayerCommand()
-        {
-            PlayerId = id,
-            Player = dto
-        });
+        var result = await _mediator.Send(new UpdatePlayerCommand(id, dto));
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 
     [HttpPatch("{id}")]
@@ -63,12 +53,14 @@ public class PlayersController : ControllerBase
         [FromRoute] Guid id,
         [FromBody, Required] JsonPatchDocument<PlayerDTO> patchDoc)
     {
-        var player = await _mediator.Send(new GetPlayerQuery(id));
+        var result = await _mediator.Send(new GetPlayerQuery(id));
 
-        if (player == null)
+        if (result.IsFailure)
         {
-            return NotFound();
+            return this.GetErrorActionResult(result.Error);
         }
+
+        var player = result.Value;
 
         patchDoc.ApplyTo(player, ModelState);
 
@@ -77,30 +69,26 @@ public class PlayersController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
-        var updateResponse = await _mediator.Send(new UpdatePlayerCommand()
-        {
-            PlayerId = id,
-            Player = player
-        });
+        var updateResult = await _mediator.Send(new UpdatePlayerCommand(id, player));
 
-        return this.GetActionResult(updateResponse);
+        return updateResult.IsSuccess ? Ok(updateResult.Value) : this.GetErrorActionResult(updateResult.Error);
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeletePlayer([FromRoute] Guid id)
     {
-        var response = await _mediator.Send(new DeletePlayerCommand(id));
+        var result = await _mediator.Send(new DeletePlayerCommand(id));
 
-        return this.GetActionResult(response);
+        return result.IsSuccess ? NoContent() : this.GetErrorActionResult(result.Error);
     }
 
     [HttpGet("{id}/Turns")]
     [ProducesResponseType(typeof(ICollection<TurnDTO>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerTurns([FromRoute] Guid id)
     {
-        var turns = await _mediator.Send(new GetPlayerTurnsQuery(id));
+        var result = await _mediator.Send(new GetPlayerTurnsQuery(id));
 
-        return Ok(turns);
+        return result.IsSuccess ? Ok(result.Value) : this.GetErrorActionResult(result.Error);
     }
 }

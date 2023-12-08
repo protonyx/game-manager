@@ -1,6 +1,5 @@
 using GameManager.Application;
 using GameManager.Application.Contracts;
-using GameManager.Application.Services;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
@@ -17,14 +16,17 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
 builder.Services.AddControllers(opt =>
     {
         opt.Filters.Add<RequireActivePlayerFilter>();
+        opt.Filters.Add<RequireValidGameFilter>();
     })
     .AddNewtonsoftJson(opt =>
     {
@@ -34,11 +36,12 @@ builder.Services.AddControllers(opt =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSignalR()
+var signalr = builder.Services.AddSignalR()
     .AddNewtonsoftJsonProtocol(opt =>
     {
         opt.PayloadSerializerSettings.Converters.Add(new StringEnumConverter());
     });
+
 builder.Services.AddSingleton<IGameClientNotificationService, GameHubClientNotificationService>();
 
 builder.Services.AddCors(opt =>
@@ -82,10 +85,27 @@ builder.Services.AddAuthentication(opt =>
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
 
-
 builder.Services.AddScoped<CustomJwtBearerEvents>();
-
 builder.Services.AddSingleton<ITokenService>(tokenService);
+
+// Caching
+builder.Services.AddMemoryCache();
+
+if (string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    builder.Services.AddDistributedMemoryCache();
+}
+else
+{
+    var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+    builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
+    builder.Services.AddStackExchangeRedisCache(opt =>
+    {
+        opt.ConnectionMultiplexerFactory = async () => redisConnectionMultiplexer;
+    });
+    signalr.AddStackExchangeRedis(redisConnectionString);
+}
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
 
@@ -94,6 +114,7 @@ builder.Services.AddSqlitePersistenceServices();
 
 builder.Services.AddHostedService<GamePruningService>();
 
+// TODO: Switch to using OTEL_EXPORTER_OTLP_ENDPOINT
 var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
 
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
@@ -113,6 +134,12 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
                 })
                 .AddHttpClientInstrumentation()
                 .AddEntityFrameworkCoreInstrumentation();
+            
+            if (!string.IsNullOrWhiteSpace(redisConnectionString))
+            {
+                tb.AddRedisInstrumentation();
+            }
+            
             tb.AddOtlpExporter(otlp =>
             {
                 otlp.Endpoint = new Uri(otlpEndpoint);

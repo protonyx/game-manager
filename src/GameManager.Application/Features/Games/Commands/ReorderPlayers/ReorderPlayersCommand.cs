@@ -1,8 +1,8 @@
-using MediatR;
+using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
-public class ReorderPlayersCommand : IRequest
+public class ReorderPlayersCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid GameId { get; }
 
