@@ -19,6 +19,20 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
 
+var assm = Assembly.GetEntryAssembly();
+string version;
+
+try
+{
+    var versionInfo = FileVersionInfo.GetVersionInfo(assm.Location);
+    version = versionInfo.ProductVersion;
+}
+catch (Exception e)
+{
+    version = assm.GetName().Version.ToString();
+}
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -121,7 +135,9 @@ var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
 {
     var resources = ResourceBuilder.CreateDefault()
-        .AddService("game-manager", serviceInstanceId: Environment.MachineName);
+        .AddService("game-manager",
+            serviceInstanceId: Environment.MachineName,
+            serviceVersion: version);
     
     builder.Services.AddOpenTelemetry()
         .WithTracing(tb =>
@@ -199,11 +215,9 @@ app.MapFallbackToFile("index.html");
 app.MapSwagger();
 app.MapGet("/version", async ctx =>
 {
-    var assm = Assembly.GetEntryAssembly();
-    var versionInfo = FileVersionInfo.GetVersionInfo(assm.Location);
     await ctx.Response.WriteAsJsonAsync(new
     {
-        Version = versionInfo.ProductVersion
+        Version = version
     });
 });
 
