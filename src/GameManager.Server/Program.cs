@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using FastEndpoints;
 using GameManager.Application;
 using GameManager.Application.Contracts;
 using GameManager.Persistence.Sqlite;
@@ -38,6 +39,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
+builder.Services.AddFastEndpoints();
 builder.Services.AddControllers(opt =>
     {
         opt.Filters.Add<RequireActivePlayerFilter>();
@@ -209,6 +211,12 @@ app.UseSwaggerUI();
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
     app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
+app.MapFastEndpoints(c =>
+{
+    c.Endpoints.RoutePrefix = "api/v2";
+    c.Endpoints.ShortNames = true;
+    c.Errors.UseProblemDetails();
+});
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
 app.MapFallbackToFile("index.html");
