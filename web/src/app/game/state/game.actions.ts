@@ -36,7 +36,9 @@ export const GameActions = createActionGroup({
     'Update Player Order': props<{ gameId: string; players: Player[] }>(),
     'End Turn': props<{ gameId: string }>(),
     'Start Game': props<{ gameId: string }>(),
+    'Game Started': props<{ gameId: string }>(),
     'End Game': props<{ gameId: string }>(),
+    'Game Ended': props<{ gameId: string }>(),
   },
 });
 

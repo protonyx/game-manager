@@ -90,6 +90,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   trackers: Tracker[] | null | undefined;
 
+  lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
+
   constructor(
     private gameService: GameService,
     private signalr: GameHubService,
@@ -146,9 +148,27 @@ export class GamePageComponent implements OnInit, OnDestroy {
         );
         snackBarRef.onAction().subscribe(() => {
           this.signalr.reconnect();
-          this.onRefresh();
         });
       });
+
+    // Handle SignalR reconnects
+    this.actions$
+      .pipe(ofType(GameHubActions.hubConnected), takeUntil(this.unsubscribe$))
+      .subscribe((connected) => {
+        this.snackBar.dismiss();
+        this.onRefresh();
+      });
+
+    // Request a web lock to prevent tab from sleeping
+    if (navigator && navigator.locks && navigator.locks.request) {
+      const promise = new Promise((res) => {
+        this.lockResolver = res;
+      });
+
+      navigator.locks.request('game-manager', { mode: 'shared' }, () => {
+        return promise;
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -156,6 +176,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
 
     this.signalr.disconnect();
+
+    // Release web lock
+    if (this.lockResolver) {
+      this.lockResolver(null);
+    }
   }
 
   onEndTurn(): void {
