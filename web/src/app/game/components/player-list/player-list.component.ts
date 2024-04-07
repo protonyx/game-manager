@@ -29,7 +29,7 @@ export class PlayerListComponent implements OnChanges {
   public currentPlayer: Player | null = null;
 
   @Input()
-  public isAdmin: boolean | null = false;
+  public isHost: boolean | null = false;
 
   @Output()
   public editPlayer: EventEmitter<Player> = new EventEmitter<Player>();
@@ -53,7 +53,7 @@ export class PlayerListComponent implements OnChanges {
 
       this.columnsToDisplay = [];
 
-      if (this.isAdmin) {
+      if (this.isHost) {
         this.columnsToDisplay.push('actions');
       }
 

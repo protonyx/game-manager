@@ -331,6 +331,35 @@ export class GameEffects {
     )
   );
 
+  $gameStarted = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameHubActions.gameUpdated),
+      filter((action) => action.game.state === 'InProgress'),
+      map((action) => GameActions.gameStarted({ gameId: action.game.id }))
+    )
+  );
+
+  $gameEnded = createEffect(() =>
+    this.actions$.pipe(
+      ofType(GameHubActions.gameUpdated),
+      filter((action) => action.game.state === 'Complete'),
+      map((action) => GameActions.gameEnded({ gameId: action.game.id }))
+    )
+  );
+
+  $redirectToSummaryOnGameEnd = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(GameActions.gameEnded),
+        concatLatestFrom((action) => this.store.select(fromGames.selectGame)),
+        filter(([action, currentGame]) => action.gameId === currentGame?.id),
+        tap(([action, currentGame]) => {
+          this.router.navigate(['game', 'summary', action.gameId]);
+        })
+      ),
+    { dispatch: false }
+  );
+
   constructor(
     private actions$: Actions,
     private store: Store,

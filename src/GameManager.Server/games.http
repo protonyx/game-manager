@@ -1,0 +1,15 @@
+﻿POST https://{{baseUrl}}/api/v2/Games
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "options": {
+    "shareOtherPlayerTrackers": true
+  },
+  "trackers": [
+    {
+      "name": "Score",
+      "startingValue": "0"
+    }
+  ]
+}

@@ -29,11 +29,11 @@ public class BasicTests
         {
             builder.AddGameId(gameId);
             builder.AddPlayerId(playerId);
-            builder.AddAdminRole();
+            builder.AddHostRole();
         });
         
         // Act
-        var isAdmin = principal.IsAdminForGame(gameId);
+        var isAdmin = principal.IsHostForGame(gameId);
         
         // Assert
         isAdmin.Should().BeTrue();
@@ -52,8 +52,8 @@ public class BasicTests
         });
         
         // Act
-        var isAuthForGame = principal.IsAuthorizedForGame(gameId);
-        var isAuthForPlayer = principal.IsAuthorizedForPlayer(playerId);
+        var isAuthForGame = principal.IsAuthorizedToViewGame(gameId);
+        var isAuthForPlayer = principal.IsAuthorizedToViewPlayer(playerId);
         
         // Assert
         isAuthForGame.Should().BeTrue();

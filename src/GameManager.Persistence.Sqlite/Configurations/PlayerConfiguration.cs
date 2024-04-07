@@ -24,7 +24,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(t => t.Active)
             .IsRequired();
         builder.Property(t => t.Order);
-        builder.Property(t => t.IsAdmin);
+        builder.Property(t => t.IsHost);
         builder.Property(t => t.JoinedDate);
         builder.Property(t => t.LastHeartbeat);
 

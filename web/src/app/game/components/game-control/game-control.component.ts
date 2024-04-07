@@ -16,7 +16,7 @@ export class GameControlComponent {
   public game: Game | null = null;
 
   @Input()
-  public isAdmin: boolean | null = false;
+  public isHost: boolean | null = false;
 
   @Output()
   public startGame: EventEmitter<void> = new EventEmitter<void>();

@@ -78,9 +78,9 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
         var identityBuilder = new PlayerIdentityBuilder();
         identityBuilder.AddGameId(game.Id)
             .AddPlayerId(newPlayer.Id);
-        if (newPlayer.IsAdmin)
+        if (newPlayer.IsHost)
         {
-            identityBuilder.AddAdminRole();
+            identityBuilder.AddHostRole();
         }
         var token = _tokenService.GenerateToken(identityBuilder.Build());
 
@@ -89,7 +89,7 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
             GameId = game.Id,
             PlayerId = newPlayer.Id,
             Token = token,
-            IsAdmin = newPlayer.IsAdmin
+            IsHost = newPlayer.IsHost
         };
 
         return dto;

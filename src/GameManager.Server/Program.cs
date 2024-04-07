@@ -1,14 +1,19 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.Json.Serialization;
+using FastEndpoints;
 using GameManager.Application;
 using GameManager.Application.Contracts;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
+using GameManager.Server.Authorization;
 using GameManager.Server.Filters;
 using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
@@ -32,12 +37,12 @@ catch (Exception e)
     version = assm.GetName().Version.ToString();
 }
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
+builder.Services.AddFastEndpoints();
 builder.Services.AddControllers(opt =>
     {
         opt.Filters.Add<RequireActivePlayerFilter>();
@@ -47,9 +52,15 @@ builder.Services.AddControllers(opt =>
     {
         opt.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.Configure<JsonOptions>(opt =>
+{
+    opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.CustomSchemaIds(t => $"{t.FullName}");
+});
 
 var signalr = builder.Services.AddSignalR()
     .AddNewtonsoftJsonProtocol(opt =>
@@ -99,6 +110,9 @@ builder.Services.AddAuthentication(opt =>
         };
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationHandler, GameAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, PlayerAuthorizationHandler>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddSingleton<ITokenService>(tokenService);
@@ -209,6 +223,14 @@ app.UseSwaggerUI();
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
     app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
+app.MapFastEndpoints(c =>
+{
+    c.Endpoints.RoutePrefix = "api/v2";
+    c.Endpoints.ShortNames = true;
+    c.Errors.UseProblemDetails();
+    c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
+        new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id.ToString(), statusCode);
+});
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
 app.MapFallbackToFile("index.html");

@@ -36,7 +36,7 @@ export class GameHubService {
 
     const connection = new HubConnectionBuilder()
       .configureLogging(LogLevel.Information)
-      .withAutomaticReconnect()
+      .withAutomaticReconnect([0, 2000, 5000, 5000, 5000])
       .withUrl(environment.baseUrl + '/hubs/game', {
         accessTokenFactory: () => accessToken,
       })
@@ -63,6 +63,10 @@ export class GameHubService {
       console.log('SignalR disconnected');
       this.store.dispatch(GameHubActions.hubDisconnected());
       this.close$.next();
+    });
+    connection.onreconnecting(() => {
+      console.log('SignalR reconnecting');
+      this.store.dispatch(GameHubActions.hubDisconnected());
     });
     connection.onreconnected(() => {
       console.log('SignalR reconnected');

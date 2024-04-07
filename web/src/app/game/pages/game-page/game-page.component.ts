@@ -66,9 +66,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
-  isAdmin$ = this.store
+  isHost$ = this.store
     .select(selectCredentials)
-    .pipe(map((c) => c?.isAdmin || false));
+    .pipe(map((c) => c?.isHost || false));
 
   isMyTurn$ = combineLatest({
     game: this.game$,
@@ -89,6 +89,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
   currentPlayer: Player | null | undefined;
 
   trackers: Tracker[] | null | undefined;
+
+  lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
   constructor(
     private gameService: GameService,
@@ -146,9 +148,27 @@ export class GamePageComponent implements OnInit, OnDestroy {
         );
         snackBarRef.onAction().subscribe(() => {
           this.signalr.reconnect();
-          this.onRefresh();
         });
       });
+
+    // Handle SignalR reconnects
+    this.actions$
+      .pipe(ofType(GameHubActions.hubConnected), takeUntil(this.unsubscribe$))
+      .subscribe((connected) => {
+        this.snackBar.dismiss();
+        this.onRefresh();
+      });
+
+    // Request a web lock to prevent tab from sleeping
+    if (navigator && navigator.locks && navigator.locks.request) {
+      const promise = new Promise((res) => {
+        this.lockResolver = res;
+      });
+
+      navigator.locks.request('game-manager', { mode: 'shared' }, () => {
+        return promise;
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -156,6 +176,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
 
     this.signalr.disconnect();
+
+    // Release web lock
+    if (this.lockResolver) {
+      this.lockResolver(null);
+    }
   }
 
   onEndTurn(): void {
@@ -213,7 +238,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
       data: {
         player: player,
         trackers: this.trackers,
-        isAdmin: this.credentials?.isAdmin,
+        isHost: this.credentials?.isHost,
       },
       width: '400px',
     });

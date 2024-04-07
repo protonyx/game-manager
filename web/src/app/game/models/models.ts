@@ -89,5 +89,5 @@ export interface PlayerCredentials {
   gameId: string;
   playerId: string;
   token: string;
-  isAdmin: boolean;
+  isHost: boolean;
 }

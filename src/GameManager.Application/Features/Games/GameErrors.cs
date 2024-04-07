@@ -15,7 +15,7 @@ public static class GameErrors
         public const string PlayerInvalidState = "player.invalid.state";
         public const string PlayerInvalidName = "player.invalid.name";
         public const string PlayerNotAuthorized = "player.not_authorized";
-        public const string PlayerNotAdmin = "player.not_admin";
+        public const string PlayerNotHost = "player.not_host";
     }
     
     public static ApplicationError InvalidEntryCode()
@@ -48,9 +48,9 @@ public static class GameErrors
                 : $"Player is not authorized to {action}",
             errorCode: ErrorCodes.PlayerNotAuthorized);
 
-    public static ApplicationError PlayerNotAdmin() =>
-        ApplicationError.Authorization("Player is not an admin for this game",
-            errorCode: ErrorCodes.PlayerNotAdmin);
+    public static ApplicationError PlayerNotHost() =>
+        ApplicationError.Authorization("Player is not a host for this game",
+            errorCode: ErrorCodes.PlayerNotHost);
 
     public static ApplicationError PlayerNotInGame() =>
         ApplicationError.Authorization("Player is not in the game",

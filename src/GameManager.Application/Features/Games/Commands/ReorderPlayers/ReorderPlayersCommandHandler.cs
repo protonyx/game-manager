@@ -36,7 +36,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
             return GameErrors.GameNotFound(request.GameId);
         }
         
-        if (!_userContext.User!.IsAuthorizedForGame(game.Id))
+        if (!_userContext.User!.IsAuthorizedToViewGame(game.Id))
         {
             return GameErrors.PlayerNotAuthorized();
         }

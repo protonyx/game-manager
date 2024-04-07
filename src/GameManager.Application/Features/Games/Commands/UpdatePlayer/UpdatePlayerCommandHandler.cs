@@ -44,8 +44,8 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
         }
         
         if (_userContext.User == null
-            || !_userContext.User.IsAuthorizedForGame(player.GameId)
-            || !_userContext.User.IsAuthorizedForPlayer(player.Id))
+            || !_userContext.User.IsAuthorizedToViewGame(player.GameId)
+            || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id))
         {
             return GameErrors.PlayerNotAuthorized("update player");
         }

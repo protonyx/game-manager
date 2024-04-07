@@ -15,7 +15,7 @@ namespace GameManager.Server.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
                 {
@@ -64,7 +64,7 @@ namespace GameManager.Server.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsAdmin")
+                    b.Property<bool>("IsHost")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("JoinedDate")
