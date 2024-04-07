@@ -29,7 +29,7 @@ public class BasicTests
         {
             builder.AddGameId(gameId);
             builder.AddPlayerId(playerId);
-            builder.AddAdminRole();
+            builder.AddHostRole();
         });
         
         // Act

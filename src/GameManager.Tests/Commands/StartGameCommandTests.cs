@@ -34,7 +34,7 @@ public class StartGameCommandTests
         {
             user.AddGameId(game.Id)
                 .AddPlayerId(player1.Id)
-                .AddAdminRole();
+                .AddHostRole();
         });
 
         var cmd = new StartGameCommand(game.Id);

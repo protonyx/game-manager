@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using FastEndpoints.Testing;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.Commands.JoinGame;
 using GameManager.Application.Features.Games.DTO;
@@ -10,20 +11,14 @@ using GameManager.Server;
 namespace GameManager.Tests;
 
 [Collection("Integration")]
-public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
 {
-    private readonly WebApplicationFactory<Program> _factory;
-
-    public IntegrationTests(WebApplicationFactory<Program> factory)
-    {
-        _factory = factory;
-    }
     
     [Fact]
     public async Task Test_CreateNewGame()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        var client = App.CreateClient();
 
         var newGame = new CreateGameDTO()
         {
