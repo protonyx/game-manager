@@ -42,8 +42,8 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
         }
         
         if (_userContext.User == null 
-            || !_userContext.User.IsAuthorizedForGame(player.GameId)
-            || !_userContext.User.IsAuthorizedForPlayer(player.Id))
+            || !_userContext.User.IsAuthorizedToViewGame(player.GameId)
+            || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id))
         {
             return ApplicationError.Authorization("Not authorized to update this player");
         }
@@ -63,7 +63,7 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
         }
         
         // If the deleted player was an admin and there are any remaining players, promote the next player to admin
-        if (player.IsAdmin)
+        if (player.IsHost)
         {
             var nextPlayer = players.Where(t => t.Active).MinBy(t => t.JoinedDate);
 
@@ -83,7 +83,7 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
                     GameId = nextPlayer.GameId,
                     PlayerId = nextPlayer.Id,
                     Token = token,
-                    IsAdmin = true
+                    IsHost = true
                 };
 
                 await _notificationService.UpdateCredentials(playerCredentials, cancellationToken);

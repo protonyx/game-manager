@@ -7,7 +7,7 @@ public static class ClaimsPrincipalExtensions
     public static Guid? GetGameId(this ClaimsPrincipal user)
     {
         var sidClaim = user.FindFirst(GameManagerClaimTypes.GameId);
-        
+
         if (sidClaim != null && Guid.TryParse(sidClaim.Value, out Guid gameId))
         {
             return gameId;
@@ -16,16 +16,31 @@ public static class ClaimsPrincipalExtensions
         return null;
     }
 
-    public static bool IsAuthorizedForGame(this ClaimsPrincipal user, Guid gameId)
+    public static bool IsAdmin(this ClaimsPrincipal user)
     {
-        return user.GetGameId() == gameId;
+        return user.IsInRole(GameManagerRoles.Admin);
     }
 
-    public static bool IsAdminForGame(this ClaimsPrincipal user, Guid gameId)
+    public static bool HasGameClaim(this ClaimsPrincipal user, Guid gameId)
     {
-        return user.GetGameId() == gameId && user.IsInRole(GameManagerClaimTypes.AdminRole);
+        return user.HasClaim(GameManagerClaimTypes.GameId, gameId.ToString());
     }
-    
+
+    public static bool IsHostForGame(this ClaimsPrincipal user, Guid gameId)
+    {
+        return user.HasGameClaim(gameId) && user.IsInRole(GameManagerRoles.Host);
+    }
+
+    public static bool IsAuthorizedToViewGame(this ClaimsPrincipal user, Guid gameId)
+    {
+        return user.HasGameClaim(gameId) || user.IsAdmin();
+    }
+
+    public static bool IsAuthorizedToModifyGame(this ClaimsPrincipal user, Guid gameId)
+    {
+        return user.IsHostForGame(gameId) || user.IsAdmin();
+    }
+
     public static Guid? GetPlayerId(this ClaimsPrincipal user)
     {
         var nameClaim = user.FindFirst(GameManagerClaimTypes.PlayerId);
@@ -37,9 +52,19 @@ public static class ClaimsPrincipalExtensions
 
         return null;
     }
-    
-    public static bool IsAuthorizedForPlayer(this ClaimsPrincipal user, Guid playerId)
+
+    public static bool HasPlayerClaim(this ClaimsPrincipal user, Guid playerId)
     {
-        return user.GetPlayerId() == playerId || user.IsInRole(GameManagerClaimTypes.AdminRole);
+        return user.HasClaim(GameManagerClaimTypes.PlayerId, playerId.ToString());
+    }
+
+    public static bool IsAuthorizedToModifyPlayer(this ClaimsPrincipal user, Guid playerId)
+    {
+        return user.HasPlayerClaim(playerId) || user.IsAdmin();
+    }
+
+    public static bool IsAuthorizedToViewPlayer(this ClaimsPrincipal user, Guid playerId)
+    {
+        return user.HasPlayerClaim(playerId) || user.IsAdmin();
     }
 }

@@ -17,7 +17,7 @@ public class Player
     
     public PlayerState State { get; private set; }
 
-    public bool IsAdmin { get; private set; }
+    public bool IsHost { get; private set; }
     
     public DateTime JoinedDate { get; private set; }
 
@@ -38,7 +38,7 @@ public class Player
         Order = player.Order;
         Name = player.Name;
         Active = player.Active;
-        IsAdmin = player.IsAdmin;
+        IsHost = player.IsHost;
         JoinedDate = player.JoinedDate;
         LastHeartbeat = player.LastHeartbeat;
         _trackerValues = player._trackerValues;
@@ -49,7 +49,7 @@ public class Player
     {
         Id = Guid.NewGuid();
         Active = true;
-        IsAdmin = false;
+        IsHost = false;
         
         Name = name;
         GameId = game.Id;
@@ -72,7 +72,7 @@ public class Player
 
     public void Promote()
     {
-        IsAdmin = true;
+        IsHost = true;
     }
 
     public void SetName(PlayerName name)

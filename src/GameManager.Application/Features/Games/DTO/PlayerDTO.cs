@@ -10,5 +10,7 @@ public class PlayerDTO
     
     public PlayerState State { get; set; }
 
+    public bool IsHost { get; set; }
+
     public IDictionary<Guid, int> TrackerValues { get; set; } = new Dictionary<Guid, int>();
 }

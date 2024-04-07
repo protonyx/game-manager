@@ -30,9 +30,16 @@ public class PlayerIdentityBuilder : IPlayerIdentityBuilder
         return this;
     }
 
+    public IPlayerIdentityBuilder AddHostRole()
+    {
+        _claims.Add(new Claim(RoleClaim, GameManagerRoles.Host));
+
+        return this;
+    }
+
     public IPlayerIdentityBuilder AddAdminRole()
     {
-        _claims.Add(new Claim(RoleClaim, GameManagerClaimTypes.AdminRole));
+        _claims.Add(new Claim(RoleClaim, GameManagerRoles.Admin));
         
         return this;
     }

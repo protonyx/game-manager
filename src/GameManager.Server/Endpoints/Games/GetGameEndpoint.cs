@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetGame;
+using GameManager.Server.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GameManager.Server.Endpoints;
@@ -18,6 +20,10 @@ public class GetGameEndpoint : EndpointWithoutRequest<Results<Ok<GameDTO>, Probl
     {
         Get("{Id}");
         Group<GamesGroup>();
+        Policy(pol =>
+        {
+            pol.CanViewGame();
+        });
     }
 
     public override async Task<Results<Ok<GameDTO>, ProblemDetails>> ExecuteAsync(CancellationToken ct)

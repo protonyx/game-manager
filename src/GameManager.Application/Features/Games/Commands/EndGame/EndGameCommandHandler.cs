@@ -28,10 +28,10 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
         var result = await game.ToResult(GameErrors.GameNotFound(request.GameId))
-            .Ensure(g => _userContext.User!.IsAuthorizedForGame(g.Id),
+            .Ensure(g => _userContext.User!.IsAuthorizedToViewGame(g.Id),
                 GameErrors.PlayerNotAuthorized())
-            .Ensure(g => _userContext.User!.IsAdminForGame(g.Id),
-                GameErrors.PlayerNotAdmin())
+            .Ensure(g => _userContext.User!.IsHostForGame(g.Id),
+                GameErrors.PlayerNotHost())
             .Ensure(g => g.State == GameState.InProgress,
                 GameErrors.GameNotInProgress(request.GameId))
             .Tap(async g =>

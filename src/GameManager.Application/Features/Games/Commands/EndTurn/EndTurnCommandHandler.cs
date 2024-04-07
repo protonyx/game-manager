@@ -51,7 +51,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
             return GameErrors.PlayerNotInGame();
         }
 
-        if (!_userContext.User!.IsAuthorizedForGame(game.Id))
+        if (!_userContext.User!.IsAuthorizedToViewGame(game.Id))
         {
             return GameErrors.PlayerNotAuthorized();
         }
@@ -63,7 +63,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
         
         var currentPlayer = players.First(t => t.Id == game.CurrentTurn.PlayerId);
 
-        if (requestPlayer != currentPlayer && !requestPlayer.IsAdmin)
+        if (requestPlayer != currentPlayer && !requestPlayer.IsHost)
         {
             return GameErrors.PlayerNotAuthorized("end the turn");
         }
