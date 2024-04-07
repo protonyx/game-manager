@@ -21,4 +21,22 @@ public static class AuthorizationExtensions
 
         return builder;
     }
+
+    public static AuthorizationPolicyBuilder CanViewPlayer(
+        this AuthorizationPolicyBuilder builder,
+        string playerIdRouteParameterName = "Id")
+    {
+        builder.Requirements.Add(new PlayerAuthorizationRequirement(playerIdRouteParameterName, false));
+
+        return builder;
+    }
+    
+    public static AuthorizationPolicyBuilder CanModifyPlayer(
+        this AuthorizationPolicyBuilder builder,
+        string playerIdRouteParameterName = "Id")
+    {
+        builder.Requirements.Add(new PlayerAuthorizationRequirement(playerIdRouteParameterName, true));
+
+        return builder;
+    }
 }

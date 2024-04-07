@@ -66,9 +66,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
-  isAdmin$ = this.store
+  isHost$ = this.store
     .select(selectCredentials)
-    .pipe(map((c) => c?.isAdmin || false));
+    .pipe(map((c) => c?.isHost || false));
 
   isMyTurn$ = combineLatest({
     game: this.game$,
@@ -213,7 +213,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
       data: {
         player: player,
         trackers: this.trackers,
-        isAdmin: this.credentials?.isAdmin,
+        isHost: this.credentials?.isHost,
       },
       width: '400px',
     });

@@ -18,47 +18,47 @@ export class GameService {
   constructor(private http: HttpClient) {}
 
   public createGame(newGame: NewGame): Observable<Game> {
-    const url = `${environment.baseUrl}/api/Games`;
+    const url = `${environment.baseUrl}/api/v2/Games`;
     return this.http.post<Game>(url, newGame);
   }
 
   public joinGame(game: JoinGame): Observable<PlayerCredentials> {
-    const url = `${environment.baseUrl}/api/Games/Join`;
+    const url = `${environment.baseUrl}/api/v2/Games/Join`;
     return this.http.post<PlayerCredentials>(url, game);
   }
 
   public getGame(gameId: string): Observable<Game> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}`;
 
     return this.http.get<Game>(url);
   }
 
   public getGameSummary(gameId: string): Observable<GameSummary> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Summary`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/Summary`;
 
     return this.http.get<GameSummary>(url);
   }
 
   public getPlayer(playerId: string): Observable<Player> {
-    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+    const url = `${environment.baseUrl}/api/v2/Players/${playerId}`;
 
     return this.http.get<Player>(url);
   }
 
   public getPlayers(gameId: string): Observable<Player[]> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Players`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/Players`;
 
     return this.http.get<Player[]>(url);
   }
 
   public updatePlayer(playerId: string, player: Player): Observable<Player> {
-    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+    const url = `${environment.baseUrl}/api/v2/Players/${playerId}`;
 
     return this.http.put<Player>(url, player);
   }
 
   public patchPlayer(playerId: string, ops: any[]): Observable<Player> {
-    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+    const url = `${environment.baseUrl}/api/v2/Players/${playerId}`;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json-patch+json',
@@ -95,13 +95,13 @@ export class GameService {
   }
 
   public endTurn(gameId: string): Observable<any> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/EndTurn`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/EndTurn`;
 
     return this.http.post<any>(url, null);
   }
 
   public reorderPlayers(gameId: string, players: Player[]): Observable<any> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Reorder`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/Reorder`;
     const body = {
       playerIds: players.map((player) => player.id),
     };
@@ -110,19 +110,19 @@ export class GameService {
   }
 
   public startGame(gameId: string): Observable<any> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Start`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/Start`;
 
     return this.http.post(url, null);
   }
 
   public endGame(gameId: string): Observable<any> {
-    const url = `${environment.baseUrl}/api/Games/${gameId}/Actions/Complete`;
+    const url = `${environment.baseUrl}/api/v2/Games/${gameId}/End`;
 
     return this.http.post(url, null);
   }
 
   public removePlayer(playerId: string): Observable<any> {
-    const url = `${environment.baseUrl}/api/Players/${playerId}`;
+    const url = `${environment.baseUrl}/api/v2/Players/${playerId}`;
 
     return this.http.delete(url);
   }
