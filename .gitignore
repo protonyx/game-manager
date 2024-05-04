@@ -503,5 +503,7 @@ Temporary Items
 .apdisk
 
 .angular/
+dist/
+.nx/
 
 *.db
