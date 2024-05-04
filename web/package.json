@@ -56,5 +56,11 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.2.5",
     "typescript": "~5.2.2"
+  },
+  "browser": {
+    "http": false,
+    "https": false,
+    "url": false,
+    "util": false
   }
 }
