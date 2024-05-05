@@ -7,6 +7,7 @@ using GameManager.Application.Features.Games.DTO;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using GameManager.Server;
+using GameManager.Server.Endpoints.Games;
 
 namespace GameManager.Tests;
 

@@ -10,9 +10,12 @@ public class JoinGameCommand : IRequest<Result<PlayerCredentialsDTO, Application
 
     public string Name { get; }
 
-    public JoinGameCommand(string entryCode, string name)
+    public bool Observer { get; }
+
+    public JoinGameCommand(string entryCode, string name, bool observer = false)
     {
         EntryCode = entryCode;
         Name = name;
+        Observer = observer;
     }
 }

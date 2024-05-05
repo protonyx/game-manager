@@ -40,58 +40,64 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
         if (entryCodeOrError.IsFailure)
             return GameErrors.InvalidEntryCode();
         
-        var playerNameOrError = PlayerName.From(request.Name);
-
-        if (playerNameOrError.IsFailure)
-            return GameErrors.PlayerInvalidName(playerNameOrError.Error);
-        
         var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
         
         if (game == null)
             return GameErrors.InvalidEntryCode();
-
-        var newPlayer = new Player(playerNameOrError.Value, game);
         
-        // Promote the player if they are the first
-        var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
-
-        newPlayer.SetOrder(existingPlayerCount + 1);
-        
-        if (existingPlayerCount == 0)
-        {
-            newPlayer.Promote();
-        }
-        
-        // Validate
-        var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            return ApplicationError.Validation<Player>(validationResult);
-        }
-
-        newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);
-        
-        await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
-
-        // Generate player token
+        // Generate token
         var identityBuilder = new PlayerIdentityBuilder();
-        identityBuilder.AddGameId(game.Id)
-            .AddPlayerId(newPlayer.Id);
-        if (newPlayer.IsHost)
-        {
-            identityBuilder.AddHostRole();
-        }
-        var token = _tokenService.GenerateToken(identityBuilder.Build());
-
+        identityBuilder.AddGameId(game.Id);
+        
         var dto = new PlayerCredentialsDTO
         {
             GameId = game.Id,
-            PlayerId = newPlayer.Id,
-            Token = token,
-            IsHost = newPlayer.IsHost
         };
 
+        if (!request.Observer)
+        {
+            var playerNameOrError = PlayerName.From(request.Name);
+
+            if (playerNameOrError.IsFailure)
+                return GameErrors.PlayerInvalidName(playerNameOrError.Error);
+        
+            var newPlayer = new Player(playerNameOrError.Value, game);
+        
+            // Promote the player if they are the first
+            var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
+
+            newPlayer.SetOrder(existingPlayerCount + 1);
+        
+            if (existingPlayerCount == 0)
+            {
+                newPlayer.Promote();
+            }
+        
+            // Validate
+            var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
+
+            if (!validationResult.IsValid)
+            {
+                return ApplicationError.Validation<Player>(validationResult);
+            }
+
+            newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);
+        
+            await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
+            
+            identityBuilder.AddPlayerId(newPlayer.Id);
+            
+            if (newPlayer.IsHost)
+            {
+                identityBuilder.AddHostRole();
+            }
+
+            dto.PlayerId = newPlayer.Id;
+            dto.IsHost = newPlayer.IsHost;
+        }
+        
+        dto.Token = _tokenService.GenerateToken(identityBuilder.Build());
+        
         return dto;
     }
 }

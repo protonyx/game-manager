@@ -27,6 +27,10 @@ public class PlayerAuthorizationHandler : AuthorizationHandler<PlayerAuthorizati
         {
             context.Succeed(requirement);
         }
+        else
+        {
+            context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this player"));
+        }
         
         return Task.CompletedTask;
     }

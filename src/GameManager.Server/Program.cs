@@ -109,6 +109,7 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IAuthorizationHandler, GameAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, PlayerAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddSingleton<ITokenService>(tokenService);
@@ -219,10 +220,22 @@ app.UseFastEndpoints(c =>
     c.Endpoints.RoutePrefix = "api";
     c.Endpoints.ShortNames = true;
     c.Versioning.Prefix = "v";
+    c.Versioning.DefaultVersion = 1;
     c.Versioning.PrependToRoute = true;
     c.Errors.UseProblemDetails();
     c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
-        new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id.ToString(), statusCode);
+        new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id, statusCode);
+    ProblemDetails.TitleTransformer = pd =>
+    {
+        if (pd.Status == StatusCodes.Status403Forbidden)
+        {
+            return "Forbidden";
+        }
+        else
+        {
+            return "One or more validation errors occurred.";
+        }
+    };
 });
 app.UseSwaggerGen();
 

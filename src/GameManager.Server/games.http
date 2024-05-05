@@ -1,4 +1,4 @@
-﻿@version = "v1"
+﻿@version=v1
 
 ### Create Game
 POST {{baseUrl}}/api/{{version}}/Games
@@ -25,7 +25,8 @@ Content-Type: application/json
 
 {
   "entryCode": "{{entryCode}}",
-  "name": "Tester 1"
+  "name": "",
+  "observer": true
 }
 
 > {% 

@@ -27,6 +27,10 @@ public class GameAuthorizationHandler : AuthorizationHandler<GameAuthorizationRe
         {
             context.Succeed(requirement);
         }
+        else
+        {
+            context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this game"));
+        }
         
         return Task.CompletedTask;
     }
