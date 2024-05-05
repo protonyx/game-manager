@@ -19,6 +19,7 @@ public class CreateGameEndpoint : Endpoint<CreateGameDTO, Results<CreatedAtRoute
         Post("");
         AllowAnonymous();
         Group<GamesGroup>();
+        Version(1);
     }
 
     public override async Task<Results<CreatedAtRoute<GameDTO>, ProblemDetails>> ExecuteAsync(

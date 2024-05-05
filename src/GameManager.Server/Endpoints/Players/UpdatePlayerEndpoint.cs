@@ -17,11 +17,16 @@ public class UpdatePlayerEndpoint : Endpoint<PlayerDTO, Results<Ok<PlayerDTO>, P
     public override void Configure()
     {
         Put("{Id}");
+        Group<PlayersGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanModifyPlayer();
         });
-        Group<PlayersGroup>();
+        Version(1);
     }
 
     public override async Task<Results<Ok<PlayerDTO>, ProblemDetails>> ExecuteAsync(PlayerDTO req, CancellationToken ct)

@@ -17,10 +17,15 @@ public class ActionStartGameEndpoint : EndpointWithoutRequest<Results<NoContent,
     {
         Post("{Id}/Start");
         Group<GamesGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanModifyGame();
         });
+        Version(1);
     }
 
     public override async Task<Results<NoContent, ProblemDetails>> ExecuteAsync(CancellationToken ct)

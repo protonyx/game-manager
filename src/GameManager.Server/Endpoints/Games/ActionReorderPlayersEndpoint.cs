@@ -16,11 +16,16 @@ public class ActionReorderPlayersEndpoint : Endpoint<PlayerIdListDTO, Results<No
     public override void Configure()
     {
         Post("{Id}/Reorder");
+        Group<GamesGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanModifyGame();
         });
-        Group<GamesGroup>();
+        Version(1);
     }
 
     public override async Task<Results<NoContent, ProblemDetails>> ExecuteAsync(PlayerIdListDTO req, CancellationToken ct)

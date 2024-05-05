@@ -1,4 +1,7 @@
-﻿POST https://{{baseUrl}}/api/v2/Games
+﻿@version = "v1"
+
+### Create Game
+POST {{baseUrl}}/api/{{version}}/Games
 Content-Type: application/json
 
 {
@@ -13,3 +16,39 @@ Content-Type: application/json
     }
   ]
 }
+
+> {% client.global.set("entryCode", response.body.entryCode); %}
+
+### Join Game
+POST {{baseUrl}}/api/{{version}}/Games/Join
+Content-Type: application/json
+
+{
+  "entryCode": "{{entryCode}}",
+  "name": "Tester 1"
+}
+
+> {% 
+    client.global.set("gameId", response.body.gameId);
+    client.global.set("token", response.body.token);
+ %}
+
+### Get Game
+GET {{baseUrl}}/api/{{version}}/Games/{{gameId}}
+Authorization: Bearer {{token}}
+
+### Get Game Players
+GET {{baseUrl}}/api/{{version}}/Games/{{gameId}}/Players
+Authorization: Bearer {{token}}
+
+### Start Game
+POST {{baseUrl}}/api/{{version}}/Games/{{gameId}}/Start
+Authorization: Bearer {{token}}
+
+### End Game
+POST {{baseUrl}}/api/{{version}}/Games/{{gameId}}/End
+Authorization: Bearer {{token}}
+
+### Get Game Summary
+GET {{baseUrl}}/api/{{version}}/Games/{{gameId}}/Summary
+Authorization: Bearer {{token}}

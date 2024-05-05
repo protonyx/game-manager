@@ -20,10 +20,15 @@ public class GetGamePlayersEndpoint : EndpointWithoutRequest<Results<Ok<IReadOnl
     {
         Get("{Id}/Players");
         Group<GamesGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanViewGame();
         });
+        Version(1);
     }
 
     public override async Task<Results<Ok<IReadOnlyList<PlayerDTO>>, ProblemDetails>> ExecuteAsync(CancellationToken ct)

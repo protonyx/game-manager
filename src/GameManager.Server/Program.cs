@@ -2,13 +2,13 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using FastEndpoints.Swagger;
 using GameManager.Application;
 using GameManager.Application.Contracts;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
 using GameManager.Server.Authorization;
-using GameManager.Server.Filters;
 using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,25 +42,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
-builder.Services.AddFastEndpoints();
-builder.Services.AddControllers(opt =>
+builder.Services.AddFastEndpoints()
+    .SwaggerDocument(o =>
     {
-        opt.Filters.Add<RequireActivePlayerFilter>();
-        opt.Filters.Add<RequireValidGameFilter>();
-    })
-    .AddNewtonsoftJson(opt =>
-    {
-        opt.SerializerSettings.Converters.Add(new StringEnumConverter());
+        o.MaxEndpointVersion = 1;
+        o.DocumentSettings = s =>
+        {
+            s.Title = "Game Manager";
+            s.Version = "v1";
+        };
     });
 builder.Services.Configure<JsonOptions>(opt =>
 {
     opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(opt =>
-{
-    opt.CustomSchemaIds(t => $"{t.FullName}");
-});
 
 var signalr = builder.Services.AddSignalR()
     .AddNewtonsoftJsonProtocol(opt =>
@@ -218,23 +214,23 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwaggerUI();
-
-if (!string.IsNullOrWhiteSpace(otlpEndpoint))
-    app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
-app.MapFastEndpoints(c =>
+app.UseFastEndpoints(c =>
 {
-    c.Endpoints.RoutePrefix = "api/v2";
+    c.Endpoints.RoutePrefix = "api";
     c.Endpoints.ShortNames = true;
+    c.Versioning.Prefix = "v";
+    c.Versioning.PrependToRoute = true;
     c.Errors.UseProblemDetails();
     c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
         new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id.ToString(), statusCode);
 });
-app.MapControllers();
+app.UseSwaggerGen();
+
+if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 app.MapHub<GameHub>("/hubs/game");
 app.MapFallbackToFile("index.html");
-app.MapSwagger();
 app.MapGet("/version", async ctx =>
 {
     await ctx.Response.WriteAsJsonAsync(new

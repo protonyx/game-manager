@@ -16,11 +16,16 @@ public class DeletePlayerEndpoint : EndpointWithoutRequest<Results<NoContent, Pr
     public override void Configure()
     {
         Delete("{Id}");
+        Group<PlayersGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanModifyPlayer();
         });
-        Group<PlayersGroup>();
+        Version(1);
     }
 
     public override async Task<Results<NoContent, ProblemDetails>> ExecuteAsync(CancellationToken ct)

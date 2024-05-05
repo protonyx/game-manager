@@ -16,8 +16,9 @@ public class JoinGameEndpoint : Endpoint<JoinGameDTO, Results<Ok<PlayerCredentia
     public override void Configure()
     {
         Post("Join");
-        AllowAnonymous();
         Group<GamesGroup>();
+        AllowAnonymous();
+        Version(1);
     }
 
     public override async Task<Results<Ok<PlayerCredentialsDTO>, ProblemDetails>> ExecuteAsync(JoinGameDTO req, CancellationToken ct)

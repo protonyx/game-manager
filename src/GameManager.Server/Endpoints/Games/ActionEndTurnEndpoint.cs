@@ -16,11 +16,16 @@ public class ActionEndTurnEndpoint : EndpointWithoutRequest<Results<NoContent, P
     public override void Configure()
     {
         Post("{Id}/EndTurn");
+        Group<GamesGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanViewGame();
         });
-        Group<GamesGroup>();
+        Version(1);
     }
 
     public override async Task<Results<NoContent, ProblemDetails>> ExecuteAsync(CancellationToken ct)

@@ -3,14 +3,8 @@ using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayer;
 using GameManager.Server.Authorization;
-using GameManager.Server.DTO;
 
 namespace GameManager.Server.Endpoints.Players;
-
-public class PatchPlayerDTO : PatchRequest
-{
-    public Guid Id { get; set; }
-}
 
 public class PatchPlayerEndpoint : Endpoint<PatchPlayerDTO, Results<Ok<PlayerDTO>, ProblemDetails>>
 {
@@ -24,11 +18,16 @@ public class PatchPlayerEndpoint : Endpoint<PatchPlayerDTO, Results<Ok<PlayerDTO
     public override void Configure()
     {
         Patch("{Id}");
+        Group<PlayersGroup>();
+        Description(b =>
+        {
+            b.Produces(StatusCodes.Status404NotFound);
+        });
         Policy(pol =>
         {
             pol.CanModifyPlayer();
         });
-        Group<PlayersGroup>();
+        Version(1);
     }
 
     public override async Task<Results<Ok<PlayerDTO>, ProblemDetails>> ExecuteAsync(PatchPlayerDTO req, CancellationToken ct)
