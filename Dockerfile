@@ -21,7 +21,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
 COPY --from=build-api /app/publish .
-COPY --from=build-web /src/dist/game-manager ./wwwroot
+COPY --from=build-web /src/dist/game-manager/browser ./wwwroot
 
 VOLUME "/var/game-manager/"
 ENV ASPNETCORE_URLS="http://*:5000"
