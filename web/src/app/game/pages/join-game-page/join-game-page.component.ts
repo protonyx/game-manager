@@ -29,18 +29,6 @@ export class JoinGamePageComponent implements OnDestroy {
     private router: Router,
     private actions$: Actions
   ) {
-    // Route on success
-    actions$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        ofType(GamesApiActions.joinedGame),
-        tap(() => {
-          this.loading = false;
-        })
-      )
-      .subscribe(() => {
-        router.navigate(['/game']);
-      });
     // Handle error
     actions$
       .pipe(

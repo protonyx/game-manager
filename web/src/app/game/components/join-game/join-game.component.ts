@@ -51,6 +51,15 @@ export class JoinGameComponent {
     this.joinGame.emit({
       entryCode: this.joinGameForm.value.entryCode as string,
       name: this.joinGameForm.value.playerName as string,
+      observer: false
+    });
+  }
+
+  onJoinAsObserver(): void {
+    this.joinGame.emit({
+      entryCode: this.joinGameForm.value.entryCode as string,
+      name: this.joinGameForm.value.playerName as string,
+      observer: true
     });
   }
 }

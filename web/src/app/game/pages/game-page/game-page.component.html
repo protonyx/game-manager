@@ -48,7 +48,7 @@
 
   <mat-expansion-panel
     [expanded]="true"
-    *ngIf="game?.state === 'InProgress' && trackers && trackers.length > 0">
+    *ngIf="game?.state === 'InProgress' && trackers && trackers.length > 0 && currentPlayer">
     <mat-expansion-panel-header>
       <mat-panel-title> Trackers</mat-panel-title>
     </mat-expansion-panel-header>

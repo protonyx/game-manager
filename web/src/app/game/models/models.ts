@@ -7,6 +7,7 @@ export interface NewGame {
 export interface JoinGame {
   entryCode: string;
   name: string;
+  observer: boolean;
 }
 
 export interface Game {

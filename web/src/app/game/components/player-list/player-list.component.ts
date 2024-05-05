@@ -46,8 +46,7 @@ export class PlayerListComponent implements OnChanges {
     if (
       (changes['game'] || changes['players']) &&
       !!this.game &&
-      !!this.players &&
-      !!this.currentPlayer
+      !!this.players
     ) {
       this.dataSource = new MatTableDataSource<Player>(this.players);
 
@@ -65,7 +64,9 @@ export class PlayerListComponent implements OnChanges {
   }
 
   checkIsMe(player: Player): boolean {
-    return player.id === this.currentPlayer?.id;
+    return this.currentPlayer != null
+      ? player.id === this.currentPlayer?.id
+      : false;
   }
 
   getTrackerValue(player: Player, trackerId: string): string {

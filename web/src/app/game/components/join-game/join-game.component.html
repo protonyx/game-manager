@@ -25,6 +25,14 @@
         (click)="onSubmit()">
         Join
       </button>
+
+      <button
+        mat-button
+        type="button"
+        [disabled]="joinGameForm.invalid || loading"
+        (click)="onJoinAsObserver()">
+        Observe
+      </button>
     </mat-card-actions>
   </mat-card>
 

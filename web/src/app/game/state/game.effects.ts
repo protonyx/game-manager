@@ -52,6 +52,7 @@ export class GameEffects {
         const joinGame: JoinGame = {
           entryCode: action.game.entryCode,
           name: 'Player 1',
+          observer: false
         };
 
         return of(GameActions.joinGame({ joinGame }));
