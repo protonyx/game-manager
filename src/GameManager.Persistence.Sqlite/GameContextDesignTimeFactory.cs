@@ -9,6 +9,9 @@ public class GameContextDesignTimeFactory : IDesignTimeDbContextFactory<GameCont
     {
         var cs = "Data Source=gm.db";
 
-        return new GameContext(cs, false);
+        var opt = new DbContextOptionsBuilder<GameContext>();
+        opt.UseSqlite(cs);
+
+        return new GameContext(opt.Options);
     }
 }

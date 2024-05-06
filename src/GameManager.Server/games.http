@@ -53,3 +53,23 @@ Authorization: Bearer {{token}}
 ### Get Game Summary
 GET {{baseUrl}}/api/{{version}}/Games/{{gameId}}/Summary
 Authorization: Bearer {{token}}
+
+### SignalR Negotiate
+POST {{baseUrl}}/hubs/game/negotiate?negotiateVersion=1
+Authorization: Bearer {{token}}
+
+> {%
+    client.global.set("signalrtoken", response.body.connectionToken);
+%}
+
+### SignalR Hub
+WEBSOCKET ws://localhost:5000/hubs/game?id={{signalrtoken}}&access_token={{token}}
+Content-Type: application/json // We use it for highlighting
+
+===
+{"protocol":"json","version":1}
+=== wait-for-server
+{"type":6}
+===
+{"arguments":[],"invocationId":"0","target":"Heartbeat","type":1}
+=== wait-for-server

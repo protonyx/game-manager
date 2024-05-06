@@ -6,35 +6,9 @@ namespace GameManager.Persistence.Sqlite;
 
 public class GameContext : DbContext
 {
-    private readonly string _connectionString;
-
-    private readonly bool _enableCommandLogging;
-
-    public GameContext(string connectionString, bool enableCommandLogging)
+    public GameContext(DbContextOptions options)
+        : base(options)
     {
-        _connectionString = connectionString;
-        _enableCommandLogging = enableCommandLogging;
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlite(_connectionString);
-
-        if (_enableCommandLogging)
-        {
-            optionsBuilder.UseLoggerFactory(BuildLoggerFactory());
-            optionsBuilder.EnableSensitiveDataLogging();
-        }
-    }
-
-    private ILoggerFactory BuildLoggerFactory()
-    {
-        return LoggerFactory.Create(logger =>
-        {
-            logger.AddFilter((category, level) =>
-                category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information);
-            logger.AddConsole();
-        });
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
