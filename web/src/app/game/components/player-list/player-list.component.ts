@@ -71,7 +71,7 @@ export class PlayerListComponent implements OnChanges {
 
   getTrackerValue(player: Player, trackerId: string): string {
     if (trackerId && Object.hasOwn(player.trackerValues, trackerId)) {
-      return player.trackerValues[trackerId] as string;
+      return player.trackerValues[trackerId].toString();
     } else {
       return '???';
     }

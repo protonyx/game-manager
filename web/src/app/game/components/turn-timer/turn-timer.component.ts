@@ -6,7 +6,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { interval, Subject, takeUntil, Timestamp } from 'rxjs';
+import { interval, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -41,7 +41,7 @@ export class TurnTimerComponent implements OnInit, OnDestroy {
   getElapsedTime(): TimeSpan {
     if (this.startTime) {
       let totalSeconds = Math.floor(
-        (+new Date() - +new Date(this.startTime)) / 1000
+        (+new Date() - +new Date(this.startTime)) / 1000,
       );
 
       let hours = 0;

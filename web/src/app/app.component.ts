@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { selectEntryCode, selectTitle } from './shared/state/layout.reducer';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { GameActions } from './game/state/game.actions';
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { LayoutComponent } from './shared/layout/layout.component';
 
 @Component({
@@ -18,7 +18,10 @@ export class AppComponent {
 
   entryCode$ = this.store.select(selectEntryCode);
 
-  constructor(private store: Store, private router: Router) {}
+  constructor(
+    private store: Store,
+    private router: Router,
+  ) {}
 
   onLeaveGame(): void {
     this.store.dispatch(GameActions.leaveGame());

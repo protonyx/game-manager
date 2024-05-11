@@ -12,67 +12,72 @@ export const gameFeatureKey = 'game';
 
 export const gameFeature = createFeature({
   name: gameFeatureKey,
-  reducer: createReducer(
+  reducer: createReducer<GameState>(
     initialState,
-    on(GameHubActions.hubConnected, (state) => {
+    on(GameHubActions.hubConnected, (state): GameState => {
       return { ...state, hubConnected: true };
     }),
-    on(GameHubActions.hubDisconnected, (state) => {
+    on(GameHubActions.hubDisconnected, (state): GameState => {
       return { ...state, hubConnected: false };
     }),
-    on(GameHubActions.gameUpdated, (state, { game }) => {
+    on(GameHubActions.gameUpdated, (state, { game }): GameState => {
       return { ...state, game: game };
     }),
-    on(GameHubActions.playerJoined, (state, message) => {
+    on(GameHubActions.playerJoined, (state, message): GameState => {
       return {
         ...state,
         players: playerAdapter.addOne(message.player, state.players),
       };
     }),
-    on(GameHubActions.playerUpdated, (state, message) => {
+    on(GameHubActions.playerUpdated, (state, message): GameState => {
       return {
         ...state,
         players: playerAdapter.setOne(message.player, state.players),
       };
     }),
-    on(GameHubActions.playerLeft, (state, message) => {
+    on(GameHubActions.playerLeft, (state, message): GameState => {
       return {
         ...state,
         players: playerAdapter.removeOne(message.playerId, state.players),
       };
     }),
-    on(GameHubActions.credentialsUpdated, (state, { credentials }) => {
-      return {
-        ...state,
-        credentials: credentials,
-      };
-    }),
-    on(GamesApiActions.joinedGame, (state, { credentials }) => {
+    on(
+      GameHubActions.credentialsUpdated,
+      (state, { credentials }): GameState => {
+        return {
+          ...state,
+          credentials: credentials,
+        };
+      },
+    ),
+    on(GamesApiActions.joinedGame, (state, { credentials }): GameState => {
       return { ...state, credentials: credentials };
     }),
-    on(GamesApiActions.retrievedGame, (state, { game }) => {
+    on(GamesApiActions.retrievedGame, (state, { game }): GameState => {
       return { ...state, game: game };
     }),
-    on(GamesApiActions.retrievedGameSummary, (state, { summary }) => {
-      return { ...state, summary: summary };
-    }),
-    on(GamesApiActions.retrievedPlayers, (state, { players }) => {
+    on(
+      GamesApiActions.retrievedGameSummary,
+      (state, { summary }): GameState => {
+        return { ...state, summary: summary };
+      },
+    ),
+    on(GamesApiActions.retrievedPlayers, (state, { players }): GameState => {
       return {
         ...state,
         players: playerAdapter.setAll(players, state.players),
       };
     }),
-    on(GameActions.clearCredentials, (state) => {
+    on(GameActions.clearCredentials, (state): GameState => {
       // Game or Player is no longer valid, reset game state
       return {
         ...state,
-        currentPlayer: null,
         credentials: null,
         game: null,
         players: playerAdapter.removeAll(state.players),
       };
     }),
-    on(GameActions.updateTracker, (state, { playerId, tracker }) => {
+    on(GameActions.updateTracker, (state, { playerId, tracker }): GameState => {
       return {
         ...state,
         players: playerAdapter.updateOne(
@@ -80,16 +85,16 @@ export const gameFeature = createFeature({
             id: playerId,
             changes: { trackerValues: { [tracker.trackerId]: tracker.value } },
           },
-          state.players
+          state.players,
         ),
       };
     }),
-    on(PlayersApiActions.playerRemoved, (state, { playerId }) => {
+    on(PlayersApiActions.playerRemoved, (state, { playerId }): GameState => {
       return {
         ...state,
         players: playerAdapter.removeOne(playerId, state.players),
       };
-    })
+    }),
   ),
 });
 
@@ -111,7 +116,7 @@ export const selectPlayerIds = createSelector(selectPlayers, selectIds);
 
 export const selectPlayersEntities = createSelector(
   selectPlayers,
-  selectEntities
+  selectEntities,
 );
 
 export const selectAllPlayers = createSelector(selectPlayers, selectAll);
@@ -120,11 +125,16 @@ export const selectTotalPlayers = createSelector(selectPlayers, selectTotal);
 
 export const selectCurrentPlayerId = createSelector(
   selectCredentials,
-  (credentials) => credentials?.playerId
+  (credentials) => credentials?.playerId,
+);
+
+export const selectCurrentPlayerIsHost = createSelector(
+  selectCredentials,
+  (credentials) => credentials?.isHost || false,
 );
 
 export const selectCurrentPlayer = createSelector(
   selectCurrentPlayerId,
   selectPlayersEntities,
-  (playerId, entities) => (playerId ? entities[playerId] : null)!
+  (playerId, entities) => (playerId ? entities[playerId] : null)!,
 );

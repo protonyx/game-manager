@@ -8,6 +8,7 @@ import { combineLatest, filter, map, Subject, takeUntil, tap } from 'rxjs';
 import {
   selectCredentials,
   selectCurrentPlayer,
+  selectCurrentPlayerIsHost,
   selectGame,
   selectAllPlayers,
 } from '../../state/game.reducer';
@@ -66,9 +67,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
-  isHost$ = this.store
-    .select(selectCredentials)
-    .pipe(map((c) => c?.isHost || false));
+  isHost$ = this.store.select(selectCurrentPlayerIsHost);
 
   isMyTurn$ = combineLatest({
     game: this.game$,
@@ -76,8 +75,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }).pipe(
     map(
       ({ game, currentPlayer }) =>
-        game?.currentTurnPlayerId === currentPlayer?.id
-    )
+        game?.currentTurnPlayerId === currentPlayer?.id,
+    ),
   );
 
   credentials: PlayerCredentials | undefined;
@@ -99,7 +98,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private actions$: Actions,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.trackers$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.trackers = data;
@@ -116,7 +115,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.credentials$
       .pipe(
         takeUntil(this.unsubscribe$),
-        filter((credentials) => credentials != null)
+        filter((credentials) => credentials != null),
       )
       .subscribe((credentials) => {
         this.credentials = credentials ? credentials : undefined;
@@ -131,7 +130,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.store.dispatch(LayoutActions.setTitle({ title: data.game.name }));
         this.store.dispatch(
-          LayoutActions.setEntryCode({ entryCode: data.game.entryCode })
+          LayoutActions.setEntryCode({ entryCode: data.game.entryCode }),
         );
       });
 
@@ -139,12 +138,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.actions$
       .pipe(
         ofType(GameHubActions.hubDisconnected),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.unsubscribe$),
       )
       .subscribe((connected) => {
         const snackBarRef = this.snackBar.open(
           'Server Disconnected',
-          'Reconnect'
+          'Reconnect',
         );
         snackBarRef.onAction().subscribe(() => {
           this.signalr.reconnect();
@@ -198,10 +197,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
   onRefresh(): void {
     if (this.credentials) {
       this.store.dispatch(
-        GameActions.loadGame({ gameId: this.credentials.gameId })
+        GameActions.loadGame({ gameId: this.credentials.gameId }),
       );
       this.store.dispatch(
-        GameActions.loadPlayers({ gameId: this.credentials.gameId })
+        GameActions.loadPlayers({ gameId: this.credentials.gameId }),
       );
     }
   }
@@ -220,7 +219,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
           GameActions.updatePlayerOrder({
             gameId: this.game!.id,
             players: data,
-          })
+          }),
         );
       }
     });
@@ -268,7 +267,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         GameActions.updateTracker({
           playerId: this.currentPlayer.id,
           tracker: trackerValue,
-        })
+        }),
       );
     }
   }

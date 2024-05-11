@@ -4,7 +4,12 @@
 @import 'app/variables.scss';
 
 @include mat.core();
+
 @include mat.all-component-themes($my-light-theme);
+
+@media (prefers-color-scheme: dark) {
+  @include mat.all-component-themes($my-dark-theme);
+}
 
 html,
 body {
