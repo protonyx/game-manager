@@ -1,11 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
-import {
-  Router,
-  RouterLinkActive,
-  RouterLink,
-  RouterOutlet,
-} from '@angular/router';
+import { RouterLinkActive, RouterLink, RouterOutlet } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { NgIf } from '@angular/common';
@@ -32,7 +27,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class LayoutComponent {
   @Input()
-  public title: string | null = 'Game Manager';
+  public title: string | null | undefined = 'Game Manager';
 
   @Input()
   public entryCode: string | null | undefined;

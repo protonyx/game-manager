@@ -106,7 +106,6 @@ export const gameFeature = createFeature({
 export const {
   name, // feature name
   reducer, // feature reducer
-  selectGameState, // feature selector
   selectHubConnected,
   selectCredentials,
   selectGame,
@@ -114,10 +113,7 @@ export const {
   selectSummary,
 } = gameFeature;
 
-const { selectIds, selectEntities, selectAll, selectTotal } =
-  playerAdapter.getSelectors();
-
-export const selectPlayerIds = createSelector(selectPlayers, selectIds);
+const { selectEntities, selectAll } = playerAdapter.getSelectors();
 
 export const selectPlayersEntities = createSelector(
   selectPlayers,
@@ -125,8 +121,6 @@ export const selectPlayersEntities = createSelector(
 );
 
 export const selectAllPlayers = createSelector(selectPlayers, selectAll);
-
-export const selectTotalPlayers = createSelector(selectPlayers, selectTotal);
 
 export const selectCurrentPlayerId = createSelector(
   selectCredentials,
@@ -143,6 +137,10 @@ export const selectCurrentPlayer = createSelector(
   selectPlayersEntities,
   (playerId, entities) => (playerId ? entities[playerId] : null)!,
 );
+
+export const selectSummaryName = createSelector(selectSummary, (summary) => {
+  return summary?.name;
+});
 
 export const selectSummaryTrackers = createSelector(
   selectSummary,
@@ -183,7 +181,7 @@ export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
         avgTurnDuration:
           player.turns
             .map((t) => t.durationSeconds)
-            .reduce((acc, d) => (acc += d), 0) / player.turns.length,
+            .reduce((acc, d) => acc + d, 0) / player.turns.length,
       };
     }) || new Array<PlayerSummary>()
   );

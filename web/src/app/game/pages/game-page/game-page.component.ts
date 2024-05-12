@@ -12,11 +12,7 @@ import {
   selectGame,
   selectAllPlayers,
 } from '../../state/game.reducer';
-import {
-  GameActions,
-  GameHubActions,
-  GamesApiActions,
-} from '../../state/game.actions';
+import { GameActions, GameHubActions } from '../../state/game.actions';
 import { GameHubService } from '../../services/game-hub.service';
 import { GameService } from '../../services/game.service';
 import {
@@ -129,7 +125,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         ofType(GameHubActions.hubDisconnected),
         takeUntil(this.unsubscribe$),
       )
-      .subscribe((connected) => {
+      .subscribe(() => {
         const snackBarRef = this.snackBar.open(
           'Server Disconnected',
           'Reconnect',
@@ -142,7 +138,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     // Handle SignalR reconnects
     this.actions$
       .pipe(ofType(GameHubActions.hubConnected), takeUntil(this.unsubscribe$))
-      .subscribe((connected) => {
+      .subscribe(() => {
         this.snackBar.dismiss();
         this.onRefresh();
       });

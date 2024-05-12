@@ -27,10 +27,4 @@ export const layoutFeature = createFeature({
   ),
 });
 
-export const {
-  name,
-  reducer,
-  selectLayoutState,
-  selectTitle,
-  selectEntryCode,
-} = layoutFeature;
+export const { name, reducer, selectTitle, selectEntryCode } = layoutFeature;

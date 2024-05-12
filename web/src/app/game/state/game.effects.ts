@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
-import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { concatLatestFrom } from '@ngrx/operators';
 import { GameService } from '../services/game.service';
 import {
   GameActions,
@@ -16,12 +17,18 @@ import {
   mergeMap,
   tap,
   filter,
+  concatMap,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
 import { Router } from '@angular/router';
 import { LayoutActions } from '../../shared/state/layout.actions';
 import { JoinGame } from '../models/models';
+import { routerNavigatedAction, getRouterSelectors } from '@ngrx/router-store';
+
+const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
+
+const selectIdRouteParam = selectRouteParam('id');
 
 export const createGame = createEffect(
   (actions$ = inject(Actions), gameService = inject(GameService)) => {
@@ -95,7 +102,7 @@ export const redirectAfterJoinedGame = createEffect(
   (actions$ = inject(Actions), router = inject(Router)) => {
     return actions$.pipe(
       ofType(GamesApiActions.joinedGame),
-      tap((action) => {
+      tap(() => {
         router.navigate(['game']);
       }),
     );
@@ -263,7 +270,7 @@ export const removePlayer = createEffect(
   (actions$ = inject(Actions), gameService = inject(GameService)) => {
     return actions$.pipe(
       ofType(GameActions.removePlayer),
-      exhaustMap((action) =>
+      mergeMap((action) =>
         gameService.removePlayer(action.playerId).pipe(
           map(() =>
             PlayersApiActions.playerRemoved({ playerId: action.playerId }),
@@ -295,7 +302,7 @@ export const updateTracker = createEffect(
     return actions$.pipe(
       ofType(GameActions.updateTracker),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
-      exhaustMap(([action, player]) =>
+      concatMap(([action, player]) =>
         gameService
           .setPlayerTracker(
             player!.id,
@@ -444,10 +451,25 @@ export const redirectToSummaryOnGameEnd = createEffect(
       ofType(GameActions.gameEnded),
       concatLatestFrom(() => store.select(fromGames.selectGame)),
       filter(([action, currentGame]) => action.gameId === currentGame?.id),
-      tap(([action, currentGame]) => {
+      tap(([action]) => {
         router.navigate(['game', 'summary', action.gameId]);
       }),
     );
   },
   { functional: true, dispatch: false },
+);
+
+export const loadGameSummaryOnNavigate = createEffect(
+  (actions$ = inject(Actions), store = inject(Store)) => {
+    return actions$.pipe(
+      ofType(routerNavigatedAction),
+      concatLatestFrom(() => [
+        store.select(selectCurrentRoute),
+        store.select(selectIdRouteParam),
+      ]),
+      filter(([, route]) => route.routeConfig.path === 'summary/:id'),
+      map(([, , paramId]) => GameActions.loadGameSummary({ gameId: paramId! })),
+    );
+  },
+  { functional: true },
 );
