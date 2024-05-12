@@ -1,5 +1,5 @@
 import { AppComponent } from './app/app.component';
-import { GameEffects } from './app/game/state/game.effects';
+import * as gameEffects from './app/game/state/game.effects';
 import { provideEffects } from '@ngrx/effects';
 import { isDevMode } from '@angular/core';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
@@ -23,7 +23,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 
 export function localStorageSyncReducer(
-  reducer: ActionReducer<any>
+  reducer: ActionReducer<any>,
 ): ActionReducer<any> {
   return localStorageSync({
     keys: [gameFeatureKey],
@@ -41,10 +41,10 @@ bootstrapApplication(AppComponent, {
         router: routerReducer,
         [layoutFeatureKey]: layoutReducer,
       },
-      { metaReducers }
+      { metaReducers },
     ),
     provideRouterStore(),
-    provideEffects(GameEffects),
+    provideEffects(gameEffects),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

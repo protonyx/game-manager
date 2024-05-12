@@ -14,8 +14,15 @@ export const layoutFeature = createFeature({
     on(LayoutActions.setEntryCode, (state, { entryCode }): LayoutState => {
       return { ...state, entryCode: entryCode };
     }),
+    on(LayoutActions.setHeader, (state, { title, entryCode }): LayoutState => {
+      return { ...state, title: title, entryCode: entryCode };
+    }),
     on(LayoutActions.resetLayout, (state): LayoutState => {
-      return { ...state, title: 'Game Manager', entryCode: '' };
+      return {
+        ...state,
+        title: initialState.title,
+        entryCode: initialState.entryCode,
+      };
     }),
   ),
 });

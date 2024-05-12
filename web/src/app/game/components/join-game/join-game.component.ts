@@ -49,17 +49,17 @@ export class JoinGameComponent {
 
   onSubmit(): void {
     this.joinGame.emit({
-      entryCode: this.joinGameForm.value.entryCode as string,
-      name: this.joinGameForm.value.playerName as string,
-      observer: false
+      entryCode: this.joinGameForm.value.entryCode?.trim() as string,
+      name: this.joinGameForm.value.playerName?.trim() as string,
+      observer: false,
     });
   }
 
   onJoinAsObserver(): void {
     this.joinGame.emit({
-      entryCode: this.joinGameForm.value.entryCode as string,
-      name: this.joinGameForm.value.playerName as string,
-      observer: true
+      entryCode: this.joinGameForm.value.entryCode?.trim() as string,
+      name: this.joinGameForm.value.playerName?.trim() as string,
+      observer: true,
     });
   }
 }

@@ -5,6 +5,7 @@ export const LayoutActions = createActionGroup({
   events: {
     'Set Title': props<{ title: string }>(),
     'Set Entry Code': props<{ entryCode: string }>(),
+    'Set Header': props<{ title: string; entryCode: string }>(),
     'Reset Layout': emptyProps(),
   },
 });

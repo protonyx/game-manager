@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { GameService } from '../services/game.service';
 import {
@@ -23,13 +23,12 @@ import { Router } from '@angular/router';
 import { LayoutActions } from '../../shared/state/layout.actions';
 import { JoinGame } from '../models/models';
 
-@Injectable()
-export class GameEffects {
-  $createGame = createEffect(() =>
-    this.actions$.pipe(
+export const createGame = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.createGame),
       exhaustMap((action) =>
-        this.gameService.createGame(action.game).pipe(
+        gameService.createGame(action.game).pipe(
           map((game) => GamesApiActions.createdGame({ game })),
           catchError((error) => {
             if (error.status === 400) {
@@ -42,11 +41,14 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $createdGame = createEffect(() =>
-    this.actions$.pipe(
+export const joinGameOnCreate = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
       ofType(GamesApiActions.createdGame),
       exhaustMap((action) => {
         const joinGame: JoinGame = {
@@ -57,14 +59,17 @@ export class GameEffects {
 
         return of(GameActions.joinGame({ joinGame }));
       }),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $joinGame = createEffect(() =>
-    this.actions$.pipe(
+export const joinGame = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.joinGame),
       exhaustMap((action) =>
-        this.gameService.joinGame(action.joinGame).pipe(
+        gameService.joinGame(action.joinGame).pipe(
           map((data) =>
             GamesApiActions.joinedGame({
               credentials: data,
@@ -81,44 +86,70 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $joinedGame = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(GamesApiActions.joinedGame),
-        tap((action) => {
-          this.router.navigate(['game']);
-        }),
-      ),
-    { dispatch: false },
-  );
+export const redirectAfterJoinedGame = createEffect(
+  (actions$ = inject(Actions), router = inject(Router)) => {
+    return actions$.pipe(
+      ofType(GamesApiActions.joinedGame),
+      tap((action) => {
+        router.navigate(['game']);
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);
 
-  $leaveGame = createEffect(() =>
-    this.actions$.pipe(
+export const leaveGame = createEffect(
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    gameService = inject(GameService),
+  ) => {
+    return actions$.pipe(
       ofType(GameActions.leaveGame),
-      concatLatestFrom(() => this.store.select(fromGames.selectCurrentPlayer)),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
       exhaustMap(([, player]) =>
-        this.gameService
+        gameService
           .removePlayer(player!.id)
           .pipe(map(() => GamesApiActions.leftGame())),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $clearCredentialsOnLeave = createEffect(() =>
-    this.actions$.pipe(
+export const clearCredentialsOnLeave = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
       ofType(GamesApiActions.leftGame),
       map(() => GameActions.clearCredentials()),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $loadGame = createEffect(() =>
-    this.actions$.pipe(
+export const loadGameOnJoin = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
+      ofType(GamesApiActions.joinedGame),
+      map(({ credentials }) =>
+        GameActions.loadGame({ gameId: credentials.gameId }),
+      ),
+    );
+  },
+  { functional: true },
+);
+
+export const loadGame = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.loadGame),
       exhaustMap((action) =>
-        this.gameService.getGame(action.gameId).pipe(
+        gameService.getGame(action.gameId).pipe(
           map((game) => GamesApiActions.retrievedGame({ game })),
           catchError((error) => {
             if (error.status === 400) {
@@ -133,14 +164,32 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  loadGameSummary$ = createEffect(() =>
-    this.actions$.pipe(
+export const updateLayoutOnGameLoaded = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
+      ofType(GamesApiActions.retrievedGame),
+      map(({ game }) =>
+        LayoutActions.setHeader({
+          title: game.name,
+          entryCode: game.entryCode,
+        }),
+      ),
+    );
+  },
+  { functional: true },
+);
+
+export const loadGameSummary = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.loadGameSummary),
       exhaustMap((action) =>
-        this.gameService.getGameSummary(action.gameId).pipe(
+        gameService.getGameSummary(action.gameId).pipe(
           map((summary) => GamesApiActions.retrievedGameSummary({ summary })),
           catchError((error) => {
             if (error.status === 400) {
@@ -155,14 +204,17 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $loadPlayers = createEffect(() =>
-    this.actions$.pipe(
+export const loadPlayers = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.loadPlayers),
       exhaustMap((action) =>
-        this.gameService.getPlayers(action.gameId).pipe(
+        gameService.getPlayers(action.gameId).pipe(
           map((players) => GamesApiActions.retrievedPlayers({ players })),
           catchError((error) => {
             if (error.status == 400) {
@@ -177,14 +229,17 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $loadPlayer = createEffect(() =>
-    this.actions$.pipe(
+export const loadPlayer = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.loadPlayer),
       exhaustMap((action) =>
-        this.gameService.getPlayer(action.playerId).pipe(
+        gameService.getPlayer(action.playerId).pipe(
           map((player) => GamesApiActions.retrievedPlayer({ player })),
           catchError((error) => {
             if (error.status == 400) {
@@ -199,14 +254,17 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $removePlayer = createEffect(() =>
-    this.actions$.pipe(
+export const removePlayer = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.removePlayer),
       exhaustMap((action) =>
-        this.gameService.removePlayer(action.playerId).pipe(
+        gameService.removePlayer(action.playerId).pipe(
           map(() =>
             PlayersApiActions.playerRemoved({ playerId: action.playerId }),
           ),
@@ -223,17 +281,22 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $updateTracker = createEffect(() =>
-    this.actions$.pipe(
+export const updateTracker = createEffect(
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    gameService = inject(GameService),
+  ) => {
+    return actions$.pipe(
       ofType(GameActions.updateTracker),
-      concatLatestFrom((action) =>
-        this.store.select(fromGames.selectCurrentPlayer),
-      ),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
       exhaustMap(([action, player]) =>
-        this.gameService
+        gameService
           .setPlayerTracker(
             player!.id,
             action.tracker.trackerId,
@@ -245,25 +308,29 @@ export class GameEffects {
             ),
           ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $updatePlayerOrder = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(GameActions.updatePlayerOrder),
-        exhaustMap((action) =>
-          this.gameService.reorderPlayers(action.gameId, action.players),
-        ),
+export const updatePlayerOrder = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
+      ofType(GameActions.updatePlayerOrder),
+      exhaustMap((action) =>
+        gameService.reorderPlayers(action.gameId, action.players),
       ),
-    { dispatch: false },
-  );
+    );
+  },
+  { functional: true, dispatch: false },
+);
 
-  $endTurn = createEffect(() =>
-    this.actions$.pipe(
+export const endTurn = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
       ofType(GameActions.endTurn),
       exhaustMap((action: { gameId: string }) =>
-        this.gameService.endTurn(action.gameId).pipe(
+        gameService.endTurn(action.gameId).pipe(
           map(() => GamesApiActions.endTurnSucceeded()),
           catchError((error) => {
             if (error.status == 400) {
@@ -278,95 +345,109 @@ export class GameEffects {
           }),
         ),
       ),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  startGame$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(GameActions.startGame),
-        exhaustMap((action: { gameId: string }) =>
-          this.gameService.startGame(action.gameId),
-        ),
+export const startGame = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
+      ofType(GameActions.startGame),
+      exhaustMap((action: { gameId: string }) =>
+        gameService.startGame(action.gameId),
       ),
-    { dispatch: false },
-  );
+    );
+  },
+  { functional: true, dispatch: false },
+);
 
-  endGame$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(GameActions.endGame),
-        exhaustMap((action: { gameId: string }) =>
-          this.gameService.endGame(action.gameId),
-        ),
+export const endGame = createEffect(
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+    return actions$.pipe(
+      ofType(GameActions.endGame),
+      exhaustMap((action: { gameId: string }) =>
+        gameService.endGame(action.gameId),
       ),
-    { dispatch: false },
-  );
+    );
+  },
+  { functional: true, dispatch: false },
+);
 
-  $authenticationError = createEffect(() =>
-    this.actions$.pipe(
+export const clearCredentialsOnAuthenticationError = createEffect(
+  (actions$ = inject(Actions), router = inject(Router)) => {
+    return actions$.pipe(
       ofType(GamesApiActions.authenticationError),
       tap(() => {
-        this.router.navigate(['game', 'join']);
+        router.navigate(['game', 'join']);
       }),
-      exhaustMap((action) => of(GameActions.clearCredentials())),
-    ),
-  );
+      exhaustMap(() => of(GameActions.clearCredentials())),
+    );
+  },
+  { functional: true },
+);
 
-  $playerKicked = createEffect(() =>
-    this.actions$.pipe(
+export const clearCredentialsWhenKicked = createEffect(
+  (actions$ = inject(Actions), store = inject(Store)) => {
+    return actions$.pipe(
       ofType(GameHubActions.playerLeft),
-      concatLatestFrom((action) =>
-        this.store.select(fromGames.selectCurrentPlayer),
-      ),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
       filter(([action, player]) => !!player && player.id === action.playerId),
-      mergeMap(([action, player]) => of(GameActions.clearCredentials())),
-    ),
-  );
+      mergeMap(() => of(GameActions.clearCredentials())),
+    );
+  },
+  { functional: true },
+);
 
-  $clearCredentials = createEffect(() =>
-    this.actions$.pipe(
+export const resetLayoutAfterClearCredentials = createEffect(
+  (actions$ = inject(Actions), router = inject(Router)) => {
+    return actions$.pipe(
       ofType(GameActions.clearCredentials),
       tap(() => {
-        this.router.navigate(['game', 'join']);
+        router.navigate(['game', 'join']);
       }),
       exhaustMap(() => of(LayoutActions.resetLayout())),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $gameStarted = createEffect(() =>
-    this.actions$.pipe(
+export const gameStarted = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
       ofType(GameHubActions.gameUpdated),
       filter((action) => action.game.state === 'InProgress'),
       map((action) => GameActions.gameStarted({ gameId: action.game.id })),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $gameEnded = createEffect(() =>
-    this.actions$.pipe(
+export const gameEnded = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
       ofType(GameHubActions.gameUpdated),
       filter((action) => action.game.state === 'Complete'),
       map((action) => GameActions.gameEnded({ gameId: action.game.id })),
-    ),
-  );
+    );
+  },
+  { functional: true },
+);
 
-  $redirectToSummaryOnGameEnd = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(GameActions.gameEnded),
-        concatLatestFrom((action) => this.store.select(fromGames.selectGame)),
-        filter(([action, currentGame]) => action.gameId === currentGame?.id),
-        tap(([action, currentGame]) => {
-          this.router.navigate(['game', 'summary', action.gameId]);
-        }),
-      ),
-    { dispatch: false },
-  );
-
-  constructor(
-    private actions$: Actions,
-    private store: Store,
-    private gameService: GameService,
-    private router: Router,
-  ) {}
-}
+export const redirectToSummaryOnGameEnd = createEffect(
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    router = inject(Router),
+  ) => {
+    return actions$.pipe(
+      ofType(GameActions.gameEnded),
+      concatLatestFrom(() => store.select(fromGames.selectGame)),
+      filter(([action, currentGame]) => action.gameId === currentGame?.id),
+      tap(([action, currentGame]) => {
+        router.navigate(['game', 'summary', action.gameId]);
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);

@@ -17,7 +17,6 @@ import {
   GameHubActions,
   GamesApiActions,
 } from '../../state/game.actions';
-import { LayoutActions } from '../../../shared/state/layout.actions';
 import { GameHubService } from '../../services/game-hub.service';
 import { GameService } from '../../services/game.service';
 import {
@@ -122,16 +121,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
         this.onRefresh();
         this.connect(credentials!);
-      });
-
-    // Update title and entry code when game is loaded
-    this.actions$
-      .pipe(ofType(GamesApiActions.retrievedGame), takeUntil(this.unsubscribe$))
-      .subscribe((data) => {
-        this.store.dispatch(LayoutActions.setTitle({ title: data.game.name }));
-        this.store.dispatch(
-          LayoutActions.setEntryCode({ entryCode: data.game.entryCode }),
-        );
       });
 
     // Handle SignalR disconnects

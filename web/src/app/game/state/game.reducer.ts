@@ -7,6 +7,11 @@ import {
   PlayersApiActions,
 } from './game.actions';
 import { GameState, initialState, playerAdapter } from './game.state';
+import {
+  PlayerSummary,
+  PlayerTrackerHistory,
+  TrackerSummary,
+} from '../models/models';
 
 export const gameFeatureKey = 'game';
 
@@ -138,3 +143,48 @@ export const selectCurrentPlayer = createSelector(
   selectPlayersEntities,
   (playerId, entities) => (playerId ? entities[playerId] : null)!,
 );
+
+export const selectSummaryTrackers = createSelector(
+  selectSummary,
+  (summary) => {
+    return summary?.trackers.map((tracker) => {
+      return <TrackerSummary>{
+        ...tracker,
+        trackerHistory: summary.players.reduce((acc, player) => {
+          // Starting value
+          acc.push({
+            playerId: player.id,
+            trackerId: tracker.id,
+            newValue: tracker.startingValue,
+            secondsSinceGameStart: 0,
+          } as PlayerTrackerHistory);
+
+          for (const th of player.trackerHistory.filter(
+            (th) => th.trackerId === tracker.id,
+          )) {
+            acc.push({
+              ...th,
+              playerId: player.id,
+            } as PlayerTrackerHistory);
+          }
+          return acc;
+        }, new Array<PlayerTrackerHistory>()),
+      };
+    });
+  },
+);
+
+export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
+  return (
+    summary?.players.map((player) => {
+      return <PlayerSummary>{
+        ...player,
+        turnCount: player.turns.length,
+        avgTurnDuration:
+          player.turns
+            .map((t) => t.durationSeconds)
+            .reduce((acc, d) => (acc += d), 0) / player.turns.length,
+      };
+    }) || new Array<PlayerSummary>()
+  );
+});

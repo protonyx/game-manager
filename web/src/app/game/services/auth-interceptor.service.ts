@@ -1,52 +1,42 @@
 import { Injectable } from '@angular/core';
 import {
-  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpResponse,
 } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { first, mergeMap, Observable, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectCredentials } from '../state/game.reducer';
-import { PlayerCredentials } from '../models/models';
 import { GamesApiActions } from '../state/game.actions';
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
-  credentials: PlayerCredentials | null | undefined;
+  credentials$ = this.store.select(selectCredentials);
 
-  constructor(private store: Store) {
-    this.store
-      .select(selectCredentials)
-      .subscribe((c) => (this.credentials = c));
-  }
+  constructor(private store: Store) {}
 
   intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    const authToken = this.credentials?.token;
-
-    if (authToken) {
-      const authReq = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${authToken}`,
+    req: HttpRequest<unknown>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<unknown>> {
+    return this.credentials$.pipe(
+      first(),
+      mergeMap((cred) => {
+        const authReq = !!cred
+          ? req.clone({
+              setHeaders: { Authorization: `Bearer ${cred.token}` },
+            })
+          : req;
+        return next.handle(authReq);
+      }),
+      tap({
+        error: (err) => {
+          if (err.status === 401) {
+            this.store.dispatch(GamesApiActions.authenticationError());
+          }
         },
-      });
-
-      return next.handle(authReq).pipe(
-        tap({
-          error: (err) => {
-            if (err.status === 401) {
-              this.store.dispatch(GamesApiActions.authenticationError());
-            }
-          },
-        })
-      );
-    }
-
-    return next.handle(req);
+      }),
+    );
   }
 }

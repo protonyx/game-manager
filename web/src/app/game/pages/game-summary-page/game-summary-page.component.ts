@@ -1,18 +1,26 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Store } from '@ngrx/store';
+import { createSelector, Store } from '@ngrx/store';
 import { GameActions } from '../../state/game.actions';
-import { selectSummary } from '../../state/game.reducer';
-import { ActivatedRoute } from '@angular/router';
-import { filter, map, Subject } from 'rxjs';
 import {
-  PlayerSummary,
-  PlayerTrackerHistory,
-  TrackerSummary,
-} from '../../models/models';
+  selectSummary,
+  selectSummaryPlayers,
+  selectSummaryTrackers,
+} from '../../state/game.reducer';
+import { getRouterSelectors } from '@ngrx/router-store';
+import { ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs';
+import { PlayerSummary } from '../../models/models';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SummaryTrackerChartComponent } from '../../components/summary-tracker-chart/summary-tracker-chart.component';
+import { CdkTableDataSourceInput } from '@angular/cdk/table';
+
+const { selectRouteParams } = getRouterSelectors();
+
+const selectGameId = createSelector(selectRouteParams, ({ id }) =>
+  id.toString(),
+);
 
 @Component({
   selector: 'app-game-summary-page',
@@ -26,80 +34,39 @@ import { SummaryTrackerChartComponent } from '../../components/summary-tracker-c
   templateUrl: './game-summary-page.component.html',
   styleUrls: ['./game-summary-page.component.scss'],
 })
-export class GameSummaryPageComponent implements OnInit, OnDestroy {
+export class GameSummaryPageComponent implements OnInit {
   gameSummary$ = this.store.select(selectSummary);
 
   title$ = this.gameSummary$.pipe(map((summary) => summary?.name));
 
-  trackers$ = this.gameSummary$.pipe(
-    map((summary) => {
-      return summary?.trackers.map((tracker) => {
-        return <TrackerSummary>{
-          ...tracker,
-          trackerHistory: summary.players.reduce((acc, player) => {
-            // Starting value
-            acc.push({
-              playerId: player.id,
-              trackerId: tracker.id,
-              newValue: tracker.startingValue,
-              secondsSinceGameStart: 0,
-            } as PlayerTrackerHistory);
+  trackers$ = this.store.select(selectSummaryTrackers);
 
-            for (const th of player.trackerHistory.filter(
-              (th) => th.trackerId === tracker.id
-            )) {
-              acc.push({
-                ...th,
-                playerId: player.id,
-              } as PlayerTrackerHistory);
-            }
-            return acc;
-          }, new Array<PlayerTrackerHistory>()),
-        };
-      });
-    })
-  );
-
-  players$ = this.gameSummary$.pipe(
-    filter((summary) => !!summary),
-    map((summary) => {
-      return summary!.players.map((player) => {
-        return {
-          ...player,
-          turnCount: player.turns.length,
-          avgTurnDuration:
-            player.turns
-              .map((t) => t.durationSeconds)
-              .reduce((acc, d) => (acc += d), 0) / player.turns.length,
-        };
-      });
-    })
-  );
+  players$ = this.store.select(selectSummaryPlayers);
 
   turnSummaryDataSource$ = this.players$.pipe(
     map((data) => {
-      return new MatTableDataSource<PlayerSummary>(<PlayerSummary[]>data);
-    })
+      return new MatTableDataSource<PlayerSummary>(
+        <PlayerSummary[]>data,
+      ) as CdkTableDataSourceInput<PlayerSummary>;
+    }),
   );
 
-  unsubscribe$: Subject<boolean> = new Subject<boolean>();
+  gameId$ = this.store.select(selectGameId);
 
-  constructor(private store: Store, private route: ActivatedRoute) {}
+  constructor(
+    private store: Store,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
     this.route.paramMap
       .pipe(
         filter((params) => params.has('id')),
-        map((params) => params.get('id'))
+        map((params) => params.get('id')),
       )
       .subscribe((id) => {
         this.store.dispatch(GameActions.loadGameSummary({ gameId: id! }));
       });
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe$.next(true);
-    this.unsubscribe$.unsubscribe();
   }
 
   formatTurnDuration(turnDuration: number) {
