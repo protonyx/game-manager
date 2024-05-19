@@ -26,13 +26,15 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(t => t.Order);
         builder.Property(t => t.IsHost);
         builder.Property(t => t.JoinedDate);
-        builder.Property(t => t.LastHeartbeat);
 
         builder.HasOne<Game>()
             .WithMany()
             .HasForeignKey(t => t.GameId);
 
         builder.Navigation(t => t.TrackerValues)
+            .AutoInclude();
+
+        builder.Navigation(t => t.Connections)
             .AutoInclude();
     }
 }

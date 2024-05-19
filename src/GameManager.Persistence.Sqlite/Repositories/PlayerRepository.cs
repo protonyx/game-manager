@@ -58,4 +58,17 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .AsQueryable()
             .AnyAsync(t => t.Id == playerId && t.Active, cancellationToken: cancellationToken);
     }
+
+    public async Task<bool> UpdateHeartbeatAsync(Guid playerId, string connectionId,
+        CancellationToken cancellationToken = default)
+    {
+        var affectedResults = await _context.Set<PlayerConnection>()
+            .AsQueryable()
+            .Where(p => p.PlayerId == playerId && p.ConnectionId == connectionId)
+            .ExecuteUpdateAsync(c =>
+                    c.SetProperty(t => t.LastHeartbeat, DateTime.UtcNow),
+                cancellationToken);
+
+        return affectedResults > 0;
+    }
 }

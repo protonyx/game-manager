@@ -42,7 +42,7 @@ public class GameHub : Hub<IGameClientNotificationService>
             
             _logger.LogInformation("Player {PlayerId} connected", playerId.Value);
             
-            var notification = new PlayerConnectedNotification(playerId.Value);
+            var notification = new PlayerConnectedNotification(playerId.Value, Context.ConnectionId);
             await _mediator.Publish(notification);
         }
     }
@@ -53,7 +53,7 @@ public class GameHub : Hub<IGameClientNotificationService>
 
         if (playerId.HasValue)
         {
-            await _mediator.Send(new UpdateHeartbeatCommand(playerId.Value));
+            await _mediator.Send(new UpdateHeartbeatCommand(playerId.Value, Context.ConnectionId));
         }
     }
 
@@ -64,7 +64,7 @@ public class GameHub : Hub<IGameClientNotificationService>
         {
             _logger.LogInformation(exception, "Player {PlayerId} disconnected", playerId.Value);
             
-            var notification = new PlayerDisconnectedNotification(playerId.Value);
+            var notification = new PlayerDisconnectedNotification(playerId.Value, Context.ConnectionId);
             await _mediator.Publish(notification);
         }
     }

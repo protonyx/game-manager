@@ -13,16 +13,7 @@ public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatComm
 
     public async Task<UnitResult<ApplicationError>> Handle(UpdateHeartbeatCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
-
-        if (player == null)
-        {
-            return GameErrors.PlayerNotFound(request.PlayerId);
-        }
-        
-        player.UpdateHeartbeat();
-
-        await _playerRepository.UpdateAsync(player, cancellationToken);
+        await _playerRepository.UpdateHeartbeatAsync(request.PlayerId, request.ConnectionId, cancellationToken);
 
         return UnitResult.Success<ApplicationError>();
     }

@@ -4,8 +4,11 @@ public class PlayerConnectedNotification : INotification
 {
     public Guid PlayerId { get; }
 
-    public PlayerConnectedNotification(Guid playerId)
+    public string ConnectionId { get; }
+
+    public PlayerConnectedNotification(Guid playerId, string connectionId)
     {
         PlayerId = playerId;
+        ConnectionId = connectionId;
     }
 }

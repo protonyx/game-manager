@@ -19,6 +19,7 @@ public class DtoProfile : Profile
             .ReverseMap();
         CreateMap<Player, PlayerDTO>()
             .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
+            .ForMember(t => t.State, opt => opt.MapFrom(t => t.Connections.Count > 0 ? PlayerState.Connected : PlayerState.Disconnected))
             .ForMember(t => t.TrackerValues, opt =>
                 opt.MapFrom(t => t.TrackerValues.ToDictionary(tv => tv.TrackerId, tv => tv.Value)))
             .ReverseMap()

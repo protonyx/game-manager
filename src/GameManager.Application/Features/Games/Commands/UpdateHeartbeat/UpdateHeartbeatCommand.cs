@@ -6,8 +6,11 @@ public class UpdateHeartbeatCommand : IRequest<UnitResult<ApplicationError>>
 {
     public Guid PlayerId { get; }
 
-    public UpdateHeartbeatCommand(Guid playerId)
+    public string ConnectionId { get; }
+
+    public UpdateHeartbeatCommand(Guid playerId, string connectionId)
     {
         PlayerId = playerId;
+        ConnectionId = connectionId;
     }
 }

@@ -24,8 +24,8 @@ public class PlayerDisconnectedNotificationHandler : INotificationHandler<Player
         {
             return;
         }
-        
-        player.SetState(PlayerState.Disconnected);
+
+        player.RemoveConnection(notification.ConnectionId);
 
         await _playerRepository.UpdateAsync(player, cancellationToken);
 

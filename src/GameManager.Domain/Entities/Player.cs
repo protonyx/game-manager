@@ -14,14 +14,14 @@ public class Player
     public PlayerName Name { get; private set; }
 
     public bool Active { get; private set; }
-    
-    public PlayerState State { get; private set; }
 
     public bool IsHost { get; private set; }
     
     public DateTime JoinedDate { get; private set; }
 
-    public DateTime? LastHeartbeat { get; private set; }
+    private List<PlayerConnection> _connections = new();
+
+    public IReadOnlyList<PlayerConnection> Connections => _connections.ToList();
 
     private List<TrackerValue> _trackerValues = new();
 
@@ -40,7 +40,6 @@ public class Player
         Active = player.Active;
         IsHost = player.IsHost;
         JoinedDate = player.JoinedDate;
-        LastHeartbeat = player.LastHeartbeat;
         _trackerValues = player._trackerValues;
     }
     
@@ -64,10 +63,29 @@ public class Player
         }
     }
     
-    public void UpdateHeartbeat()
+    public void UpdateHeartbeat(string connectionId)
     {
-        State = PlayerState.Connected;
-        LastHeartbeat = DateTime.UtcNow;
+        var existing = _connections.FirstOrDefault(c => c.ConnectionId.Equals(connectionId));
+
+        existing?.UpdateHeartbeat();
+    }
+
+    public void AddConnection(string connectionId)
+    {
+        if (!_connections.Any(c => c.ConnectionId.Equals(connectionId)))
+        {
+            _connections.Add(new PlayerConnection(Id, connectionId));
+        }
+    }
+
+    public void RemoveConnection(string connectionId)
+    {
+        var existing = _connections.FirstOrDefault(c => c.ConnectionId.Equals(connectionId));
+
+        if (existing != null)
+        {
+            _connections.Remove(existing);
+        }
     }
 
     public void Promote()
@@ -88,11 +106,6 @@ public class Player
         Order = newOrder;
 
         return Result.Success();
-    }
-
-    public void SetState(PlayerState newState)
-    {
-        State = newState;
     }
 
     public Result SetTracker(Guid trackerId, int value)
@@ -125,6 +138,5 @@ public class Player
     {
         Active = false;
         Order = 0;
-        State = PlayerState.Disconnected;
     }
 }
