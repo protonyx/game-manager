@@ -46,6 +46,7 @@ bootstrapApplication(AppComponent, {
     provideRouterStore(),
     provideEffects(gameEffects),
     provideStoreDevtools({
+      name: 'Game Manager',
       maxAge: 25,
       logOnly: !isDevMode(),
     }),

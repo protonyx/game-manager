@@ -1,5 +1,6 @@
 ﻿using GameManager.Application.Contracts.Persistence;
 using GameManager.Persistence.Sqlite.Repositories;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,9 +14,14 @@ public static class SqlitePersistenceServiceRegistration
         services.AddDbContext<GameContext>((sp, opt) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
+            
             var cs = config.GetConnectionString("Database");
+            var csb = new SqliteConnectionStringBuilder(cs)
+            {
+                Cache = SqliteCacheMode.Shared
+            };
 
-            opt.UseSqlite(cs);
+            opt.UseSqlite(csb.ConnectionString);
             opt.EnableSensitiveDataLogging();
         });
         
