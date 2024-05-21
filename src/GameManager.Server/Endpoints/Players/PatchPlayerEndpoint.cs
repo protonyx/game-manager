@@ -39,11 +39,11 @@ public class PatchPlayerEndpoint : Endpoint<PatchPlayerDTO, Results<Ok<PlayerDTO
         {
             return result.Error.ToProblemDetails();
         }
-        
+
         var player = result.Value;
 
         req.Patch(player);
-        
+
         var updateResult = await _mediator.Send(new UpdatePlayerCommand(req.Id, player), ct);
 
         return updateResult.IsSuccess

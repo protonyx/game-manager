@@ -8,10 +8,10 @@ public class CurrentTurnDetails
 
     protected CurrentTurnDetails()
     {
-        
+
     }
 
-public CurrentTurnDetails(Player player)
+    public CurrentTurnDetails(Player player)
     {
         PlayerId = player.Id;
         StartTime = DateTime.UtcNow;

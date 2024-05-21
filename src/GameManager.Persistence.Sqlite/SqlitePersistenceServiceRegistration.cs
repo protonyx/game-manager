@@ -14,7 +14,7 @@ public static class SqlitePersistenceServiceRegistration
         services.AddDbContext<GameContext>((sp, opt) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
-            
+
             var cs = config.GetConnectionString("Database");
             var csb = new SqliteConnectionStringBuilder(cs)
             {
@@ -24,7 +24,7 @@ public static class SqlitePersistenceServiceRegistration
             opt.UseSqlite(csb.ConnectionString);
             opt.EnableSensitiveDataLogging();
         });
-        
+
         // Repositories
         services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IGameRepository, GameRepository>();

@@ -16,7 +16,7 @@ public class TokenService : ITokenService
     public TokenService(IConfiguration configuration)
     {
         _configuration = configuration;
-        
+
         var key = configuration["Jwt:Key"];
         byte[] keyBytes;
 
@@ -30,7 +30,7 @@ public class TokenService : ITokenService
         {
             keyBytes = Convert.FromBase64String(key);
         }
-        
+
         _signingKey = new SymmetricSecurityKey(keyBytes);
         _signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
     }
@@ -48,7 +48,7 @@ public class TokenService : ITokenService
             notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: _signingCredentials);
-        
+
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

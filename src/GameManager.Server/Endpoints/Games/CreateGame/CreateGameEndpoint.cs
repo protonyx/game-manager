@@ -27,11 +27,11 @@ public class CreateGameEndpoint : Endpoint<CreateGameDTO, Results<CreatedAtRoute
         CancellationToken ct)
     {
         var request = new CreateGameCommand(req);
-        
+
         var result = await _mediator.Send(request, ct);
 
         return result.IsSuccess
-            ? TypedResults.CreatedAtRoute(result.Value, nameof(GetGameEndpoint), new {id = result.Value.Id})
+            ? TypedResults.CreatedAtRoute(result.Value, nameof(GetGameEndpoint), new { id = result.Value.Id })
             : result.Error.ToProblemDetails();
     }
 }

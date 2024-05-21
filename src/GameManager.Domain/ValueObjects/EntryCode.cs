@@ -7,13 +7,13 @@ public class EntryCode
     private const string ValidEntryCodeCharacters = "ABCEFHJKMNPQRTWXY0123456789";
 
     private const int DefaultEntryCodeLength = 4;
-    
+
     public string Value { get; }
 
     public static EntryCode New(int length = DefaultEntryCodeLength)
     {
         var charSet = new HashSet<char>(ValidEntryCodeCharacters);
-        
+
         var sb = new StringBuilder(length);
 
         for (int i = 0; i < length; i++)
@@ -22,7 +22,7 @@ public class EntryCode
             var nextChar = charSet.ElementAt(idx);
 
             sb.Append(nextChar);
-            
+
             charSet.Remove(nextChar);
         }
 
@@ -35,7 +35,7 @@ public class EntryCode
             return Result.Failure<EntryCode>("Entry code is empty");
         if (value.Length > 10)
             return Result.Failure<EntryCode>("Entry code is too long");
-        
+
         return new EntryCode(value);
     }
 

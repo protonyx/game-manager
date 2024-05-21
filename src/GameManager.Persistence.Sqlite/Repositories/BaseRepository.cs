@@ -15,14 +15,14 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class
     public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         T? t = await _context.Set<T>().FindAsync(id);
-        
+
         return t;
     }
 
     public virtual async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)
     {
         _context.Set<T>().Add(entity);
-        
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity;
@@ -32,7 +32,7 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class
     {
         _context.Entry(entity).State = EntityState.Modified;
         await _context.SaveChangesAsync(cancellationToken);
-        
+
         return entity;
     }
 
@@ -42,7 +42,7 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class
         {
             _context.Entry(entity).State = EntityState.Modified;
         }
-        
+
         return _context.SaveChangesAsync(cancellationToken);
     }
 

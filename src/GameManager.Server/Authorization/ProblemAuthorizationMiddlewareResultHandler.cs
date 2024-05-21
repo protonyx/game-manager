@@ -10,7 +10,7 @@ namespace GameManager.Server.Authorization;
 public class ProblemAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
 {
     private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
-    
+
     public Task HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy,
         PolicyAuthorizationResult authorizeResult)
     {
@@ -18,7 +18,7 @@ public class ProblemAuthorizationMiddlewareResultHandler : IAuthorizationMiddlew
         {
             return next(context);
         }
-        
+
         return Handle();
 
         async Task Handle()

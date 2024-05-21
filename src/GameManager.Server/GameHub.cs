@@ -14,7 +14,7 @@ namespace GameManager.Server;
 public class GameHub : Hub<IGameClientNotificationService>
 {
     private readonly IMediator _mediator;
-    
+
     private readonly ILogger<GameHub> _logger;
 
     public GameHub(IMediator mediator, ILogger<GameHub> logger)
@@ -26,7 +26,7 @@ public class GameHub : Hub<IGameClientNotificationService>
     public override async Task OnConnectedAsync()
     {
         var gameId = Context.User?.GetGameId();
-        
+
         if (gameId.HasValue)
         {
             // Add the connection to a group named with the Game ID
@@ -39,9 +39,9 @@ public class GameHub : Hub<IGameClientNotificationService>
         {
             // Add the connection to a group named with the Player ID
             await Groups.AddToGroupAsync(Context.ConnectionId, playerId.Value.ToString());
-            
+
             _logger.LogInformation("Player {PlayerId} connected", playerId.Value);
-            
+
             var notification = new PlayerConnectedNotification(playerId.Value, Context.ConnectionId);
             await _mediator.Publish(notification);
         }
@@ -63,7 +63,7 @@ public class GameHub : Hub<IGameClientNotificationService>
         if (playerId.HasValue)
         {
             _logger.LogInformation(exception, "Player {PlayerId} disconnected", playerId.Value);
-            
+
             var notification = new PlayerDisconnectedNotification(playerId.Value, Context.ConnectionId);
             await _mediator.Publish(notification);
         }

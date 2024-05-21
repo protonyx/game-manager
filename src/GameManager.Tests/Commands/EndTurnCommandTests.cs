@@ -32,7 +32,7 @@ public class EndTurnCommandTests
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
-            .ReturnsAsync(new List<Player>() {player1, player2});
+            .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
             user.AddGameId(game.Id)
@@ -44,12 +44,12 @@ public class EndTurnCommandTests
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None), Times.Once);
     }
-    
+
     [Fact]
     public async Task EndTurnCommand_WithNonCurrentAdminPlayer_ShouldAdvanceToNextPlayer()
     {
@@ -74,7 +74,7 @@ public class EndTurnCommandTests
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
-            .ReturnsAsync(new List<Player>() {player1, player2});
+            .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
             user.AddGameId(game.Id)
@@ -86,12 +86,12 @@ public class EndTurnCommandTests
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None), Times.Once);
     }
-    
+
     [Fact]
     public async Task EndTurnCommand_WithNonCurrentPlayer_ShouldNotBeAllowed()
     {
@@ -113,7 +113,7 @@ public class EndTurnCommandTests
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
-            .ReturnsAsync(new List<Player>() {player1, player2});
+            .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
             user.AddGameId(game.Id)
@@ -125,7 +125,7 @@ public class EndTurnCommandTests
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.ErrorType.Should().Be(ApplicationErrorType.AuthorizationError);

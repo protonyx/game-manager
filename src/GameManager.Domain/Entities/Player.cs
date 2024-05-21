@@ -10,13 +10,13 @@ public class Player
     public Guid GameId { get; private set; }
 
     public int Order { get; private set; }
-    
+
     public PlayerName Name { get; private set; }
 
     public bool Active { get; private set; }
 
     public bool IsHost { get; private set; }
-    
+
     public DateTime JoinedDate { get; private set; }
 
     private List<PlayerConnection> _connections = new();
@@ -42,14 +42,14 @@ public class Player
         JoinedDate = player.JoinedDate;
         _trackerValues = player._trackerValues;
     }
-    
+
     public Player(PlayerName name, Game game)
-        :this()
+        : this()
     {
         Id = Guid.NewGuid();
         Active = true;
         IsHost = false;
-        
+
         Name = name;
         GameId = game.Id;
         JoinedDate = DateTime.UtcNow;
@@ -62,7 +62,7 @@ public class Player
             }
         }
     }
-    
+
     public void UpdateHeartbeat(string connectionId)
     {
         var existing = _connections.FirstOrDefault(c => c.ConnectionId.Equals(connectionId));

@@ -16,7 +16,7 @@ public static class ListExtensions
         {
             return;
         }
-        
+
         var target = list[oldIndex];
         var delta = newIndex < oldIndex ? -1 : 1;
 

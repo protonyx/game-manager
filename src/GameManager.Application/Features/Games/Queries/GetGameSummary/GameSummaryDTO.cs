@@ -11,7 +11,7 @@ public class GameSummaryDTO
     public ICollection<TrackerDTO> Trackers { get; set; } = new List<TrackerDTO>();
 
     public ICollection<PlayerSummaryDTO> Players { get; set; } = new List<PlayerSummaryDTO>();
-    
+
     public DateTime CreatedDate { get; set; }
 
     public DateTime? StartedDate { get; set; }

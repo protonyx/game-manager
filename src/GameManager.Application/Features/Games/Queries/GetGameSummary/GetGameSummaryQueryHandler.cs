@@ -8,7 +8,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
     private readonly IGameRepository _gameRepository;
 
     private readonly IPlayerRepository _playerRepository;
-    
+
     private readonly ITurnRepository _turnRepository;
 
     private readonly ITrackerHistoryRepository _trackerHistoryRepository;
@@ -45,7 +45,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
         var turns = await _turnRepository.GetTurnsByGameId(request.GameId, cancellationToken);
         var trackerHistory = await _trackerHistoryRepository.GetHistoryByGameId(request.GameId, cancellationToken);
-        
+
         var ret = new GameSummaryDTO()
         {
             Id = game.Id,
@@ -57,7 +57,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
             Players = players.Select(p =>
             {
                 var dto = _mapper.Map<PlayerSummaryDTO>(p);
-                
+
                 dto.Turns = turns.Where(t => t.PlayerId == p.Id)
                     .Select(_mapper.Map<TurnDTO>)
                     .ToList();
@@ -66,12 +66,12 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
                     {
                         var thDto = _mapper.Map<TrackerHistoryDTO>(t);
                         var timeDiff = thDto.ChangedTime - (game.StartedDate ?? game.CreatedDate);
-                        thDto.SecondsSinceGameStart = (int) Math.Abs(timeDiff.TotalSeconds);
+                        thDto.SecondsSinceGameStart = (int)Math.Abs(timeDiff.TotalSeconds);
 
                         return thDto;
                     })
                     .ToList();
-                
+
                 return dto;
             }).ToList()
         };

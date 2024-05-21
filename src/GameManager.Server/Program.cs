@@ -81,7 +81,7 @@ builder.Services.AddCors(opt =>
         {
             policy.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader();            
+                .AllowAnyHeader();
         }
     });
 });
@@ -149,7 +149,7 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
         .AddService("game-manager",
             serviceInstanceId: Environment.MachineName,
             serviceVersion: version);
-    
+
     builder.Services.AddOpenTelemetry()
         .WithTracing(tb =>
         {
@@ -162,12 +162,12 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
                 })
                 .AddHttpClientInstrumentation()
                 .AddEntityFrameworkCoreInstrumentation();
-            
+
             if (!string.IsNullOrWhiteSpace(redisConnectionString))
             {
                 tb.AddRedisInstrumentation();
             }
-            
+
             tb.AddOtlpExporter(otlp =>
             {
                 otlp.Endpoint = new Uri(otlpEndpoint);

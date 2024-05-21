@@ -11,7 +11,7 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
         : base(context)
     {
     }
-    
+
     public async Task<IReadOnlyList<Game>> FindAsync(DateTime? olderThan = null, CancellationToken cancellationToken = default)
     {
         IQueryable<Game> query = _context.Set<Game>()
@@ -46,13 +46,13 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
                 _context.Attach(entity.CurrentTurn);
             }
         }
-        
+
         return base.UpdateAsync(entity, cancellationToken);
     }
 
     public override async Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Game>().FindAsync(new object?[] {gameId}, cancellationToken);
+        return await _context.Set<Game>().FindAsync(new object?[] { gameId }, cancellationToken);
     }
 
     public async Task<Game?> GetGameByEntryCodeAsync(EntryCode entryCode, CancellationToken cancellationToken = default)

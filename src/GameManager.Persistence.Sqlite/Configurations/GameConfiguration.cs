@@ -10,19 +10,19 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
     public void Configure(EntityTypeBuilder<Game> builder)
     {
         builder.ToTable("Games");
-        
+
         builder.HasKey(t => t.Id);
-        
+
         builder.Property(t => t.Name)
             .IsRequired()
             .HasMaxLength(100);
-        
+
         builder.Property(t => t.EntryCode)
             .HasConversion(
                 v => v.Value,
                 v => EntryCode.From(v).Value)
             .HasMaxLength(10);
-        
+
         builder.OwnsOne(t => t.Options, build =>
         {
             build.ToTable("GameOptions");

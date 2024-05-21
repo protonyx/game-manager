@@ -10,7 +10,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
     public void Configure(EntityTypeBuilder<Player> builder)
     {
         builder.ToTable("Players");
-        
+
         builder.HasKey(t => t.Id);
 
         builder.HasIndex(t => t.GameId);

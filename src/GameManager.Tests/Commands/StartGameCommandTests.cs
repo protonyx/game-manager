@@ -21,7 +21,7 @@ public class StartGameCommandTests
         player1.SetOrder(1);
         var player2 = players[1];
         player2.SetOrder(2);
-        
+
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
@@ -29,7 +29,7 @@ public class StartGameCommandTests
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
-            .ReturnsAsync(new List<Player>() {player1, player2});
+            .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
             user.AddGameId(game.Id)
@@ -39,10 +39,10 @@ public class StartGameCommandTests
 
         var cmd = new StartGameCommand(game.Id);
         var sut = fixture.Create<StartGameCommandHandler>();
-        
+
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         gameRepo.Verify(t => t.UpdateAsync(It.Is<Game>(g => g.State == GameState.InProgress), CancellationToken.None), Times.Once);

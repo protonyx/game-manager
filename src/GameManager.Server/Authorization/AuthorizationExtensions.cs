@@ -12,7 +12,7 @@ public static class AuthorizationExtensions
 
         return builder;
     }
-    
+
     public static AuthorizationPolicyBuilder CanModifyGame(
         this AuthorizationPolicyBuilder builder,
         string gameIdRouteParameterName = "Id")
@@ -30,7 +30,7 @@ public static class AuthorizationExtensions
 
         return builder;
     }
-    
+
     public static AuthorizationPolicyBuilder CanModifyPlayer(
         this AuthorizationPolicyBuilder builder,
         string playerIdRouteParameterName = "Id")

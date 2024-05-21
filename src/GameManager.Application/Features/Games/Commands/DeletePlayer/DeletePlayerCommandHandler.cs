@@ -9,11 +9,11 @@ namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<ApplicationError>>
 {
     private readonly IPlayerRepository _playerRepository;
-    
+
     private readonly IUserContext _userContext;
-    
+
     private readonly IMediator _mediator;
-    
+
     private readonly ITokenService _tokenService;
 
     private readonly IGameClientNotificationService _notificationService;
@@ -40,28 +40,28 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
         {
             return GameErrors.PlayerNotFound(request.PlayerId);
         }
-        
-        if (_userContext.User == null 
+
+        if (_userContext.User == null
             || !_userContext.User.IsAuthorizedToViewGame(player.GameId)
             || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id))
         {
             return ApplicationError.Authorization("Not authorized to update this player");
         }
-        
+
         player.SoftDelete();
-        
+
         await _playerRepository.UpdateAsync(player, cancellationToken);
-        
+
         await _mediator.Publish(new PlayerDeletedNotification(player), cancellationToken);
-        
+
         // Update player order for remaining players
         var players = await _playerRepository.GetPlayersByGameIdAsync(player.GameId, cancellationToken);
-            
+
         for (int i = 0; i < players.Count; i++)
         {
             players[i].SetOrder(i + 1);
         }
-        
+
         // If the deleted player was an admin and there are any remaining players, promote the next player to admin
         if (player.IsHost)
         {
@@ -70,7 +70,7 @@ public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, U
             if (nextPlayer != null)
             {
                 nextPlayer.Promote();
-                
+
                 // Generate player token
                 var identityBuilder = new PlayerIdentityBuilder();
                 identityBuilder.AddGameId(nextPlayer.GameId)

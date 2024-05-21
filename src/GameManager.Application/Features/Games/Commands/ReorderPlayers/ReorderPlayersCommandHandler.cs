@@ -8,7 +8,7 @@ namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
-    
+
     private readonly IPlayerRepository _playerRepository;
 
     private readonly IMediator _mediator;
@@ -35,7 +35,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
         {
             return GameErrors.GameNotFound(request.GameId);
         }
-        
+
         if (!_userContext.User!.IsAuthorizedToViewGame(game.Id))
         {
             return GameErrors.PlayerNotAuthorized();
@@ -45,7 +45,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
 
         var newIdList = request.PlayerIds;
         var existingIdSet = players.Where(p => p.Active).Select(p => p.Id).ToHashSet();
-        
+
         // Rearrange players based on input list
         var nextOrder = 1;
         foreach (var playerId in newIdList)
@@ -72,7 +72,7 @@ public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersComman
         {
             await _mediator.Publish(new PlayerUpdatedNotification(player), cancellationToken);
         }
-        
+
         return UnitResult.Success<ApplicationError>();
     }
 }

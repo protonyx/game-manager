@@ -34,10 +34,10 @@ public class UpdatePlayerCommandTests
             .With(p => p.Name, "Player 1")
             .Create();
         var command = new UpdatePlayerCommand(player.Id, dto);
-        
+
         // Act
         var result = await sut.Handle(command, CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         playerRepository.Verify(x => x.UpdateAsync(It.IsAny<Player>(), It.IsAny<CancellationToken>()), Times.Once);

@@ -7,7 +7,7 @@ public class ApplicationError
     public ApplicationErrorType ErrorType { get; }
 
     public string? ErrorCode { get; }
-    
+
     public string? Reason { get; private set; }
 
     public ValidationResult? ValidationResult { get; private set; }

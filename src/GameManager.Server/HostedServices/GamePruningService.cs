@@ -17,7 +17,7 @@ public class GamePruningService : BackgroundService
     {
         _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
-        
+
         _retentionDays = configuration.GetValue<int>("Retention:Days");
     }
 
@@ -27,9 +27,9 @@ public class GamePruningService : BackgroundService
         {
             return;
         }
-        
+
         _logger.LogInformation("Game Pruning Service running");
-        
+
         using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
 
         await DoWork(stoppingToken);
@@ -51,7 +51,7 @@ public class GamePruningService : BackgroundService
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        
+
         var cmd = new PruneGamesCommand(TimeSpan.FromDays(_retentionDays));
 
         await mediator.Send(cmd, cancellationToken);

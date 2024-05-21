@@ -5,5 +5,5 @@ namespace GameManager.Tests;
 
 public class GameManagerApp : AppFixture<Program>
 {
-    
+
 }

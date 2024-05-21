@@ -22,7 +22,7 @@ public class PlayerCreatedNotificationHandler : INotificationHandler<PlayerCreat
     {
         var player = notification.Player;
         var dto = _mapper.Map<PlayerDTO>(player);
-        
+
         var message = new PlayerJoinedMessage()
         {
             GameId = player.GameId,

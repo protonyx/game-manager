@@ -37,7 +37,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
             if (result.IsFailure)
                 return ApplicationError.Failure(result.Error);
         }
-        
+
         // Validate
         var validationResult = await _gameValidator.ValidateAsync(game, cancellationToken);
 

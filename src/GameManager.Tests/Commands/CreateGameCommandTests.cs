@@ -21,15 +21,15 @@ public class CreateGameCommandTests
 
         var sut = fixture.Create<CreateGameCommandHandler>();
         var cmd = fixture.Create<CreateGameCommand>();
-        
+
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         repo.Verify(t => t.CreateAsync(It.IsAny<Game>(), It.IsAny<CancellationToken>()), Times.Once);
     }
-    
+
     [Fact]
     public async Task CreateGameCommandHandler_WithInvalidInput_ReturnsValidationError()
     {
@@ -38,15 +38,15 @@ public class CreateGameCommandTests
         var validator = new InlineValidator<Game>();
         validator.RuleFor(t => t.Id).MustAsync((t, ct) => Task.FromResult(false));
         fixture.Inject<IValidator<Game>>(validator);
-        
+
         var repo = fixture.Freeze<Mock<IGameRepository>>();
 
         var sut = fixture.Create<CreateGameCommandHandler>();
         var cmd = fixture.Create<CreateGameCommand>();
-        
+
         // Act
         var response = await sut.Handle(cmd, CancellationToken.None);
-        
+
         // Assert
         response.IsFailure.Should().BeTrue();
         response.Error.ErrorType.Should().Be(ApplicationErrorType.ValidationError);

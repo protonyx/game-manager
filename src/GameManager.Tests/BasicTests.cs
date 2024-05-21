@@ -7,7 +7,7 @@ namespace GameManager.Tests;
 
 public class BasicTests
 {
-    
+
     [Fact]
     public void Test_AutoMapper_Profiles()
     {
@@ -15,7 +15,7 @@ public class BasicTests
         {
             cfg.AddProfile<DtoProfile>();
         });
-        
+
         mappingConfig.AssertConfigurationIsValid();
     }
 
@@ -31,14 +31,14 @@ public class BasicTests
             builder.AddPlayerId(playerId);
             builder.AddHostRole();
         });
-        
+
         // Act
         var isAdmin = principal.IsHostForGame(gameId);
-        
+
         // Assert
         isAdmin.Should().BeTrue();
     }
-    
+
     [Fact]
     public void PlayerIdentityBuilder_ForGame_IsAuthReturnsTrue()
     {
@@ -50,11 +50,11 @@ public class BasicTests
             builder.AddGameId(gameId);
             builder.AddPlayerId(playerId);
         });
-        
+
         // Act
         var isAuthForGame = principal.IsAuthorizedToViewGame(gameId);
         var isAuthForPlayer = principal.IsAuthorizedToViewPlayer(playerId);
-        
+
         // Assert
         isAuthForGame.Should().BeTrue();
         isAuthForPlayer.Should().BeTrue();

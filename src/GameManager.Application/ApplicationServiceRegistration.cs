@@ -18,7 +18,7 @@ public static class ApplicationServiceRegistration
             cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        
+
         return services;
     }
 }

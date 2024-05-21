@@ -11,10 +11,10 @@ public class GameTests
         // Arrange
         var game = new Game("Test", new GameOptions());
         var player1 = new Player(PlayerName.From("Player 1").Value, game);
-        
+
         // Act
         var result = game.Start(player1);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
     }

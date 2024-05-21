@@ -15,6 +15,6 @@ public interface IGameClientNotificationService
     Task PlayerUpdated(PlayerUpdatedMessage message, CancellationToken cancellationToken);
 
     Task PlayerLeft(PlayerLeftMessage message, CancellationToken cancellationToken);
-    
+
     Task UpdateCredentials(PlayerCredentialsDTO message, CancellationToken cancellationToken);
 }

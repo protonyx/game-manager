@@ -13,7 +13,7 @@ public class PlayerValidatorTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        
+
         var game = new Game(fixture.Create<string>(), new GameOptions());
         var player = fixture.Build<Player>()
             .FromFactory(() =>
@@ -31,20 +31,20 @@ public class PlayerValidatorTests
             .ReturnsAsync(false);
 
         var sut = fixture.Create<PlayerValidator>();
-        
+
         // Act
         var result = await sut.TestValidateAsync(player);
-        
+
         // Assert
         result.ShouldHaveValidationErrorFor(t => t.Name);
     }
-    
+
     [Fact]
     public async Task PlayerValidator_WithInvalidGameId_ReturnsValidationError()
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        
+
         var game = new Game(fixture.Create<string>(), new GameOptions());
         var player = fixture.Build<Player>()
             .FromFactory(() =>
@@ -59,10 +59,10 @@ public class PlayerValidatorTests
             .ReturnsAsync(default(Game));
 
         var sut = fixture.Create<PlayerValidator>();
-        
+
         // Act
         var result = await sut.TestValidateAsync(player);
-        
+
         // Assert
         result.ShouldHaveValidationErrorFor(t => t.GameId);
     }

@@ -8,7 +8,7 @@ public class CreateGameDTO
     [Required]
     [StringLength(50)]
     public string Name { get; set; } = String.Empty;
-    
+
     public GameOptionsDTO? Options { get; set; }
 
     public ICollection<TrackerDTO> Trackers { get; set; } = new List<TrackerDTO>();

@@ -12,7 +12,7 @@ public class ActionEndGameEndpoint : EndpointWithoutRequest<Results<NoContent, P
     {
         _mediator = mediator;
     }
-    
+
     public override void Configure()
     {
         Post("{Id}/End");

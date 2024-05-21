@@ -14,7 +14,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
     private readonly ITurnRepository _turnRepository;
 
     private readonly IUserContext _userContext;
-    
+
     private readonly IMediator _mediator;
 
     public EndTurnCommandHandler(
@@ -41,7 +41,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
         {
             return GameErrors.GameNotFound(request.GameId);
         }
-        
+
         var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
         var requestPlayerId = _userContext.User?.GetPlayerId();
         var requestPlayer = players.FirstOrDefault(t => t.Id == requestPlayerId);
@@ -60,7 +60,7 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
         {
             return GameErrors.GameNotInProgress(game.Id);
         }
-        
+
         var currentPlayer = players.First(t => t.Id == game.CurrentTurn.PlayerId);
 
         if (requestPlayer != currentPlayer && !requestPlayer.IsHost)
@@ -81,9 +81,9 @@ public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<
         await _turnRepository.CreateAsync(turn, cancellationToken);
 
         game.SetCurrentTurn(nextPlayer);
-        
+
         var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
-        
+
         await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
 
         return UnitResult.Success<ApplicationError>();

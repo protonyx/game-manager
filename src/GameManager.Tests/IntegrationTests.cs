@@ -14,7 +14,7 @@ namespace GameManager.Tests;
 [Collection("Integration")]
 public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
 {
-    
+
     [Fact]
     public async Task Test_CreateNewGame()
     {
@@ -40,7 +40,7 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
                 }
             }
         };
-        
+
         // Act
         // Create Game
         var content = new StringContent(JsonConvert.SerializeObject(newGame));
@@ -51,7 +51,7 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
         var game = JsonConvert.DeserializeObject<GameDTO>(await gameResponse.Content.ReadAsStringAsync());
         Assert.True(game != null);
         Assert.True(game!.EntryCode.Length == 4);
-        
+
         // Join the new game
         var newPlayer = new JoinGameDTO()
         {
@@ -76,6 +76,6 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
         var players = JsonConvert.DeserializeObject<List<PlayerDTO>>(await playersResponse.Content.ReadAsStringAsync());
 
         Assert.NotNull(players);
-        Assert.True(players.Any(p => p.Id == player.PlayerId));
+        Assert.Contains(players, p => p.Id == player.PlayerId);
     }
 }

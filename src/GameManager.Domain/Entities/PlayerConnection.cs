@@ -17,10 +17,10 @@ public class PlayerConnection
         ConnectedDate = DateTime.UtcNow;
         LastHeartbeat = ConnectedDate;
     }
-    
+
     public void UpdateHeartbeat()
     {
         LastHeartbeat = DateTime.UtcNow;
     }
-    
+
 }

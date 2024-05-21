@@ -10,7 +10,7 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
     private readonly IGameRepository _gameRepository;
 
     private readonly IUserContext _userContext;
-    
+
     private readonly IMediator _mediator;
 
     public EndGameCommandHandler(
@@ -44,7 +44,7 @@ public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<
             {
                 await _mediator.Publish(new GameUpdatedNotification(g), cancellationToken);
             });
-            
+
         return result.IsSuccess ? UnitResult.Success<ApplicationError>() : UnitResult.Failure(result.Error);
     }
 }

@@ -10,23 +10,23 @@ public class PlayerIdentityBuilder : IPlayerIdentityBuilder
     private const string RoleClaim = "role";
 
     private readonly ConcurrentBag<Claim> _claims = new();
-    
+
     public PlayerIdentityBuilder()
     {
-        
+
     }
 
     public IPlayerIdentityBuilder AddGameId(Guid gameId)
     {
         _claims.Add(new Claim(GameManagerClaimTypes.GameId, gameId.ToString()));
-        
+
         return this;
     }
 
     public IPlayerIdentityBuilder AddPlayerId(Guid playerId)
     {
         _claims.Add(new Claim(GameManagerClaimTypes.PlayerId, playerId.ToString()));
-        
+
         return this;
     }
 
@@ -40,10 +40,10 @@ public class PlayerIdentityBuilder : IPlayerIdentityBuilder
     public IPlayerIdentityBuilder AddAdminRole()
     {
         _claims.Add(new Claim(RoleClaim, GameManagerRoles.Admin));
-        
+
         return this;
     }
-    
+
     public ClaimsIdentity Build()
     {
         return new ClaimsIdentity(_claims, roleType: RoleClaim, nameType: ClaimTypes.Name,

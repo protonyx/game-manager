@@ -13,7 +13,7 @@ public static class ModelStateValidationExtensions
         {
             foreach (var memberName in validationResult.MemberNames)
             {
-                modelState.AddModelError(memberName, validationResult.ErrorMessage ?? "An error occurred");                
+                modelState.AddModelError(memberName, validationResult.ErrorMessage ?? "An error occurred");
             }
         }
     }

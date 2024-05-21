@@ -8,11 +8,11 @@ namespace GameManager.Application.Features.Games.Commands.StartGame;
 public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
-    
+
     private readonly IPlayerRepository _playerRepository;
-    
+
     private readonly IUserContext _userContext;
-    
+
     private readonly IMediator _mediator;
 
     public StartGameCommandHandler(
@@ -30,7 +30,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
     public async Task<UnitResult<ApplicationError>> Handle(StartGameCommand request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
-        
+
         var result = await game.ToResult(GameErrors.GameNotFound(request.GameId))
             .Ensure(g => _userContext.User!.IsAuthorizedToViewGame(g.Id),
                 GameErrors.PlayerNotAuthorized())

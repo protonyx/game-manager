@@ -16,7 +16,7 @@ public class PlayerAuthorizationHandler : AuthorizationHandler<PlayerAuthorizati
     {
         var routeValues = _httpContextAccessor.HttpContext.Request.RouteValues;
         var user = _httpContextAccessor.HttpContext.User;
-        
+
         if (!string.IsNullOrWhiteSpace(requirement.PlayerIdRouteParameterName)
             && routeValues.TryGetValue(requirement.PlayerIdRouteParameterName, out object? value)
             && value != null
@@ -31,7 +31,7 @@ public class PlayerAuthorizationHandler : AuthorizationHandler<PlayerAuthorizati
         {
             context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this player"));
         }
-        
+
         return Task.CompletedTask;
     }
 }

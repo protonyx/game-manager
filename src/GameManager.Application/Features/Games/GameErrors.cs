@@ -17,15 +17,15 @@ public static class GameErrors
         public const string PlayerNotAuthorized = "player.not_authorized";
         public const string PlayerNotHost = "player.not_host";
     }
-    
+
     public static ApplicationError InvalidEntryCode()
         => ApplicationError.Failure("Invalid entry code",
             errorCode: ErrorCodes.GameInvalidEntryCode);
-        
+
     public static ApplicationError GameNotFound(Guid? gameId)
         => ApplicationError.NotFound<Game>(gameId?.ToString(),
             errorCode: ErrorCodes.GameInvalidId);
-        
+
     public static ApplicationError GameNotInProgress(Guid gameId)
         => ApplicationError.Failure("Game not in progress",
             errorCode: ErrorCodes.GameInvalidState);

@@ -8,7 +8,7 @@ namespace GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 public class GameUpdatedNotificationHandler : INotificationHandler<GameUpdatedNotification>
 {
-    
+
     private readonly IGameClientNotificationService _gameClientNotificationService;
 
     private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ public class GameUpdatedNotificationHandler : INotificationHandler<GameUpdatedNo
     {
         var game = notification.Game;
         var dto = _mapper.Map<GameDTO>(game);
-        
+
         var message = new GameStateChangedMessage()
         {
             GameId = game.Id,

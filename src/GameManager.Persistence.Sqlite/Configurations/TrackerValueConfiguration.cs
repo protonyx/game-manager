@@ -9,7 +9,7 @@ public class TrackerValueConfiguration : IEntityTypeConfiguration<TrackerValue>
     public void Configure(EntityTypeBuilder<TrackerValue> builder)
     {
         builder.ToTable("TrackerValues");
-        
+
         builder.HasKey(t => t.Id);
 
         builder.HasOne<Player>()

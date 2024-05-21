@@ -39,16 +39,16 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
 
         if (entryCodeOrError.IsFailure)
             return GameErrors.InvalidEntryCode();
-        
+
         var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
-        
+
         if (game == null)
             return GameErrors.InvalidEntryCode();
-        
+
         // Generate token
         var identityBuilder = new PlayerIdentityBuilder();
         identityBuilder.AddGameId(game.Id);
-        
+
         var dto = new PlayerCredentialsDTO
         {
             GameId = game.Id,
@@ -60,19 +60,19 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
 
             if (playerNameOrError.IsFailure)
                 return GameErrors.PlayerInvalidName(playerNameOrError.Error);
-        
+
             var newPlayer = new Player(playerNameOrError.Value, game);
-        
+
             // Promote the player if they are the first
             var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
 
             newPlayer.SetOrder(existingPlayerCount + 1);
-        
+
             if (existingPlayerCount == 0)
             {
                 newPlayer.Promote();
             }
-        
+
             // Validate
             var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
 
@@ -82,11 +82,11 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
             }
 
             newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);
-        
+
             await _mediator.Publish(new PlayerCreatedNotification(newPlayer), cancellationToken);
-            
+
             identityBuilder.AddPlayerId(newPlayer.Id);
-            
+
             if (newPlayer.IsHost)
             {
                 identityBuilder.AddHostRole();
@@ -95,9 +95,9 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
             dto.PlayerId = newPlayer.Id;
             dto.IsHost = newPlayer.IsHost;
         }
-        
+
         dto.Token = _tokenService.GenerateToken(identityBuilder.Build());
-        
+
         return dto;
     }
 }

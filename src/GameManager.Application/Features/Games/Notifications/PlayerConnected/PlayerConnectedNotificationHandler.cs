@@ -25,7 +25,7 @@ public class PlayerConnectedNotificationHandler : INotificationHandler<PlayerCon
         {
             return;
         }
-        
+
         player.AddConnection(notification.ConnectionId);
 
         await _playerRepository.UpdateAsync(player, cancellationToken);

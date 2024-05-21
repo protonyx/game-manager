@@ -13,13 +13,13 @@ public class GameDTO
     public GameState State { get; set; }
 
     public GameOptionsDTO Options { get; set; } = new GameOptionsDTO();
-    
+
     public Guid? CurrentTurnPlayerId { get; set; }
-    
+
     public DateTime? LastTurnStartTime { get; set; }
 
     public ICollection<TrackerDTO> Trackers { get; set; } = new List<TrackerDTO>();
-    
+
     public DateTime CreatedDate { get; set; }
 
     public DateTime? StartedDate { get; set; }

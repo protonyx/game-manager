@@ -6,7 +6,7 @@ namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 public class UpdatePlayerCommand : IRequest<Result<PlayerDTO, ApplicationError>>
 {
     public Guid PlayerId { get; }
-    
+
     public PlayerDTO Player { get; }
 
     public UpdatePlayerCommand(Guid playerId, PlayerDTO player)

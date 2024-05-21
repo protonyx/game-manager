@@ -17,7 +17,7 @@ public static class ControllerExtensions
                     statusCode: StatusCodes.Status400BadRequest);
             case ApplicationErrorType.ValidationError:
                 controller.ModelState.AddValidationResults(error.ValidationResult!);
-                
+
                 return controller.ValidationProblem(
                     type: error.ErrorCode,
                     title: error.ErrorType.ToString(),

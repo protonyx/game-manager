@@ -21,7 +21,7 @@ public class GameHubClientNotificationService : IGameClientNotificationService
                 message,
                 cancellationToken: cancellationToken);
     }
-    
+
     public Task PlayerJoined(PlayerJoinedMessage message, CancellationToken cancellationToken)
     {
         return _hubContext.Clients.Group(message.GameId.ToString())
@@ -29,7 +29,7 @@ public class GameHubClientNotificationService : IGameClientNotificationService
                 message,
                 cancellationToken: cancellationToken);
     }
-    
+
     public Task PlayerUpdated(PlayerUpdatedMessage message, CancellationToken cancellationToken)
     {
         return _hubContext.Clients.Group(message.GameId.ToString())

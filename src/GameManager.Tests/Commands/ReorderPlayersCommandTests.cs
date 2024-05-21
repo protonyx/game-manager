@@ -16,7 +16,7 @@ public class ReorderPlayersCommandTests
         var players = fixture.BuildPlayer(game)
             .CreateMany(3)
             .ToList();
-        
+
         ICollection<Player> reorderedPlayers = null;
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
         gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))

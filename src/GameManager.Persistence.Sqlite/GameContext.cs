@@ -14,7 +14,7 @@ public class GameContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-        
+
         // Treat all DateTime properties as UTC
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),
@@ -43,7 +43,7 @@ public class GameContext : DbContext
                 }
             }
         }
-        
+
         base.OnModelCreating(modelBuilder);
     }
 }

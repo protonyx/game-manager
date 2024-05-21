@@ -17,12 +17,12 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
         _gameClientNotificationService = gameClientNotificationService;
         _mapper = mapper;
     }
-    
+
     public Task Handle(PlayerUpdatedNotification notification, CancellationToken cancellationToken)
     {
         var player = notification.Player;
         var dto = _mapper.Map<PlayerDTO>(player);
-        
+
         var message = new PlayerUpdatedMessage()
         {
             GameId = player.GameId,

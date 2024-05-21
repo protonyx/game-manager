@@ -16,7 +16,7 @@ public class GameAuthorizationHandler : AuthorizationHandler<GameAuthorizationRe
     {
         var routeValues = _httpContextAccessor.HttpContext.Request.RouteValues;
         var user = _httpContextAccessor.HttpContext.User;
-        
+
         if (!string.IsNullOrWhiteSpace(requirement.GameIdRouteParameterName)
             && routeValues.TryGetValue(requirement.GameIdRouteParameterName, out object? value)
             && value != null
@@ -31,7 +31,7 @@ public class GameAuthorizationHandler : AuthorizationHandler<GameAuthorizationRe
         {
             context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this game"));
         }
-        
+
         return Task.CompletedTask;
     }
 }

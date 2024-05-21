@@ -14,7 +14,7 @@ public class Game
     public GameState State { get; private set; }
 
     public GameOptions Options { get; private set; }
-    
+
     public CurrentTurnDetails? CurrentTurn { get; private set; }
 
     private List<Tracker> _trackers = new();
@@ -28,9 +28,9 @@ public class Game
 
     protected Game()
     {
-        
+
     }
-    
+
     public Game(string name, GameOptions options)
         : this()
     {
