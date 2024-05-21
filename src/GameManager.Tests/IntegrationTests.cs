@@ -19,7 +19,10 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
     public async Task Test_CreateNewGame()
     {
         // Arrange
-        var client = App.CreateClient();
+        var client = App.CreateClient(new WebApplicationFactoryClientOptions()
+        {
+            BaseAddress = new("http://localhost/api/v1/")
+        });
 
         var newGame = new CreateGameDTO()
         {
@@ -39,11 +42,11 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
         };
         
         // Act
+        // Create Game
         var content = new StringContent(JsonConvert.SerializeObject(newGame));
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var gameResponse = await client.PostAsync("api/Games", content);
+        var gameResponse = await client.PostAsync("Games", content);
 
-        // Assert
         gameResponse.EnsureSuccessStatusCode();
         var game = JsonConvert.DeserializeObject<GameDTO>(await gameResponse.Content.ReadAsStringAsync());
         Assert.True(game != null);
@@ -58,12 +61,21 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
 
         //var content2 = new StringContent(JsonConvert.SerializeObject(newPlayer));
         //content2.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var playerResponse = await client.PostAsJsonAsync("api/Games/Join", newPlayer);
+        var playerResponse = await client.PostAsJsonAsync("Games/Join", newPlayer);
 
         playerResponse.EnsureSuccessStatusCode();
         var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync());
 
-        Assert.True(player != null);
+        Assert.NotNull(player);
         Assert.True(!string.IsNullOrWhiteSpace(player!.Token));
+
+        // Get game players
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", player.Token);
+
+        var playersResponse = await client.GetAsync($"Games/{game.Id}/Players");
+        var players = JsonConvert.DeserializeObject<List<PlayerDTO>>(await playersResponse.Content.ReadAsStringAsync());
+
+        Assert.NotNull(players);
+        Assert.True(players.Any(p => p.Id == player.PlayerId));
     }
 }
