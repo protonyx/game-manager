@@ -29,7 +29,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
             game.AddTracker(tracker);
         }
 
-        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode, cancellationToken))
+        while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode!, cancellationToken))
         {
             // Generate a new entry code until we find a unique code
             var result = game.RegenerateEntryCode();

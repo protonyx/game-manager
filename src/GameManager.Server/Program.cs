@@ -32,7 +32,7 @@ try
     var versionInfo = FileVersionInfo.GetVersionInfo(assm.Location);
     version = versionInfo.ProductVersion;
 }
-catch (Exception e)
+catch (Exception)
 {
     version = assm.GetName().Version.ToString();
 }
@@ -127,7 +127,7 @@ else
     builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
     builder.Services.AddStackExchangeRedisCache(opt =>
     {
-        opt.ConnectionMultiplexerFactory = async () => redisConnectionMultiplexer;
+        opt.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnectionMultiplexer);
     });
     signalr.AddStackExchangeRedis(redisConnectionString);
 }
