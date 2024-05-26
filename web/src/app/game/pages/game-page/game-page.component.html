@@ -8,7 +8,7 @@
       [game]="game$ | async"
       [isHost]="isHost$ | async"
       (startGame)="onStartGame()"
-      (advanceTurn)="onEndTurn()"
+      (advanceTurn)="onEndTurn(game)"
       (endGame)="onEndGame()">
     </app-game-control>
   </mat-expansion-panel>
@@ -42,7 +42,7 @@
       [players]="players$ | async"
       [currentPlayer]="currentPlayer$ | async"
       [isHost]="isHost$ | async"
-      (endTurn)="onEndTurn()">
+      (endTurn)="onEndTurn(game)">
     </app-current-turn>
   </mat-expansion-panel>
 

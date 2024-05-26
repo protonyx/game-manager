@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -8,11 +8,6 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Player, Tracker } from '../../models/models';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatDialogModule,
-} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -25,7 +20,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -33,27 +27,27 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatButtonModule,
   ],
 })
-export class PlayerEditComponent {
+export class PlayerEditComponent implements OnChanges {
+  @Input()
   public player: Player | null | undefined;
 
+  @Input()
   public trackers: Tracker[] | null | undefined;
-
-  public isAdmin: boolean | undefined = false;
 
   playerForm = this.fb.group({
     name: ['', Validators.required],
     trackers: this.fb.group({}),
   });
 
+  get value(): Player {
+    return <Player>this.playerForm.value;
+  }
+
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<PlayerEditComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
-    this.player = data.player;
-    this.trackers = data.trackers;
-    this.isAdmin = data.isAdmin;
+  ) {}
 
+  ngOnChanges(changes: SimpleChanges): void {
     this.updateTrackers(this.trackers);
     this.playerForm.reset({
       name: this.player!.name,
@@ -81,7 +75,5 @@ export class PlayerEditComponent {
     this.playerForm.setControl('trackers', trackerGroup);
   }
 
-  handleUpdate(): void {
-    this.dialogRef.close(this.playerForm.value);
-  }
+
 }

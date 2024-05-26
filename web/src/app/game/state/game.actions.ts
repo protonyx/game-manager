@@ -16,7 +16,7 @@ import {
 } from '../models/messages';
 
 export const GameActions = createActionGroup({
-  source: 'Games',
+  source: 'Games Page',
   events: {
     'Create Game': props<{ game: NewGame }>(),
     'Join Game': props<{ joinGame: JoinGame }>(),
@@ -25,24 +25,25 @@ export const GameActions = createActionGroup({
     'Load Game': props<{ gameId: string }>(),
     'Load Game Summary': props<{ gameId: string }>(),
     'Load Players': props<{ gameId: string }>(),
+    'Edit Player': props<{ playerId: string }>(),
     'Remove Player': props<{ playerId: string }>(),
     'Load Player': props<{ playerId: string }>(),
     'Update Tracker': props<{ playerId: string; tracker: TrackerValue }>(),
     'Update Player Order': props<{ gameId: string; players: Player[] }>(),
     'End Turn': props<{ gameId: string }>(),
     'Start Game': props<{ gameId: string }>(),
-    'Game Started': props<{ gameId: string }>(),
     'End Game': props<{ gameId: string }>(),
-    'Game Ended': props<{ gameId: string }>(),
   },
 });
 
 export const GameHubActions = createActionGroup({
   source: 'GameHub',
   events: {
+    'Hub Reconnect': emptyProps(),
     'Hub Connected': emptyProps(),
     'Hub Disconnected': emptyProps(),
     'Game Updated': props<GameStateChangedMessage>(),
+    'Game Ended': props<{ gameId: string }>(),
     'Player Joined': props<PlayerJoinedMessage>(),
     'Player Updated': props<PlayerUpdatedMessage>(),
     'Player Left': props<PlayerLeftMessage>(),
@@ -69,6 +70,9 @@ export const GamesApiActions = createActionGroup({
     'Retrieved Players Error': props<{ error: string }>(),
     'Retrieved Player': props<{ player: Player }>(),
     'Retrieved Player Error': props<{ error: string }>(),
+    'Patch Player': props<{ playerId: string, ops: any[]}>(),
+    'Patched Player': props<{ player: Player}>(),
+    'Patched Player Error': props<{ error: string }>(),
     'End Turn Succeeded': emptyProps(),
     'End Turn Error': props<{ error: string }>(),
     'Authentication Error': emptyProps(),

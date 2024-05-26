@@ -8,6 +8,7 @@ import { GameSummaryPageComponent } from './pages/game-summary-page/game-summary
 export default [
   {
     path: '',
+    title: 'GamePage',
     canActivate: [GameRouteGuard],
     component: GamePageComponent,
   },

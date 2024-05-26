@@ -113,6 +113,11 @@ export const {
   selectSummary,
 } = gameFeature;
 
+export const selectGameTrackers = createSelector(
+  selectGame,
+  (game) => game?.trackers
+);
+
 const { selectEntities, selectAll } = playerAdapter.getSelectors();
 
 export const selectPlayersEntities = createSelector(
@@ -121,6 +126,11 @@ export const selectPlayersEntities = createSelector(
 );
 
 export const selectAllPlayers = createSelector(selectPlayers, selectAll);
+
+export const selectPlayerById = (playerId: string) => createSelector(
+  selectPlayersEntities,
+  (playerEntities) => playerId && playerEntities[playerId],
+);
 
 export const selectCurrentPlayerId = createSelector(
   selectCredentials,
