@@ -1,9 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { JoinGame } from '../../models/models';
-import { GameService } from '../../services/game.service';
 import { Store } from '@ngrx/store';
 import { GameActions, GamesApiActions } from '../../state/game.actions';
-import { Router } from '@angular/router';
 import { map, Subject, takeUntil, BehaviorSubject, tap } from 'rxjs';
 import { JoinGameComponent } from '../../components/join-game/join-game.component';
 import { CommonModule } from '@angular/common';
@@ -24,9 +22,7 @@ export class JoinGamePageComponent implements OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
   constructor(
-    private gameService: GameService,
     private store: Store,
-    private router: Router,
     private actions$: Actions
   ) {
     // Handle error

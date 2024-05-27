@@ -17,7 +17,7 @@ import {
   mergeMap,
   tap,
   filter,
-  concatMap, Observable
+  concatMap
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
@@ -492,7 +492,7 @@ export const clearCredentialsOnAuthenticationError = createEffect(
       tap(() => {
         router.navigate(['game', 'join']);
       }),
-      exhaustMap(() => of(GameActions.clearCredentials()))
+      map(() => GameActions.clearCredentials())
     );
   },
   { functional: true }
@@ -504,7 +504,7 @@ export const clearCredentialsWhenKicked = createEffect(
       ofType(GameHubActions.playerLeft),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
       filter(([action, player]) => !!player && player.id === action.playerId),
-      mergeMap(() => of(GameActions.clearCredentials()))
+      map(() => GameActions.clearCredentials())
     );
   },
   { functional: true }
@@ -514,10 +514,7 @@ export const resetLayoutAfterClearCredentials = createEffect(
   (actions$ = inject(Actions), router = inject(Router)) => {
     return actions$.pipe(
       ofType(GameActions.clearCredentials),
-      tap(() => {
-        router.navigate(['game', 'join']);
-      }),
-      exhaustMap(() => of(LayoutActions.resetLayout()))
+      map(() => LayoutActions.resetLayout())
     );
   },
   { functional: true }
@@ -526,10 +523,20 @@ export const resetLayoutAfterClearCredentials = createEffect(
 export const gameEnded = createEffect(
   (actions$ = inject(Actions)) => {
     return actions$.pipe(
-      ofType(GameHubActions.gameUpdated),
+      ofType(GameHubActions.gameUpdated, GamesApiActions.retrievedGame),
       filter((action) => action.game.state === 'Complete'),
       map((action) => GameHubActions.gameEnded({ gameId: action.game.id }))
     );
+  },
+  { functional: true }
+);
+
+export const clearCredentialsOnGameEnded = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
+      ofType(GameHubActions.gameEnded),
+      map((action) => GameActions.clearCredentials())
+    )
   },
   { functional: true }
 );

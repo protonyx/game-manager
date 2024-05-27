@@ -22,9 +22,34 @@ export const layoutFeature = createFeature({
         ...state,
         title: initialState.title,
         entryCode: initialState.entryCode,
+        sidenavOpen: initialState.sidenavOpen
       };
     }),
+    on(LayoutActions.openSidenav, (state): LayoutState => {
+      return {
+        ...state,
+        sidenavOpen: true
+      }
+    }),
+    on(LayoutActions.closeSidenav, (state): LayoutState => {
+      return {
+        ...state,
+        sidenavOpen: false
+      }
+    }),
+    on(LayoutActions.toggleSidenav, (state): LayoutState => {
+      return {
+        ...state,
+        sidenavOpen: !state.sidenavOpen
+      }
+    })
   ),
 });
 
-export const { name, reducer, selectTitle, selectEntryCode } = layoutFeature;
+export const {
+  name,
+  reducer,
+  selectTitle,
+  selectEntryCode,
+  selectSidenavOpen,
+} = layoutFeature;

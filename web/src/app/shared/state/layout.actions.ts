@@ -7,5 +7,8 @@ export const LayoutActions = createActionGroup({
     'Set Entry Code': props<{ entryCode: string }>(),
     'Set Header': props<{ title: string; entryCode: string }>(),
     'Reset Layout': emptyProps(),
+    'Open Sidenav': emptyProps(),
+    'Close Sidenav': emptyProps(),
+    'Toggle Sidenav': emptyProps(),
   },
 });

@@ -32,8 +32,17 @@ export class LayoutComponent {
   @Input()
   public entryCode: string | null | undefined;
 
+  @Input()
+  public sidenavOpen: boolean | null | undefined;
+
   @Output()
   public leaveGame: EventEmitter<unknown> = new EventEmitter<unknown>();
+
+  @Output()
+  public closeSidenav: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output()
+  public toggleSidenav: EventEmitter<void> = new EventEmitter<void>();
 
   mobileQuery: MediaQueryList;
 
@@ -43,5 +52,6 @@ export class LayoutComponent {
 
   onLeaveGame(): void {
     this.leaveGame.emit();
+    this.closeSidenav.emit();
   }
 }

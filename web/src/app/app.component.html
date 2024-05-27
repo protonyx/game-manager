@@ -1,5 +1,8 @@
 <app-layout
   [title]="title$ | async"
   [entryCode]="entryCode$ | async"
-  (leaveGame)="onLeaveGame()">
+  [sidenavOpen]="sidenavOpen$ | async"
+  (leaveGame)="onLeaveGame()"
+  (toggleSidenav)="toggleSidenav()"
+  (closeSidenav)="closeSidenav()">
 </app-layout>
