@@ -143,22 +143,34 @@ builder.Services.AddHostedService<GamePruningService>();
 // TODO: Switch to using OTEL_EXPORTER_OTLP_ENDPOINT
 var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
 
+var resources = ResourceBuilder.CreateDefault()
+    .AddService("game-manager",
+        serviceInstanceId: Environment.MachineName,
+        serviceVersion: version);
+
+var otelBuilder = builder.Services.AddOpenTelemetry()
+    .WithMetrics(mb =>
+    {
+        mb.SetResourceBuilder(resources);
+        mb.AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+        mb.AddPrometheusExporter(prom =>
+        {
+            prom.ScrapeEndpointPath = "/metrics";
+        });
+    });
+
 if (!string.IsNullOrWhiteSpace(otlpEndpoint))
 {
-    var resources = ResourceBuilder.CreateDefault()
-        .AddService("game-manager",
-            serviceInstanceId: Environment.MachineName,
-            serviceVersion: version);
-
-    builder.Services.AddOpenTelemetry()
+    otelBuilder
         .WithTracing(tb =>
         {
             tb.SetResourceBuilder(resources);
             tb.AddAspNetCoreInstrumentation(opt =>
                 {
                     opt.Filter = hc => !hc.Request.Method.Equals("OPTIONS")
-                        && !hc.Request.Path.StartsWithSegments("/health")
-                        && !hc.Request.Path.StartsWithSegments("/metrics");
+                                       && !hc.Request.Path.StartsWithSegments("/health")
+                                       && !hc.Request.Path.StartsWithSegments("/metrics");
                 })
                 .AddHttpClientInstrumentation()
                 .AddEntityFrameworkCoreInstrumentation();
@@ -172,16 +184,6 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
             {
                 otlp.Endpoint = new Uri(otlpEndpoint);
                 otlp.Protocol = OtlpExportProtocol.Grpc;
-            });
-        })
-        .WithMetrics(mb =>
-        {
-            mb.SetResourceBuilder(resources);
-            mb.AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation();
-            mb.AddPrometheusExporter(prom =>
-            {
-                prom.ScrapeEndpointPath = "/metrics";
             });
         });
 
@@ -239,8 +241,7 @@ app.UseFastEndpoints(c =>
 });
 app.UseSwaggerGen();
 
-if (!string.IsNullOrWhiteSpace(otlpEndpoint))
-    app.UseOpenTelemetryPrometheusScrapingEndpoint();
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapHub<GameHub>("/hubs/game");
 app.MapFallbackToFile("index.html");

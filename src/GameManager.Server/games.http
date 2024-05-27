@@ -54,6 +54,12 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/api/{{version}}/Games/{{gameId}}/Summary
 Authorization: Bearer {{token}}
 
+### Metrics
+GET {{baseUrl}}/metrics
+
+### Version
+GET {{baseUrl}}/version
+
 ### SignalR Negotiate
 POST {{baseUrl}}/hubs/game/negotiate?negotiateVersion=1
 Authorization: Bearer {{token}}

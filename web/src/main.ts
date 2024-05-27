@@ -26,7 +26,9 @@ export function localStorageSyncReducer(
   reducer: ActionReducer<any>,
 ): ActionReducer<any> {
   return localStorageSync({
-    keys: [gameFeatureKey],
+    keys: [
+      {[gameFeatureKey]: ['credentials']}
+    ],
     rehydrate: true,
   })(reducer);
 }
