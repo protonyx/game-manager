@@ -5,7 +5,7 @@ import { GameService } from '../services/game.service';
 import {
   GameActions,
   GameHubActions,
-  GamesApiActions,
+  GamesApiActions, PlayerReorderDialogActions,
   PlayersApiActions
 } from './game.actions';
 import {
@@ -17,7 +17,7 @@ import {
   mergeMap,
   tap,
   filter,
-  concatMap
+  concatMap, Observable
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.reducer';
@@ -31,6 +31,7 @@ import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-edit-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -210,6 +211,7 @@ export const editPlayerDialog = createEffect(
         });
 
         return dialogRef.afterClosed().pipe(
+          filter((result: any) => result !== undefined),
           map((result: any) => {
             if (result === 'kick') {
               return GameActions.removePlayer({ playerId: action.playerId });
@@ -218,6 +220,31 @@ export const editPlayerDialog = createEffect(
             return GamesApiActions.patchPlayer({ playerId: action.playerId, ops: result });
           })
         );
+      })
+    );
+  },
+  { functional: true }
+);
+
+export const reorderPlayerDialog = createEffect(
+  (actions$ = inject(Actions),
+   dialog = inject(MatDialog)) => {
+    return actions$.pipe(
+      ofType(GameActions.reorderPlayers),
+      exhaustMap(() => {
+        const dialogRef = dialog.open(PlayerReorderDialogComponent, {
+          width: '400px'
+        });
+
+        return dialogRef.afterClosed();
+      }),
+      map((result: any) => {
+        console.log(result);
+        if (result === undefined) {
+          return PlayerReorderDialogActions.closed();
+        }
+
+        return PlayerReorderDialogActions.updatePlayerOrder({ players: result });
       })
     );
   },
@@ -395,11 +422,14 @@ export const updateTracker = createEffect(
 );
 
 export const updatePlayerOrder = createEffect(
-  (actions$ = inject(Actions), gameService = inject(GameService)) => {
+  (actions$ = inject(Actions),
+   store = inject(Store),
+   gameService = inject(GameService)) => {
     return actions$.pipe(
-      ofType(GameActions.updatePlayerOrder),
-      exhaustMap((action) =>
-        gameService.reorderPlayers(action.gameId, action.players)
+      ofType(PlayerReorderDialogActions.updatePlayerOrder),
+      concatLatestFrom(() => store.select(selectCredentials)),
+      exhaustMap(([action, credentials]) =>
+        gameService.reorderPlayers(credentials!.gameId, action.players)
       )
     );
   },

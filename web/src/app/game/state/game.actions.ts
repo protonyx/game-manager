@@ -29,7 +29,7 @@ export const GameActions = createActionGroup({
     'Remove Player': props<{ playerId: string }>(),
     'Load Player': props<{ playerId: string }>(),
     'Update Tracker': props<{ playerId: string; tracker: TrackerValue }>(),
-    'Update Player Order': props<{ gameId: string; players: Player[] }>(),
+    'Reorder Players': emptyProps(),
     'End Turn': props<{ gameId: string }>(),
     'Start Game': props<{ gameId: string }>(),
     'End Game': props<{ gameId: string }>(),
@@ -78,6 +78,14 @@ export const GamesApiActions = createActionGroup({
     'Authentication Error': emptyProps(),
   },
 });
+
+export const PlayerReorderDialogActions = createActionGroup({
+  source: 'Player Reorder Dialog',
+  events: {
+    'Closed': emptyProps(),
+    'Update Player Order': props<{ players: Player[] }>(),
+  }
+})
 
 export const PlayersApiActions = createActionGroup({
   source: 'Players API',

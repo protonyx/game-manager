@@ -8,7 +8,7 @@ import {
   name as layoutFeatureKey,
   reducer as layoutReducer,
 } from './app/shared/state/layout.reducer';
-import { name as gameFeatureKey } from './app/game/state/game.reducer';
+import { name as gameFeatureKey, reducer as gameReducer } from './app/game/state/game.reducer';
 import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { MetaReducer, ActionReducer, provideStore } from '@ngrx/store';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -42,6 +42,7 @@ bootstrapApplication(AppComponent, {
       {
         router: routerReducer,
         [layoutFeatureKey]: layoutReducer,
+        [gameFeatureKey]: gameReducer
       },
       { metaReducers },
     ),

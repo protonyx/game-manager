@@ -3,10 +3,10 @@
   <table
     mat-table
     #table
-    [dataSource]="players"
+    [dataSource]="newPlayers"
     cdkDropList
-    [cdkDropListData]="players"
-    (cdkDropListDropped)="dropTable($event)"
+    [cdkDropListData]="newPlayers"
+    (cdkDropListDropped)="dropTable($event, table)"
     [cdkDropListDisabled]="dragDisabled">
     <ng-container matColumnDef="position">
       <th mat-header-cell *matHeaderCellDef></th>
@@ -45,6 +45,6 @@
   </table>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close="">Cancel</button>
-  <button mat-stroked-button color="primary" [mat-dialog-close]="players">Save</button>
+  <button mat-button [mat-dialog-close]="undefined">Cancel</button>
+  <button mat-stroked-button color="primary" [mat-dialog-close]="newPlayers">Save</button>
 </mat-dialog-actions>

@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { combineLatest, map, Subject, takeUntil, tap } from 'rxjs';
 import {
   selectCurrentPlayer,
   selectCurrentPlayerIsHost,
@@ -12,8 +10,6 @@ import { GameActions } from '../../state/game.actions';
 import {
   Game,
   Player,
-  PlayerCredentials,
-  Tracker,
   TrackerValue,
 } from '../../models/models';
 import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
@@ -23,7 +19,7 @@ import { PlayerListComponent } from '../../components/player-list/player-list.co
 import { MatExpansionModule } from '@angular/material/expansion';
 import { GameControlComponent } from '../../components/game-control/game-control.component';
 import { MatButtonModule } from '@angular/material/button';
-import { PlayerReorderModalComponent } from '../../components/player-reorder-modal/player-reorder-modal.component';
+import { LetDirective } from '@ngrx/component';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -39,52 +35,32 @@ const selectIsCurrentPlayerTurn = createSelector(
   imports: [
     CommonModule,
     MatButtonModule,
-    MatDialogModule,
     MatExpansionModule,
     GameControlComponent,
     PlayerListComponent,
     CurrentTurnComponent,
     TrackerEditorComponent,
-  ],
+    LetDirective
+  ]
 })
 export class GamePageComponent implements OnInit, OnDestroy {
   currentPlayer$ = this.store.select(selectCurrentPlayer);
 
-  game$ = this.store.select(selectGame).pipe(tap((g) => (this.game = g)));
+  game$ = this.store.select(selectGame);
 
   trackers$ = this.store.select(selectGameTrackers);
 
   players$ = this.store.select(selectAllPlayers);
 
-  unsubscribe$: Subject<boolean> = new Subject<boolean>();
-
   isHost$ = this.store.select(selectCurrentPlayerIsHost);
 
   isMyTurn$ = this.store.select(selectIsCurrentPlayerTurn);
-
-  game: Game | null | undefined;
-
-  players: Player[] | null | undefined;
-
-  currentPlayer: Player | null | undefined;
-
-  trackers: Tracker[] | null | undefined;
 
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
   constructor(
     private store: Store,
-    private dialog: MatDialog,
   ) {
-    this.trackers$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.trackers = data;
-    });
-    this.players$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.players = data;
-    });
-    this.currentPlayer$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.currentPlayer = data;
-    });
   }
 
   ngOnInit(): void {
@@ -101,9 +77,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.unsubscribe$.next(true);
-    this.unsubscribe$.unsubscribe();
-
     // Release web lock
     if (this.lockResolver) {
       this.lockResolver(null);
@@ -114,32 +87,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.store.dispatch(GameActions.endTurn({ gameId: game!.id }));
   }
 
-  onStartGame(): void {
-    this.store.dispatch(GameActions.startGame({ gameId: this.game!.id }));
+  onStartGame(game: Game | null | undefined): void {
+    this.store.dispatch(GameActions.startGame({ gameId: game!.id }));
   }
 
-  onEndGame() {
-    this.store.dispatch(GameActions.endGame({ gameId: this.game!.id }));
+  onEndGame(game: Game | null | undefined) {
+    this.store.dispatch(GameActions.endGame({ gameId: game!.id }));
   }
 
   onReorder(): void {
-    const dialogRef = this.dialog.open(PlayerReorderModalComponent, {
-      data: {
-        players: this.players,
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((data: Player[]) => {
-      if (data) {
-        this.store.dispatch(
-          GameActions.updatePlayerOrder({
-            gameId: this.game!.id,
-            players: data,
-          }),
-        );
-      }
-    });
+    this.store.dispatch(GameActions.reorderPlayers());
   }
 
   async onLeave(): Promise<void> {
@@ -150,14 +107,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.store.dispatch(GameActions.editPlayer({playerId: player.id }));
   }
 
-  onTrackerUpdate(trackerValue: TrackerValue): void {
-    if (this.currentPlayer) {
-      this.store.dispatch(
+  onTrackerUpdate(player: Player, trackerValue: TrackerValue): void {
+    this.store.dispatch(
         GameActions.updateTracker({
-          playerId: this.currentPlayer.id,
+          playerId: player.id,
           tracker: trackerValue,
         }),
       );
-    }
   }
 }

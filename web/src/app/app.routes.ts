@@ -14,6 +14,5 @@ export const routes: Routes = [
   {
     path: 'game',
     loadChildren: () => import('./game/routes'),
-    providers: [provideState(gameFeatureKey, gameReducer)],
   },
 ];

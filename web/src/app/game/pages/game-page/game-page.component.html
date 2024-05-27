@@ -1,61 +1,63 @@
-<mat-accordion multi="true">
-  <mat-expansion-panel *ngIf="isHost$ | async" [expanded]="false">
-    <mat-expansion-panel-header>
-      <mat-panel-title> Game Control</mat-panel-title>
-    </mat-expansion-panel-header>
+<ng-container *ngrxLet="{ game: game$, currentPlayer: currentPlayer$, trackers: trackers$ } as vm">
+  <mat-accordion multi="true">
+    <mat-expansion-panel *ngIf="isHost$ | async" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Game Control</mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <app-game-control
-      [game]="game$ | async"
-      [isHost]="isHost$ | async"
-      (startGame)="onStartGame()"
-      (advanceTurn)="onEndTurn(game)"
-      (endGame)="onEndGame()">
-    </app-game-control>
-  </mat-expansion-panel>
+      <app-game-control
+        [game]="vm.game"
+        [isHost]="isHost$ | async"
+        (startGame)="onStartGame(vm.game)"
+        (advanceTurn)="onEndTurn(vm.game)"
+        (endGame)="onEndGame(vm.game)">
+      </app-game-control>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel [expanded]="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title> Player List</mat-panel-title>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Player List</mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <app-player-list
-      [game]="game$ | async"
-      [players]="players$ | async"
-      [currentPlayer]="currentPlayer$ | async"
-      [isHost]="isHost$ | async"
-      (editPlayer)="onPlayerEdit($event)"></app-player-list>
+      <app-player-list
+        [game]="vm.game"
+        [players]="players$ | async"
+        [currentPlayer]="vm.currentPlayer"
+        [isHost]="isHost$ | async"
+        (editPlayer)="onPlayerEdit($event)"></app-player-list>
 
-    <mat-action-row *ngIf="isHost$ | async">
-      <button mat-button color="primary" (click)="onReorder()">Reorder</button>
-    </mat-action-row>
-  </mat-expansion-panel>
+      <mat-action-row *ngIf="isHost$ | async">
+        <button mat-button color="primary" (click)="onReorder()">Reorder</button>
+      </mat-action-row>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel
-    *ngIf="game && game.state === 'InProgress' && currentPlayer"
-    [expanded]="true"
-    [class.is-active]="isMyTurn$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title> Current Turn</mat-panel-title>
-    </mat-expansion-panel-header>
-    <app-current-turn
-      [game]="game$ | async"
-      [players]="players$ | async"
-      [currentPlayer]="currentPlayer$ | async"
-      [isHost]="isHost$ | async"
-      (endTurn)="onEndTurn(game)">
-    </app-current-turn>
-  </mat-expansion-panel>
+    <mat-expansion-panel
+      *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+      [expanded]="true"
+      [class.is-active]="isMyTurn$ | async">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Current Turn</mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-current-turn
+        [game]="vm.game"
+        [players]="players$ | async"
+        [currentPlayer]="vm.currentPlayer"
+        [isHost]="isHost$ | async"
+        (endTurn)="onEndTurn(vm.game)">
+      </app-current-turn>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel
-    [expanded]="true"
-    *ngIf="game?.state === 'InProgress' && trackers && trackers.length > 0 && currentPlayer">
-    <mat-expansion-panel-header>
-      <mat-panel-title> Trackers</mat-panel-title>
-    </mat-expansion-panel-header>
-    <app-tracker-editor
-      [trackers]="trackers$ | async"
-      [player]="currentPlayer$ | async"
-      (updateTrackers)="onTrackerUpdate($event)">
-    </app-tracker-editor>
-  </mat-expansion-panel>
-</mat-accordion>
+    <mat-expansion-panel
+      [expanded]="true"
+      *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Trackers</mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-tracker-editor
+        [trackers]="vm.trackers"
+        [player]="vm.currentPlayer"
+        (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+      </app-tracker-editor>
+    </mat-expansion-panel>
+  </mat-accordion>
+</ng-container>
