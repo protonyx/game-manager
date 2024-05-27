@@ -1,5 +1,6 @@
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Persistence.Sqlite.Repositories;
@@ -36,11 +37,12 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return players;
     }
 
-    public async Task<bool> NameIsUniqueAsync(Guid gameId, string name, Guid? playerId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> NameIsUniqueAsync(Guid gameId, PlayerName name, Guid? playerId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Set<Player>()
             .AsQueryable()
-            .Where(p => p.GameId == gameId && p.Active && p.Name.Equals(name));
+            .Where(p => p.GameId == gameId && p.Active)
+            .Where(p => ((string)(object)p.Name).ToLower() == name.Value.ToLower());
 
         if (playerId.HasValue)
         {

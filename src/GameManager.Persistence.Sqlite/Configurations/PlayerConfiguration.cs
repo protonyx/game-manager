@@ -20,7 +20,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
                 v => v.Value,
                 v => PlayerName.From(v).Value)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasMaxLength(PlayerName.MaximumLength);
         builder.Property(t => t.Active)
             .IsRequired();
         builder.Property(t => t.Order);

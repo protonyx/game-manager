@@ -8,10 +8,17 @@ public class EntryCode
 
     private const int DefaultEntryCodeLength = 4;
 
+    public const int MaximumLength = 10;
+
     public string Value { get; }
 
     public static EntryCode New(int length = DefaultEntryCodeLength)
     {
+        if (length > MaximumLength)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), length, "Requested entry code length is too large");
+        }
+        
         var charSet = new HashSet<char>(ValidEntryCodeCharacters);
 
         var sb = new StringBuilder(length);
@@ -31,9 +38,11 @@ public class EntryCode
 
     public static Result<EntryCode> From(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        string trimmedValue = value.Trim();
+        
+        if (string.IsNullOrWhiteSpace(trimmedValue))
             return Result.Failure<EntryCode>("Entry code is empty");
-        if (value.Length > 10)
+        if (trimmedValue.Length > MaximumLength)
             return Result.Failure<EntryCode>("Entry code is too long");
 
         return new EntryCode(value);
@@ -55,7 +64,7 @@ public class EntryCode
     }
 
     private bool Equals(EntryCode other)
-        => string.Equals(other.Value, Value, StringComparison.CurrentCultureIgnoreCase);
+        => string.Equals(other.Value, Value, StringComparison.OrdinalIgnoreCase);
 
     public override bool Equals(object? obj)
         => ReferenceEquals(this, obj) || obj is EntryCode other && Equals(other);
