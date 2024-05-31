@@ -14,6 +14,7 @@ import {
   PlayerLeftMessage,
   PlayerUpdatedMessage,
 } from '../models/messages';
+import { PatchOperation } from '../models/patch';
 
 export const GameActions = createActionGroup({
   source: 'Games Page',
@@ -70,8 +71,8 @@ export const GamesApiActions = createActionGroup({
     'Retrieved Players Error': props<{ error: string }>(),
     'Retrieved Player': props<{ player: Player }>(),
     'Retrieved Player Error': props<{ error: string }>(),
-    'Patch Player': props<{ playerId: string, ops: any[]}>(),
-    'Patched Player': props<{ player: Player}>(),
+    'Patch Player': props<{ playerId: string; ops: PatchOperation[] }>(),
+    'Patched Player': props<{ player: Player }>(),
     'Patched Player Error': props<{ error: string }>(),
     'End Turn Succeeded': emptyProps(),
     'End Turn Error': props<{ error: string }>(),
@@ -82,10 +83,10 @@ export const GamesApiActions = createActionGroup({
 export const PlayerReorderDialogActions = createActionGroup({
   source: 'Player Reorder Dialog',
   events: {
-    'Closed': emptyProps(),
+    Closed: emptyProps(),
     'Update Player Order': props<{ players: Player[] }>(),
-  }
-})
+  },
+});
 
 export const PlayersApiActions = createActionGroup({
   source: 'Players API',

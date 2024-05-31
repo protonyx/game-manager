@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
@@ -18,12 +18,11 @@ export class SummaryTrackerChartComponent implements OnChanges {
   public tracker: TrackerSummary | undefined;
 
   @Input()
-  public players: PlayerSummary[] | any[] | undefined | null;
+  public players: PlayerSummary[] | undefined | null;
 
-  // @ts-ignore
-  chartOptions: Highcharts.Options;
+  chartOptions: Highcharts.Options | undefined;
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     if (!!this.tracker && !!this.players) {
       this.chartOptions = {
         chart: {
@@ -36,7 +35,7 @@ export class SummaryTrackerChartComponent implements OnChanges {
             step: 'left',
             name: p.name,
             data: this.tracker!.trackerHistory!.filter(
-              (th) => th.playerId === p.id
+              (th) => th.playerId === p.id,
             ).map((th) => [th.secondsSinceGameStart, th.newValue]),
           };
         }),

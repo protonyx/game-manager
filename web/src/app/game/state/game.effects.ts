@@ -5,8 +5,9 @@ import { GameService } from '../services/game.service';
 import {
   GameActions,
   GameHubActions,
-  GamesApiActions, PlayerReorderDialogActions,
-  PlayersApiActions
+  GamesApiActions,
+  PlayerReorderDialogActions,
+  PlayersApiActions,
 } from './game.actions';
 import {
   catchError,
@@ -17,21 +18,21 @@ import {
   mergeMap,
   tap,
   filter,
-  concatMap
+  concatMap,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
-import * as fromGames from './game.reducer';
+import * as fromGames from './game.selectors';
 import { Router } from '@angular/router';
 import { LayoutActions } from '../../shared/state/layout.actions';
-import { JoinGame } from '../models/models';
+import { JoinGame, Player } from '../models/models';
 import { routerNavigatedAction, getRouterSelectors } from '@ngrx/router-store';
 import { GameHubService } from '../services/game-hub.service';
-import { selectCredentials } from './game.reducer';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-edit-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
+import { PatchOperation } from '../models/patch';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -47,17 +48,17 @@ export const createGame = createEffect(
           catchError((error) => {
             if (error.status === 400) {
               return of(
-                GamesApiActions.createdGameError({ error: error.error.title })
+                GamesApiActions.createdGameError({ error: error.error.title }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const joinGameOnCreate = createEffect(
@@ -68,14 +69,14 @@ export const joinGameOnCreate = createEffect(
         const joinGame: JoinGame = {
           entryCode: action.game.entryCode,
           name: 'Player 1',
-          observer: false
+          observer: false,
         };
 
         return of(GameActions.joinGame({ joinGame }));
-      })
+      }),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const joinGame = createEffect(
@@ -87,22 +88,22 @@ export const joinGame = createEffect(
           map((data) =>
             GamesApiActions.joinedGame({
               credentials: data,
-              entryCode: action.joinGame.entryCode
-            })
+              entryCode: action.joinGame.entryCode,
+            }),
           ),
           catchError((error) => {
             if (error.status == 400) {
               return of(
-                GamesApiActions.joinedGameError({ error: error.error.detail })
+                GamesApiActions.joinedGameError({ error: error.error.detail }),
               );
             }
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const redirectAfterJoinedGame = createEffect(
@@ -111,17 +112,17 @@ export const redirectAfterJoinedGame = createEffect(
       ofType(GamesApiActions.joinedGame),
       tap(() => {
         router.navigate(['game']);
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const leaveGame = createEffect(
   (
     actions$ = inject(Actions),
     store = inject(Store),
-    gameService = inject(GameService)
+    gameService = inject(GameService),
   ) => {
     return actions$.pipe(
       ofType(GameActions.leaveGame),
@@ -129,25 +130,24 @@ export const leaveGame = createEffect(
       exhaustMap(([, player]) =>
         gameService
           .removePlayer(player!.id)
-          .pipe(map(() => GamesApiActions.leftGame()))
-      )
+          .pipe(map(() => GamesApiActions.leftGame())),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const clearCredentialsOnLeave = createEffect(
-  (actions$ = inject(Actions),
-   router = inject(Router)) => {
+  (actions$ = inject(Actions), router = inject(Router)) => {
     return actions$.pipe(
       ofType(GamesApiActions.leftGame),
       tap(() => {
         router.navigate(['./join']);
       }),
-      map(() => GameActions.clearCredentials())
+      map(() => GameActions.clearCredentials()),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadGameOnJoin = createEffect(
@@ -155,21 +155,21 @@ export const loadGameOnJoin = createEffect(
     return actions$.pipe(
       ofType(GamesApiActions.joinedGame),
       map(({ credentials }) =>
-        GameActions.loadGame({ gameId: credentials.gameId })
-      )
+        GameActions.loadGame({ gameId: credentials.gameId }),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadPlayersOnLoadGame = createEffect(
   (actions$ = inject(Actions)) => {
     return actions$.pipe(
       ofType(GameActions.loadGame),
-      map((action) => GameActions.loadPlayers({ gameId: action.gameId }))
+      map((action) => GameActions.loadPlayers({ gameId: action.gameId })),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadGame = createEffect(
@@ -183,77 +183,81 @@ export const loadGame = createEffect(
             if (error.status === 400) {
               return of(
                 GamesApiActions.retrievedGameError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const editPlayerDialog = createEffect(
-  (actions$ = inject(Actions),
-   dialog = inject(MatDialog)) => {
+  (actions$ = inject(Actions), dialog = inject(MatDialog)) => {
     return actions$.pipe(
       ofType(GameActions.editPlayer),
       exhaustMap((action) => {
-        let dialogRef = dialog.open(PlayerEditDialogComponent, {
+        const dialogRef = dialog.open(PlayerEditDialogComponent, {
           data: {
-            playerId: action.playerId
+            playerId: action.playerId,
           },
-          width: '400px'
+          width: '400px',
         });
 
         return dialogRef.afterClosed().pipe(
-          filter((result: any) => result !== undefined),
-          map((result: any) => {
+          filter(
+            (result: string | PatchOperation[] | undefined) =>
+              result !== undefined,
+          ),
+          map((result: string | PatchOperation[] | undefined) => {
             if (result === 'kick') {
               return GameActions.removePlayer({ playerId: action.playerId });
             }
 
-            return GamesApiActions.patchPlayer({ playerId: action.playerId, ops: result });
-          })
+            return GamesApiActions.patchPlayer({
+              playerId: action.playerId,
+              ops: <PatchOperation[]>result,
+            });
+          }),
         );
-      })
+      }),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const reorderPlayerDialog = createEffect(
-  (actions$ = inject(Actions),
-   dialog = inject(MatDialog)) => {
+  (actions$ = inject(Actions), dialog = inject(MatDialog)) => {
     return actions$.pipe(
       ofType(GameActions.reorderPlayers),
       exhaustMap(() => {
         const dialogRef = dialog.open(PlayerReorderDialogComponent, {
-          width: '400px'
+          width: '400px',
         });
 
         return dialogRef.afterClosed();
       }),
-      map((result: any) => {
-        console.log(result);
+      map((result: undefined | Player[]) => {
         if (result === undefined) {
           return PlayerReorderDialogActions.closed();
         }
 
-        return PlayerReorderDialogActions.updatePlayerOrder({ players: result });
-      })
+        return PlayerReorderDialogActions.updatePlayerOrder({
+          players: result,
+        });
+      }),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const patchPlayer = createEffect(
-  (actions$ = inject(Actions),
-   gameService = inject(GameService)) => {
+  (actions$ = inject(Actions), gameService = inject(GameService)) => {
     return actions$.pipe(
       ofType(GamesApiActions.patchPlayer),
       exhaustMap((action) => {
@@ -263,18 +267,18 @@ export const patchPlayer = createEffect(
             if (error.status === 400) {
               return of(
                 GamesApiActions.patchedPlayerError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
+          }),
         );
-      })
+      }),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const updateLayoutOnGameLoaded = createEffect(
@@ -284,12 +288,12 @@ export const updateLayoutOnGameLoaded = createEffect(
       map(({ game }) =>
         LayoutActions.setHeader({
           title: game.name,
-          entryCode: game.entryCode
-        })
-      )
+          entryCode: game.entryCode,
+        }),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadGameSummary = createEffect(
@@ -303,18 +307,18 @@ export const loadGameSummary = createEffect(
             if (error.status === 400) {
               return of(
                 GamesApiActions.retrievedGameSummaryError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadPlayers = createEffect(
@@ -328,18 +332,18 @@ export const loadPlayers = createEffect(
             if (error.status == 400) {
               return of(
                 GamesApiActions.retrievedPlayersError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadPlayer = createEffect(
@@ -353,18 +357,18 @@ export const loadPlayer = createEffect(
             if (error.status == 400) {
               return of(
                 GamesApiActions.retrievedPlayerError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const removePlayer = createEffect(
@@ -374,31 +378,31 @@ export const removePlayer = createEffect(
       mergeMap((action) =>
         gameService.removePlayer(action.playerId).pipe(
           map(() =>
-            PlayersApiActions.playerRemoved({ playerId: action.playerId })
+            PlayersApiActions.playerRemoved({ playerId: action.playerId }),
           ),
           catchError((error) => {
             if (error.status == 400) {
               return of(
                 PlayersApiActions.playerRemovedError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const updateTracker = createEffect(
   (
     actions$ = inject(Actions),
     store = inject(Store),
-    gameService = inject(GameService)
+    gameService = inject(GameService),
   ) => {
     return actions$.pipe(
       ofType(GameActions.updateTracker),
@@ -408,32 +412,34 @@ export const updateTracker = createEffect(
           .setPlayerTracker(
             player!.id,
             action.tracker.trackerId,
-            action.tracker.value
+            action.tracker.value,
           )
           .pipe(
             map((player) =>
-              PlayersApiActions.playerUpdated({ player: player })
-            )
-          )
-      )
+              PlayersApiActions.playerUpdated({ player: player }),
+            ),
+          ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const updatePlayerOrder = createEffect(
-  (actions$ = inject(Actions),
-   store = inject(Store),
-   gameService = inject(GameService)) => {
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    gameService = inject(GameService),
+  ) => {
     return actions$.pipe(
       ofType(PlayerReorderDialogActions.updatePlayerOrder),
-      concatLatestFrom(() => store.select(selectCredentials)),
+      concatLatestFrom(() => store.select(fromGames.selectCredentials)),
       exhaustMap(([action, credentials]) =>
-        gameService.reorderPlayers(credentials!.gameId, action.players)
-      )
+        gameService.reorderPlayers(credentials!.gameId, action.players),
+      ),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const endTurn = createEffect(
@@ -447,18 +453,18 @@ export const endTurn = createEffect(
             if (error.status == 400) {
               return of(
                 GamesApiActions.endTurnError({
-                  error: error.error.title
-                })
+                  error: error.error.title,
+                }),
               );
             }
 
             return EMPTY;
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const startGame = createEffect(
@@ -466,11 +472,11 @@ export const startGame = createEffect(
     return actions$.pipe(
       ofType(GameActions.startGame),
       exhaustMap((action: { gameId: string }) =>
-        gameService.startGame(action.gameId)
-      )
+        gameService.startGame(action.gameId),
+      ),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const endGame = createEffect(
@@ -478,11 +484,11 @@ export const endGame = createEffect(
     return actions$.pipe(
       ofType(GameActions.endGame),
       exhaustMap((action: { gameId: string }) =>
-        gameService.endGame(action.gameId)
-      )
+        gameService.endGame(action.gameId),
+      ),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const clearCredentialsOnAuthenticationError = createEffect(
@@ -492,10 +498,10 @@ export const clearCredentialsOnAuthenticationError = createEffect(
       tap(() => {
         router.navigate(['game', 'join']);
       }),
-      map(() => GameActions.clearCredentials())
+      map(() => GameActions.clearCredentials()),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const clearCredentialsWhenKicked = createEffect(
@@ -504,20 +510,20 @@ export const clearCredentialsWhenKicked = createEffect(
       ofType(GameHubActions.playerLeft),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
       filter(([action, player]) => !!player && player.id === action.playerId),
-      map(() => GameActions.clearCredentials())
+      map(() => GameActions.clearCredentials()),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const resetLayoutAfterClearCredentials = createEffect(
-  (actions$ = inject(Actions), router = inject(Router)) => {
+  (actions$ = inject(Actions)) => {
     return actions$.pipe(
       ofType(GameActions.clearCredentials),
-      map(() => LayoutActions.resetLayout())
+      map(() => LayoutActions.resetLayout()),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const gameEnded = createEffect(
@@ -525,27 +531,27 @@ export const gameEnded = createEffect(
     return actions$.pipe(
       ofType(GameHubActions.gameUpdated, GamesApiActions.retrievedGame),
       filter((action) => action.game.state === 'Complete'),
-      map((action) => GameHubActions.gameEnded({ gameId: action.game.id }))
+      map((action) => GameHubActions.gameEnded({ gameId: action.game.id })),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const clearCredentialsOnGameEnded = createEffect(
   (actions$ = inject(Actions)) => {
     return actions$.pipe(
       ofType(GameHubActions.gameEnded),
-      map((action) => GameActions.clearCredentials())
-    )
+      map(() => GameActions.clearCredentials()),
+    );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const redirectToSummaryOnGameEnd = createEffect(
   (
     actions$ = inject(Actions),
     store = inject(Store),
-    router = inject(Router)
+    router = inject(Router),
   ) => {
     return actions$.pipe(
       ofType(GameHubActions.gameEnded),
@@ -553,10 +559,10 @@ export const redirectToSummaryOnGameEnd = createEffect(
       filter(([action, currentGame]) => action.gameId === currentGame?.id),
       tap(([action]) => {
         router.navigate(['game', 'summary', action.gameId]);
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const loadGameSummaryOnNavigate = createEffect(
@@ -565,110 +571,111 @@ export const loadGameSummaryOnNavigate = createEffect(
       ofType(routerNavigatedAction),
       concatLatestFrom(() => [
         store.select(selectCurrentRoute),
-        store.select(selectIdRouteParam)
+        store.select(selectIdRouteParam),
       ]),
       filter(([, route]) => route.routeConfig.path === 'summary/:id'),
-      map(([, , paramId]) => GameActions.loadGameSummary({ gameId: paramId! }))
+      map(([, , paramId]) => GameActions.loadGameSummary({ gameId: paramId! })),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const loadGameOnNavigateToGamePage = createEffect(
-  (actions$ = inject(Actions),
-   store = inject(Store)) => {
+  (actions$ = inject(Actions), store = inject(Store)) => {
     return actions$.pipe(
       ofType(routerNavigatedAction),
       concatLatestFrom(() => [
         store.select(selectCurrentRoute),
-        store.select(selectCredentials)
+        store.select(fromGames.selectCredentials),
       ]),
-      filter(([, route, credentials]) => route.routeConfig.title === 'GamePage'
-        && credentials != null),
+      filter(
+        ([, route, credentials]) =>
+          route.routeConfig.title === 'GamePage' && credentials != null,
+      ),
       map(([, , credentials]) => {
         return GameActions.loadGame({ gameId: credentials!.gameId });
-      })
+      }),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const signalrConnectOnNavigateToGamePage = createEffect(
-  (actions$ = inject(Actions),
-   store = inject(Store),
-   hubService = inject(GameHubService)) => {
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    hubService = inject(GameHubService),
+  ) => {
     return actions$.pipe(
       ofType(routerNavigatedAction),
       concatLatestFrom(() => [
         store.select(selectCurrentRoute),
-        store.select(selectCredentials)
+        store.select(fromGames.selectCredentials),
       ]),
-      filter(([, route, credentials]) => route.routeConfig.title === 'GamePage'
-        && credentials != null),
+      filter(
+        ([, route, credentials]) =>
+          route.routeConfig.title === 'GamePage' && credentials != null,
+      ),
       tap(([, , credentials]) => {
         hubService.connect(credentials!.gameId, credentials!.token);
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const signalrDisconnectOnClearCredentials = createEffect(
-  (actions$ = inject(Actions),
-   hubService = inject(GameHubService)) => {
+  (actions$ = inject(Actions), hubService = inject(GameHubService)) => {
     return actions$.pipe(
       ofType(GameActions.clearCredentials),
       tap(() => {
         hubService.disconnect();
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const snackbarOnSignalrDisconnect = createEffect(
-  (actions$ = inject(Actions),
-   store = inject(Store),
-   snackbar = inject(MatSnackBar)) => {
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    snackbar = inject(MatSnackBar),
+  ) => {
     return actions$.pipe(
       ofType(GameHubActions.hubDisconnected),
-      concatLatestFrom(() => store.select(selectCredentials)),
+      concatLatestFrom(() => store.select(fromGames.selectCredentials)),
       filter(([, credentials]) => credentials != null),
       exhaustMap(() => {
-        const snackBarRef = snackbar.open(
-          'Server Disconnected',
-          'Reconnect'
-        );
+        const snackBarRef = snackbar.open('Server Disconnected', 'Reconnect');
         return snackBarRef.onAction();
       }),
-      map(() => GameHubActions.hubReconnect())
+      map(() => GameHubActions.hubReconnect()),
     );
   },
-  { functional: true }
+  { functional: true },
 );
 
 export const snackbarDismissOnSignalrConnect = createEffect(
-  (actions$ = inject(Actions),
-   snackbar = inject(MatSnackBar)) => {
+  (actions$ = inject(Actions), snackbar = inject(MatSnackBar)) => {
     return actions$.pipe(
       ofType(GameHubActions.hubConnected),
       tap(() => {
         snackbar.dismiss();
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );
 
 export const signalrReconnect = createEffect(
-  (actions$ = inject(Actions),
-   hubService = inject(GameHubService)) => {
+  (actions$ = inject(Actions), hubService = inject(GameHubService)) => {
     return actions$.pipe(
       ofType(GameHubActions.hubReconnect),
       exhaustMap(() => {
         return fromPromise(hubService.reconnect());
-      })
+      }),
     );
   },
-  { functional: true, dispatch: false }
+  { functional: true, dispatch: false },
 );

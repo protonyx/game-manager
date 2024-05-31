@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { first, mergeMap, Observable, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { selectCredentials } from '../state/game.reducer';
+import { selectCredentials } from '../state/game.selectors';
 import { GamesApiActions } from '../state/game.actions';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class AuthInterceptorService implements HttpInterceptor {
     return this.credentials$.pipe(
       first(),
       mergeMap((cred) => {
-        const authReq = !!cred
+        const authReq = cred
           ? req.clone({
               setHeaders: { Authorization: `Bearer ${cred.token}` },
             })

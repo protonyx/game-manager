@@ -1,13 +1,17 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { Player } from '../../models/models';
 import { Store } from '@ngrx/store';
-import { selectAllPlayers } from '../../state/game.reducer';
+import { selectAllPlayers } from '../../state/game.selectors';
 import { Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
@@ -22,14 +26,17 @@ import { Subject, takeUntil, tap } from 'rxjs';
     DragDropModule,
   ],
   templateUrl: './player-reorder-dialog.component.html',
-  styleUrl: './player-reorder-dialog.component.scss'
+  styleUrl: './player-reorder-dialog.component.scss',
 })
 export class PlayerReorderDialogComponent implements OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
 
-  players$ = this.store.select(selectAllPlayers)
+  players$ = this.store
+    .select(selectAllPlayers)
     .pipe(
-      tap(players => this.newPlayers = players.map(p => <Player>{...p}))
+      tap(
+        (players) => (this.newPlayers = players.map((p) => <Player>{ ...p })),
+      ),
     );
 
   newPlayers: Player[] = [];
@@ -37,9 +44,7 @@ export class PlayerReorderDialogComponent implements OnDestroy {
   columnsToDisplay = ['position', 'order', 'name'];
   dragDisabled = true;
 
-  constructor(
-    private store: Store
-  ) {
+  constructor(private store: Store) {
     this.players$.pipe(takeUntil(this.unsubscribe$)).subscribe();
   }
 

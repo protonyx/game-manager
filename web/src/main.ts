@@ -8,7 +8,11 @@ import {
   name as layoutFeatureKey,
   reducer as layoutReducer,
 } from './app/shared/state/layout.reducer';
-import { name as gameFeatureKey, reducer as gameReducer } from './app/game/state/game.reducer';
+import {} from './app/game/state/game.selectors';
+import {
+  gameFeatureKey,
+  reducer as gameReducer,
+} from './app/game/state/game.reducer';
 import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { MetaReducer, ActionReducer, provideStore } from '@ngrx/store';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -23,16 +27,15 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 
 export function localStorageSyncReducer(
-  reducer: ActionReducer<any>,
-): ActionReducer<any> {
+  reducer: ActionReducer<unknown>,
+): ActionReducer<unknown> {
   return localStorageSync({
-    keys: [
-      {[gameFeatureKey]: ['credentials']}
-    ],
+    keys: [{ [gameFeatureKey]: ['credentials'] }],
     rehydrate: true,
   })(reducer);
 }
 
+// @ts-expect-error
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 bootstrapApplication(AppComponent, {
@@ -42,7 +45,7 @@ bootstrapApplication(AppComponent, {
       {
         router: routerReducer,
         [layoutFeatureKey]: layoutReducer,
-        [gameFeatureKey]: gameReducer
+        [gameFeatureKey]: gameReducer,
       },
       { metaReducers },
     ),

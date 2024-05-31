@@ -5,7 +5,7 @@ import {
   selectSummaryName,
   selectSummaryPlayers,
   selectSummaryTrackers,
-} from '../../state/game.reducer';
+} from '../../state/game.selectors';
 import { map } from 'rxjs';
 import { PlayerSummary } from '../../models/models';
 import { MatCardModule } from '@angular/material/card';

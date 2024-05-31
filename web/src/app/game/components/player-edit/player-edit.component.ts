@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -12,6 +12,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+
+export interface PlayerEditFormValue {
+  name: string;
+  trackers: { [key: string]: number };
+}
 
 @Component({
   selector: 'app-player-edit',
@@ -39,15 +44,13 @@ export class PlayerEditComponent implements OnChanges {
     trackers: this.fb.group({}),
   });
 
-  get value(): Player {
-    return <Player>this.playerForm.value;
+  get value(): PlayerEditFormValue {
+    return <PlayerEditFormValue>this.playerForm.value;
   }
 
-  constructor(
-    private fb: FormBuilder,
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.updateTrackers(this.trackers);
     this.playerForm.reset({
       name: this.player!.name,
@@ -56,7 +59,7 @@ export class PlayerEditComponent implements OnChanges {
   }
 
   createTrackerFormGroup(trackers: Tracker[]): FormGroup {
-    const group: any = {};
+    const group: { [key: string]: FormControl } = {};
 
     trackers.forEach((t) => {
       group[t.id] = new FormControl('', Validators.pattern(/-?[0-9]*/));
@@ -74,6 +77,4 @@ export class PlayerEditComponent implements OnChanges {
 
     this.playerForm.setControl('trackers', trackerGroup);
   }
-
-
 }

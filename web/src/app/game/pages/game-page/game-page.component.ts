@@ -4,14 +4,12 @@ import {
   selectCurrentPlayer,
   selectCurrentPlayerIsHost,
   selectGame,
-  selectAllPlayers, selectGameTrackers, selectCurrentPlayerId
-} from '../../state/game.reducer';
+  selectAllPlayers,
+  selectGameTrackers,
+  selectCurrentPlayerId,
+} from '../../state/game.selectors';
 import { GameActions } from '../../state/game.actions';
-import {
-  Game,
-  Player,
-  TrackerValue,
-} from '../../models/models';
+import { Game, Player, TrackerValue } from '../../models/models';
 import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
 import { CommonModule } from '@angular/common';
 import { CurrentTurnComponent } from '../../components/current-turn/current-turn.component';
@@ -24,7 +22,7 @@ import { LetDirective } from '@ngrx/component';
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
   selectGame,
-  (currentPlayerId, game) => game?.currentTurnPlayerId === currentPlayerId
+  (currentPlayerId, game) => game?.currentTurnPlayerId === currentPlayerId,
 );
 
 @Component({
@@ -40,8 +38,8 @@ const selectIsCurrentPlayerTurn = createSelector(
     PlayerListComponent,
     CurrentTurnComponent,
     TrackerEditorComponent,
-    LetDirective
-  ]
+    LetDirective,
+  ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
   currentPlayer$ = this.store.select(selectCurrentPlayer);
@@ -58,10 +56,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
-  constructor(
-    private store: Store,
-  ) {
-  }
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
     // Request a web lock to prevent tab from sleeping
@@ -104,15 +99,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
   }
 
   onPlayerEdit(player: Player): void {
-    this.store.dispatch(GameActions.editPlayer({playerId: player.id }));
+    this.store.dispatch(GameActions.editPlayer({ playerId: player.id }));
   }
 
   onTrackerUpdate(player: Player, trackerValue: TrackerValue): void {
     this.store.dispatch(
-        GameActions.updateTracker({
-          playerId: player.id,
-          tracker: trackerValue,
-        }),
-      );
+      GameActions.updateTracker({
+        playerId: player.id,
+        tracker: trackerValue,
+      }),
+    );
   }
 }

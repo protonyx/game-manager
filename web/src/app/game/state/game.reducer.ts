@@ -1,4 +1,4 @@
-import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { createFeature, createReducer, on } from '@ngrx/store';
 
 import {
   GameActions,
@@ -7,11 +7,6 @@ import {
   PlayersApiActions,
 } from './game.actions';
 import { GameState, initialState, playerAdapter } from './game.state';
-import {
-  PlayerSummary,
-  PlayerTrackerHistory,
-  TrackerSummary,
-} from '../models/models';
 
 export const gameFeatureKey = 'game';
 
@@ -103,96 +98,4 @@ export const gameFeature = createFeature({
   ),
 });
 
-export const {
-  name, // feature name
-  reducer, // feature reducer
-  selectHubConnected,
-  selectCredentials,
-  selectGame,
-  selectPlayers,
-  selectSummary,
-} = gameFeature;
-
-export const selectGameTrackers = createSelector(
-  selectGame,
-  (game) => game?.trackers
-);
-
-const { selectEntities, selectAll } = playerAdapter.getSelectors();
-
-export const selectPlayersEntities = createSelector(
-  selectPlayers,
-  selectEntities,
-);
-
-export const selectAllPlayers = createSelector(selectPlayers, selectAll);
-
-export const selectPlayerById = (playerId: string) => createSelector(
-  selectPlayersEntities,
-  (playerEntities) => playerId && playerEntities[playerId],
-);
-
-export const selectCurrentPlayerId = createSelector(
-  selectCredentials,
-  (credentials) => credentials?.playerId,
-);
-
-export const selectCurrentPlayerIsHost = createSelector(
-  selectCredentials,
-  (credentials) => credentials?.isHost || false,
-);
-
-export const selectCurrentPlayer = createSelector(
-  selectCurrentPlayerId,
-  selectPlayersEntities,
-  (playerId, entities) => (playerId ? entities[playerId] : null)!,
-);
-
-export const selectSummaryName = createSelector(selectSummary, (summary) => {
-  return summary?.name;
-});
-
-export const selectSummaryTrackers = createSelector(
-  selectSummary,
-  (summary) => {
-    return summary?.trackers.map((tracker) => {
-      return <TrackerSummary>{
-        ...tracker,
-        trackerHistory: summary.players.reduce((acc, player) => {
-          // Starting value
-          acc.push({
-            playerId: player.id,
-            trackerId: tracker.id,
-            newValue: tracker.startingValue,
-            secondsSinceGameStart: 0,
-          } as PlayerTrackerHistory);
-
-          for (const th of player.trackerHistory.filter(
-            (th) => th.trackerId === tracker.id,
-          )) {
-            acc.push({
-              ...th,
-              playerId: player.id,
-            } as PlayerTrackerHistory);
-          }
-          return acc;
-        }, new Array<PlayerTrackerHistory>()),
-      };
-    });
-  },
-);
-
-export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
-  return (
-    summary?.players.map((player) => {
-      return <PlayerSummary>{
-        ...player,
-        turnCount: player.turns.length,
-        avgTurnDuration:
-          player.turns
-            .map((t) => t.durationSeconds)
-            .reduce((acc, d) => acc + d, 0) / player.turns.length,
-      };
-    }) || new Array<PlayerSummary>()
-  );
-});
+export const reducer = gameFeature.reducer;
