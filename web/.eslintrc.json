@@ -51,5 +51,8 @@
         "plugin:@ngrx/recommended"
       ]
     }
+  ],
+  "extends": [
+    "prettier"
   ]
 }
