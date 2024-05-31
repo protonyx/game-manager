@@ -189,7 +189,7 @@ if (!string.IsNullOrWhiteSpace(otlpEndpoint))
 
     builder.Logging.AddOpenTelemetry(opt =>
     {
-        opt.IncludeFormattedMessage = false;
+        opt.IncludeFormattedMessage = true;
         opt.SetResourceBuilder(resources);
         opt.AddOtlpExporter(otlp =>
         {
