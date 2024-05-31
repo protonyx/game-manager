@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
-import { selectEntryCode, selectTitle, selectSidenavOpen } from './shared/state/layout.reducer';
+import {
+  selectEntryCode,
+  selectTitle,
+  selectSidenavOpen,
+} from './shared/state/layout.reducer';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { GameActions } from './game/state/game.actions';
@@ -32,7 +36,7 @@ export class AppComponent {
   }
 
   toggleSidenav(): void {
-    this.store.dispatch(LayoutActions.toggleSidenav())
+    this.store.dispatch(LayoutActions.toggleSidenav());
   }
 
   closeSidenav(): void {

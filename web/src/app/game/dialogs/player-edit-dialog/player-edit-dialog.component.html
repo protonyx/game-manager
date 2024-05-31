@@ -1,12 +1,23 @@
 <h2 mat-dialog-title>Edit Player</h2>
 <mat-dialog-content>
-
-  <app-player-edit #editor [player]="player$ | async"
-                   [trackers]="trackers$ | async" />
-
+  <app-player-edit
+    #editor
+    [player]="player$ | async"
+    [trackers]="trackers$ | async" />
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-stroked-button [mat-dialog-close]="undefined">Cancel</button>
-  <button mat-stroked-button color="warn" *ngIf="isHost$ | async" mat-dialog-close="kick">Kick</button>
-  <button mat-stroked-button color="primary" [mat-dialog-close]="formatOps(editor.value, trackers$ | async)">Update</button>
+  <button
+    mat-stroked-button
+    color="warn"
+    *ngIf="isHost$ | async"
+    mat-dialog-close="kick">
+    Kick
+  </button>
+  <button
+    mat-stroked-button
+    color="primary"
+    [mat-dialog-close]="formatOps(editor.value, trackers$ | async)">
+    Update
+  </button>
 </mat-dialog-actions>

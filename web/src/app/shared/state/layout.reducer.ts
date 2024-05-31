@@ -22,27 +22,27 @@ export const layoutFeature = createFeature({
         ...state,
         title: initialState.title,
         entryCode: initialState.entryCode,
-        sidenavOpen: initialState.sidenavOpen
+        sidenavOpen: initialState.sidenavOpen,
       };
     }),
     on(LayoutActions.openSidenav, (state): LayoutState => {
       return {
         ...state,
-        sidenavOpen: true
-      }
+        sidenavOpen: true,
+      };
     }),
     on(LayoutActions.closeSidenav, (state): LayoutState => {
       return {
         ...state,
-        sidenavOpen: false
-      }
+        sidenavOpen: false,
+      };
     }),
     on(LayoutActions.toggleSidenav, (state): LayoutState => {
       return {
         ...state,
-        sidenavOpen: !state.sidenavOpen
-      }
-    })
+        sidenavOpen: !state.sidenavOpen,
+      };
+    }),
   ),
 });
 

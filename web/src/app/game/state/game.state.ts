@@ -25,7 +25,7 @@ export const playerAdapter: EntityAdapter<Player> = createEntityAdapter<Player>(
   {
     selectId: selectPlayerId,
     sortComparer: sortPlayersByOrder,
-  }
+  },
 );
 
 export const initialState: GameState = {

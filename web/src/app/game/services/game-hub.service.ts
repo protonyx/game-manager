@@ -56,7 +56,7 @@ export class GameHubService {
     });
     connection.on('UpdateCredentials', (data: PlayerCredentials) => {
       this.store.dispatch(
-        GameHubActions.credentialsUpdated({ credentials: data })
+        GameHubActions.credentialsUpdated({ credentials: data }),
       );
     });
     connection.onclose(async () => {

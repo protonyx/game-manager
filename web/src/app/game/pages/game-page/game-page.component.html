@@ -1,4 +1,9 @@
-<ng-container *ngrxLet="{ game: game$, currentPlayer: currentPlayer$, trackers: trackers$ } as vm">
+<ng-container
+  *ngrxLet="{
+    game: game$,
+    currentPlayer: currentPlayer$,
+    trackers: trackers$
+  } as vm">
   <mat-accordion multi="true">
     <mat-expansion-panel *ngIf="isHost$ | async" [expanded]="false">
       <mat-expansion-panel-header>
@@ -27,7 +32,9 @@
         (editPlayer)="onPlayerEdit($event)"></app-player-list>
 
       <mat-action-row *ngIf="isHost$ | async">
-        <button mat-button color="primary" (click)="onReorder()">Reorder</button>
+        <button mat-button color="primary" (click)="onReorder()">
+          Reorder
+        </button>
       </mat-action-row>
     </mat-expansion-panel>
 
@@ -49,7 +56,12 @@
 
     <mat-expansion-panel
       [expanded]="true"
-      *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer">
+      *ngIf="
+        vm.game?.state === 'InProgress' &&
+        vm.trackers &&
+        vm.trackers.length > 0 &&
+        vm.currentPlayer
+      ">
       <mat-expansion-panel-header>
         <mat-panel-title> Trackers</mat-panel-title>
       </mat-expansion-panel-header>

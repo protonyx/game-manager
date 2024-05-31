@@ -8,7 +8,6 @@ import {
   name as layoutFeatureKey,
   reducer as layoutReducer,
 } from './app/shared/state/layout.reducer';
-import {} from './app/game/state/game.selectors';
 import {
   gameFeatureKey,
   reducer as gameReducer,
@@ -35,7 +34,6 @@ export function localStorageSyncReducer(
   })(reducer);
 }
 
-// @ts-expect-error
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 bootstrapApplication(AppComponent, {

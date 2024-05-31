@@ -8,10 +8,9 @@ describe('PlayerReorderDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlayerReorderDialogComponent]
-    })
-    .compileComponents();
-    
+      imports: [PlayerReorderDialogComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(PlayerReorderDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

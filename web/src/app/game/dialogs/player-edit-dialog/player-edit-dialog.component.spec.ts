@@ -8,10 +8,9 @@ describe('PlayerEditDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlayerEditDialogComponent]
-    })
-    .compileComponents();
-    
+      imports: [PlayerEditDialogComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(PlayerEditDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

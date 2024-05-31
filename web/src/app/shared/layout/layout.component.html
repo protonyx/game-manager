@@ -9,10 +9,14 @@
 
     <span class="navbar-spacer"></span>
 
-    <span *ngIf="entryCode">Entry Code: <strong>{{ entryCode }}</strong></span>
+    <span *ngIf="entryCode"
+      >Entry Code: <strong>{{ entryCode }}</strong></span
+    >
   </mat-toolbar>
 
-  <mat-sidenav-container class="navbar-sidenav-container" (backdropClick)="closeSidenav.emit()">
+  <mat-sidenav-container
+    class="navbar-sidenav-container"
+    (backdropClick)="closeSidenav.emit()">
     <mat-sidenav
       [opened]="sidenavOpen"
       fixedTopGap="56"
@@ -60,9 +64,7 @@
           <span> Game </span>
         </a>
 
-        <a mat-list-item
-           (click)="onLeaveGame()"
-           *ngIf="entryCode">
+        <a mat-list-item (click)="onLeaveGame()" *ngIf="entryCode">
           <button mat-icon-button>
             <mat-icon> logout</mat-icon>
           </button>

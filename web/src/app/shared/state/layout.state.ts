@@ -7,5 +7,5 @@ export interface LayoutState {
 export const initialState: LayoutState = {
   title: 'Game Manager',
   entryCode: '',
-  sidenavOpen: false
+  sidenavOpen: false,
 };

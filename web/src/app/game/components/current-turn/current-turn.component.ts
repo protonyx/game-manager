@@ -55,7 +55,7 @@ export class CurrentTurnComponent implements OnChanges {
     ) {
       // Get the current turn player
       const currentTurnIdx = this.players?.findIndex(
-        (p) => p.id === this.game?.currentTurnPlayerId
+        (p) => p.id === this.game?.currentTurnPlayerId,
       );
 
       if (currentTurnIdx >= 0) {

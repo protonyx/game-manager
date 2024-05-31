@@ -23,7 +23,7 @@ export class JoinGamePageComponent implements OnDestroy {
 
   constructor(
     private store: Store,
-    private actions$: Actions
+    private actions$: Actions,
   ) {
     // Handle error
     actions$
@@ -33,7 +33,7 @@ export class JoinGamePageComponent implements OnDestroy {
         map((action) => action.error),
         tap(() => {
           this.loading = false;
-        })
+        }),
       )
       .subscribe(this.error$);
   }

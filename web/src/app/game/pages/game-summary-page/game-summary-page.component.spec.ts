@@ -8,7 +8,7 @@ describe('GameSummaryPageComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [GameSummaryPageComponent]
+      imports: [GameSummaryPageComponent],
     });
     fixture = TestBed.createComponent(GameSummaryPageComponent);
     component = fixture.componentInstance;

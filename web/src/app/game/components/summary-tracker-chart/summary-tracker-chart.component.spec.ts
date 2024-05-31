@@ -8,7 +8,7 @@ describe('SummaryTrackerChartComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SummaryTrackerChartComponent]
+      imports: [SummaryTrackerChartComponent],
     });
     fixture = TestBed.createComponent(SummaryTrackerChartComponent);
     component = fixture.componentInstance;
