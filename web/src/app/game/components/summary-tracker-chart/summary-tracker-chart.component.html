@@ -1,2 +1,4 @@
-<highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions">
-</highcharts-chart>
+<ng-container *ngIf="chartOptions">
+  <highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions">
+  </highcharts-chart>
+</ng-container>
