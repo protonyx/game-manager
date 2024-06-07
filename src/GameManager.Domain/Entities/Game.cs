@@ -1,9 +1,12 @@
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using GameManager.Domain.Common;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public class Game
+public record Game
 {
     public Guid Id { get; private set; }
 
@@ -25,6 +28,10 @@ public class Game
     public DateTime? StartedDate { get; private set; }
 
     public DateTime? CompletedDate { get; private set; }
+    
+    public DateTime? LastModified { get; private set; }
+    
+    public ETag ETag { get; private set; }
 
     protected Game()
     {
@@ -51,6 +58,7 @@ public class Game
 
         var codeLength = EntryCode?.Value.Length ?? 4;
         EntryCode = EntryCode.New(codeLength);
+        LastModified = DateTime.UtcNow;
 
         return Result.Success();
     }
@@ -65,6 +73,7 @@ public class Game
         State = GameState.InProgress;
         StartedDate = DateTime.UtcNow;
         SetCurrentTurn(startingPlayer);
+        LastModified = DateTime.UtcNow;
 
         return Result.Success();
     }
@@ -80,6 +89,7 @@ public class Game
         CompletedDate = DateTime.UtcNow;
         CurrentTurn = null;
         EntryCode = null;
+        LastModified = DateTime.UtcNow;
 
         return Result.Success();
     }
@@ -87,10 +97,23 @@ public class Game
     public void SetCurrentTurn(Player currentPlayer)
     {
         CurrentTurn = new CurrentTurnDetails(currentPlayer);
+        LastModified = DateTime.UtcNow;
     }
 
     public void AddTracker(Tracker tracker)
     {
         this._trackers.Add(tracker);
+        LastModified = DateTime.UtcNow;
+    }
+
+    public void UpdateETag()
+    {
+        var toChecksum = this with { ETag = ETag.Empty() };
+        var checksumBytes = Encoding.UTF8.GetBytes(
+            JsonSerializer.Serialize(toChecksum));
+
+        using var hash = SHA1.Create();
+        var hashBytes = hash.ComputeHash(checksumBytes);
+        ETag = ETag.From(Convert.ToHexString(hashBytes));
     }
 }

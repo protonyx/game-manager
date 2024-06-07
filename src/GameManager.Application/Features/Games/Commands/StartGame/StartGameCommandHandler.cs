@@ -44,7 +44,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitRes
                 var firstPlayer = players.OrderBy(t => t.Order).First();
 
                 g.Start(firstPlayer);
-
+                
                 await _gameRepository.UpdateAsync(g, cancellationToken);
             })
             .Tap(async g =>

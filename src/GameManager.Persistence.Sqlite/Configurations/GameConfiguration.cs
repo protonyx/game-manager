@@ -23,6 +23,12 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
                 v => EntryCode.From(v).Value)
             .HasMaxLength(EntryCode.MaximumLength);
 
+        builder.Property(t => t.ETag)
+            .HasConversion(
+                v => v.Value.ToString(),
+                v => ETag.From(v))
+            .IsConcurrencyToken();
+
         builder.OwnsOne(t => t.Options, build =>
         {
             build.ToTable("GameOptions");

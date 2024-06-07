@@ -3,7 +3,7 @@ using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommand : IRequest<Result<GameDTO, ApplicationError>>
+public class CreateGameCommand : IRequest<Result<CreateGameCommandResponse, ApplicationError>>
 {
     public CreateGameDTO Game { get; }
 

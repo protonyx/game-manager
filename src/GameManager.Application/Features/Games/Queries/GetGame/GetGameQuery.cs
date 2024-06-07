@@ -4,7 +4,7 @@ using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
-public class GetGameQuery : IRequest<Result<GameDTO, ApplicationError>>
+public class GetGameQuery : IRequest<Result<GetGameQueryResponse, ApplicationError>>
 {
     public Guid GameId { get; }
 

@@ -3,7 +3,7 @@ using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
-public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GameDTO, ApplicationError>>
+public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GetGameQueryResponse, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -15,7 +15,7 @@ public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GameDTO,
         _mapper = mapper;
     }
 
-    public async Task<Result<GameDTO, ApplicationError>> Handle(GetGameQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetGameQueryResponse, ApplicationError>> Handle(GetGameQuery request, CancellationToken cancellationToken)
     {
         var game = await _gameRepository.GetByIdAsync(request.GameId, cancellationToken);
 
@@ -26,6 +26,6 @@ public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GameDTO,
 
         var dto = _mapper.Map<GameDTO>(game);
 
-        return dto;
+        return new GetGameQueryResponse(dto, game.ETag);
     }
 }

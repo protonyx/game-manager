@@ -3,7 +3,7 @@ using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Result<GameDTO, ApplicationError>>
+public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Result<CreateGameCommandResponse, ApplicationError>>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -18,7 +18,7 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
         _mapper = mapper;
     }
 
-    public async Task<Result<GameDTO, ApplicationError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreateGameCommandResponse, ApplicationError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
         var options = _mapper.Map<GameOptions>(request.Game.Options) ?? new GameOptions();
         var game = new Game(request.Game.Name, options);
@@ -50,6 +50,6 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
 
         var dto = _mapper.Map<GameDTO>(game);
 
-        return dto;
+        return new CreateGameCommandResponse(dto, game.ETag);
     }
 }

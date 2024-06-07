@@ -29,9 +29,13 @@ public class CreateGameEndpoint : Endpoint<CreateGameDTO, Results<CreatedAtRoute
         var request = new CreateGameCommand(req);
 
         var result = await _mediator.Send(request, ct);
+        
+        if (result.IsSuccess)
+            HttpContext.Response.SetETag(result.Value.ETag);
 
         return result.IsSuccess
-            ? TypedResults.CreatedAtRoute(result.Value, nameof(GetGameEndpoint), new { id = result.Value.Id })
+            ? TypedResults.CreatedAtRoute(result.Value.Game, nameof(GetGameEndpoint),
+                new { id = result.Value.Game.Id })
             : result.Error.ToProblemDetails();
     }
 }
