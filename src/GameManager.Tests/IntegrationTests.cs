@@ -24,16 +24,16 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
             BaseAddress = new("http://localhost/api/v1/")
         });
 
-        var newGame = new CreateGameDTO()
+        var newGame = new CreateGameCommand()
         {
             Name = "Test",
             Options = new GameOptionsDTO()
             {
                 ShareOtherPlayerTrackers = true
             },
-            Trackers = new List<TrackerDTO>()
+            Trackers = new List<CreateTrackerDTO>()
             {
-                new TrackerDTO()
+                new CreateTrackerDTO()
                 {
                     Name = "Score",
                     StartingValue = 0

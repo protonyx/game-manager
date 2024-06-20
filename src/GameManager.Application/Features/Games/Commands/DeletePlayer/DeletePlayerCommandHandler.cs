@@ -6,7 +6,7 @@ using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
 
 namespace GameManager.Application.Features.Games.Commands.DeletePlayer;
 
-public class DeletePlayerCommandHandler : IRequestHandler<DeletePlayerCommand, UnitResult<ApplicationError>>
+public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
 {
     private readonly IPlayerRepository _playerRepository;
 

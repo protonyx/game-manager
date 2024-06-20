@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 
 namespace GameManager.Application.Features.Games.Commands.EndGame;
 
-public class EndGameCommand : IRequest<UnitResult<ApplicationError>>
+public class EndGameCommand : ICommand
 {
     public Guid GameId { get; }
 

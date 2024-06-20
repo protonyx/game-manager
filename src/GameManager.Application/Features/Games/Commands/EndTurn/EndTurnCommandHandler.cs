@@ -5,7 +5,7 @@ using GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
 
-public class EndTurnCommandHandler : IRequestHandler<EndTurnCommand, UnitResult<ApplicationError>>
+public class EndTurnCommandHandler : ICommandHandler<EndTurnCommand>
 {
     private readonly IGameRepository _gameRepository;
 

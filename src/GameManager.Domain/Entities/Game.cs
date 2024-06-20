@@ -10,7 +10,7 @@ public record Game
 {
     public Guid Id { get; private set; }
 
-    public string Name { get; private set; }
+    public GameName Name { get; private set; }
 
     public EntryCode? EntryCode { get; private set; }
 
@@ -30,15 +30,15 @@ public record Game
     public DateTime? CompletedDate { get; private set; }
     
     public DateTime? LastModified { get; private set; }
-    
-    public ETag ETag { get; private set; }
+
+    public ETag ETag { get; private set; } = ETag.Empty();
 
     protected Game()
     {
 
     }
 
-    public Game(string name, GameOptions options)
+    public Game(GameName name, GameOptions options)
         : this()
     {
         Id = Guid.NewGuid();
@@ -47,6 +47,15 @@ public record Game
         State = GameState.Preparing;
         Options = options;
         CreatedDate = DateTime.UtcNow;
+        UpdateETag();
+    }
+
+    public Result ChangeName(GameName name)
+    {
+        Name = name;
+        UpdateETag();
+
+        return Result.Success();
     }
 
     public Result RegenerateEntryCode()
@@ -59,6 +68,7 @@ public record Game
         var codeLength = EntryCode?.Value.Length ?? 4;
         EntryCode = EntryCode.New(codeLength);
         LastModified = DateTime.UtcNow;
+        UpdateETag();
 
         return Result.Success();
     }
@@ -74,6 +84,7 @@ public record Game
         StartedDate = DateTime.UtcNow;
         SetCurrentTurn(startingPlayer);
         LastModified = DateTime.UtcNow;
+        UpdateETag();
 
         return Result.Success();
     }
@@ -90,6 +101,7 @@ public record Game
         CurrentTurn = null;
         EntryCode = null;
         LastModified = DateTime.UtcNow;
+        UpdateETag();
 
         return Result.Success();
     }
@@ -98,15 +110,24 @@ public record Game
     {
         CurrentTurn = new CurrentTurnDetails(currentPlayer);
         LastModified = DateTime.UtcNow;
+        UpdateETag();
     }
 
-    public void AddTracker(Tracker tracker)
+    public Result AddTracker(string name, int startingValue)
     {
-        this._trackers.Add(tracker);
+        var trackerOrError = Tracker.Create(this, name, startingValue);
+
+        if (trackerOrError.IsFailure)
+            return Result.Failure($"Failed to add tracker: {trackerOrError.Error}");
+        
+        this._trackers.Add(trackerOrError.Value);
         LastModified = DateTime.UtcNow;
+        UpdateETag();
+
+        return Result.Success();
     }
 
-    public void UpdateETag()
+    private void UpdateETag()
     {
         var toChecksum = this with { ETag = ETag.Empty() };
         var checksumBytes = Encoding.UTF8.GetBytes(

@@ -1,8 +1,9 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
+using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.UpdateHeartbeat;
 
-public class UpdateHeartbeatCommandHandler : IRequestHandler<UpdateHeartbeatCommand, UnitResult<ApplicationError>>
+public class UpdateHeartbeatCommandHandler : ICommandHandler<UpdateHeartbeatCommand>
 {
     private readonly IPlayerRepository _playerRepository;
 

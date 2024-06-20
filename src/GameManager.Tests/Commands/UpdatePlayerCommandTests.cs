@@ -13,15 +13,18 @@ public class UpdatePlayerCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        var game = new Game(fixture.Create<string>(), new GameOptions());
+        
+        var gameName = GameName.From(fixture.Create<string>());
+        var game = new Game(gameName.Value, new GameOptions());
         var player = fixture.BuildPlayer(game).Create();
         var playerRepository = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepository.Setup(x => x.GetByIdAsync(player.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(player);
         playerRepository.Setup(x => x.UpdateAsync(It.Is<Player>(p => p.Id == player.Id), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Player p, CancellationToken ct) => p);
-        var playerValidator = new InlineValidator<Player>();
-        fixture.Inject<IValidator<Player>>(playerValidator);
+        playerRepository.Setup(t => t.NameIsUniqueAsync(It.IsAny<Guid>(), It.IsAny<PlayerName>(), It.IsAny<Guid?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
         fixture.SetUser(user =>
         {
             user.AddGameId(player.GameId)

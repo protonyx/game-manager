@@ -10,7 +10,9 @@ public static class GameErrors
     {
         public const string GameInvalidEntryCode = "game.invalid.code";
         public const string GameInvalidId = "game.invalid.id";
+        public const string GameInvalidName = "game.invalid.name";
         public const string GameInvalidState = "game.invalid.state";
+        public const string GameInvalidTracker = "game.invalid.tracker";
         public const string PlayerInvalidId = "player.invalid.id";
         public const string PlayerInvalidState = "player.invalid.state";
         public const string PlayerInvalidName = "player.invalid.name";
@@ -21,6 +23,16 @@ public static class GameErrors
     public static ApplicationError InvalidEntryCode()
         => ApplicationError.Failure("Invalid entry code",
             errorCode: ErrorCodes.GameInvalidEntryCode);
+
+    public static ApplicationError GameInvalidName(string? reason = null) =>
+        ApplicationError.Validation(
+            string.IsNullOrWhiteSpace(reason)
+                ? "Game name is invalid"
+                : "Game name is invalid: {reason}",
+            errorCode: ErrorCodes.GameInvalidName);
+
+    public static ApplicationError GameInvalidTracker(string reason) =>
+        ApplicationError.Validation($"Tracker is invalid: {reason}");
 
     public static ApplicationError GameNotFound(Guid? gameId)
         => ApplicationError.NotFound<Game>(gameId?.ToString(),

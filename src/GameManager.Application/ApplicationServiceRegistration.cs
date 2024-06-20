@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
+using GameManager.Application.Pipelines;
 using GameManager.Application.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,11 +14,15 @@ public static class ApplicationServiceRegistration
         {
             cfg.AddProfile<DtoProfile>();
         });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            cfg.RegisterServicesFromAssemblies(typeof(ApplicationServiceRegistration).Assembly);
+            #if DEBUG
+            cfg.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+            #endif
+            cfg.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         return services;
     }

@@ -1,10 +1,8 @@
-﻿using GameManager.Application.Errors;
-using GameManager.Application.Features.Games.DTO;
-using MediatR;
+﻿using GameManager.Application.Contracts;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
-public class GetGameQuery : IRequest<Result<GetGameQueryResponse, ApplicationError>>
+public class GetGameQuery : IQuery<GetGameQueryResponse>
 {
     public Guid GameId { get; }
 

@@ -7,7 +7,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
 
-public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<PlayerCredentialsDTO, ApplicationError>>
+public class JoinGameCommandHandler : ICommandHandler<JoinGameCommand, PlayerCredentialsDTO>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -15,21 +15,17 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
 
     private readonly ITokenService _tokenService;
 
-    private readonly IValidator<Player> _playerValidator;
-
     private readonly IMediator _mediator;
 
     public JoinGameCommandHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
         ITokenService tokenService,
-        IValidator<Player> playerValidator,
         IMediator mediator)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
         _tokenService = tokenService;
-        _playerValidator = playerValidator;
         _mediator = mediator;
     }
 
@@ -62,6 +58,12 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
                 return GameErrors.PlayerInvalidName(playerNameOrError.Error);
 
             var newPlayer = new Player(playerNameOrError.Value, game);
+            
+            // Check uniqueness
+            var isUnique = await _playerRepository.NameIsUniqueAsync(game.Id, playerNameOrError.Value, cancellationToken: cancellationToken);
+
+            if (!isUnique)
+                return GameErrors.PlayerInvalidName("Name must be unique");
 
             // Promote the player if they are the first
             var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);
@@ -71,14 +73,6 @@ public class JoinGameCommandHandler : IRequestHandler<JoinGameCommand, Result<Pl
             if (existingPlayerCount == 0)
             {
                 newPlayer.Promote();
-            }
-
-            // Validate
-            var validationResult = await _playerValidator.ValidateAsync(newPlayer, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                return ApplicationError.Validation<Player>(validationResult);
             }
 
             newPlayer = await _playerRepository.CreateAsync(newPlayer, cancellationToken);

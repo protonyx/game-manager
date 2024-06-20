@@ -14,8 +14,9 @@ public class EndTurnCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-
-        var game = new Game(fixture.Create<string>(), new GameOptions());
+        
+        var gameName = GameName.From(fixture.Create<string>());
+        var game = new Game(gameName.Value, new GameOptions());
         var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();
@@ -55,8 +56,9 @@ public class EndTurnCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-
-        var game = new Game(fixture.Create<string>(), new GameOptions());
+        
+        var gameName = GameName.From(fixture.Create<string>());
+        var game = new Game(gameName.Value, new GameOptions());
         var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();
@@ -97,8 +99,9 @@ public class EndTurnCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-
-        var game = new Game(fixture.Create<string>(), new GameOptions());
+        
+        var gameName = GameName.From(fixture.Create<string>());
+        var game = new Game(gameName.Value, new GameOptions());
         var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();

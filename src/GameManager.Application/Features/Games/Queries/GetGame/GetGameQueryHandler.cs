@@ -1,9 +1,10 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
-public class GetGameQueryHandler : IRequestHandler<GetGameQuery, Result<GetGameQueryResponse, ApplicationError>>
+public class GetGameQueryHandler : IQueryHandler<GetGameQuery, GetGameQueryResponse>
 {
     private readonly IGameRepository _gameRepository;
 

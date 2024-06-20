@@ -5,7 +5,7 @@ using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.ReorderPlayers;
 
-public class ReorderPlayersCommandHandler : IRequestHandler<ReorderPlayersCommand, UnitResult<ApplicationError>>
+public class ReorderPlayersCommandHandler : ICommandHandler<ReorderPlayersCommand>
 {
     private readonly IGameRepository _gameRepository;
 

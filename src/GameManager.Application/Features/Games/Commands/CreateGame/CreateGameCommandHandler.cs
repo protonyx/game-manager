@@ -1,32 +1,39 @@
+using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Result<CreateGameCommandResponse, ApplicationError>>
+public class CreateGameCommandHandler : ICommandHandler<CreateGameCommand, CreateGameCommandResponse>
 {
     private readonly IGameRepository _gameRepository;
 
-    private readonly IValidator<Game> _gameValidator;
-
     private readonly IMapper _mapper;
 
-    public CreateGameCommandHandler(IGameRepository gameRepository, IValidator<Game> gameValidator, IMapper mapper)
+    public CreateGameCommandHandler(IGameRepository gameRepository, IMapper mapper)
     {
         _gameRepository = gameRepository;
-        _gameValidator = gameValidator;
         _mapper = mapper;
     }
 
     public async Task<Result<CreateGameCommandResponse, ApplicationError>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
-        var options = _mapper.Map<GameOptions>(request.Game.Options) ?? new GameOptions();
-        var game = new Game(request.Game.Name, options);
+        var options = _mapper.Map<GameOptions>(request.Options) ?? new GameOptions();
 
-        foreach (var trackerDto in request.Game.Trackers)
+        var gameNameOrError = GameName.From(request.Name);
+
+        if (gameNameOrError.IsFailure)
+            return GameErrors.GameInvalidName(gameNameOrError.Error);
+        
+        var game = new Game(gameNameOrError.Value, options);
+
+        foreach (var tracker in request.Trackers)
         {
-            var tracker = _mapper.Map<Tracker>(trackerDto);
-            game.AddTracker(tracker);
+            var trackerAddResult = game.AddTracker(tracker.Name, tracker.StartingValue);
+
+            if (trackerAddResult.IsFailure)
+                return GameErrors.GameInvalidTracker(trackerAddResult.Error);
         }
 
         while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode!, cancellationToken))
@@ -36,14 +43,6 @@ public class CreateGameCommandHandler : IRequestHandler<CreateGameCommand, Resul
 
             if (result.IsFailure)
                 return ApplicationError.Failure(result.Error);
-        }
-
-        // Validate
-        var validationResult = await _gameValidator.ValidateAsync(game, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            return ApplicationError.Validation<Game>(validationResult);
         }
 
         game = await _gameRepository.CreateAsync(game, cancellationToken);

@@ -8,13 +8,11 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 
-public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, Result<PlayerDTO, ApplicationError>>
+public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, PlayerDTO>
 {
     private readonly IPlayerRepository _playerRepository;
 
     private readonly IMapper _mapper;
-
-    private readonly IValidator<Player> _playerValidator;
 
     private readonly IUserContext _userContext;
 
@@ -23,13 +21,11 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
     public UpdatePlayerCommandHandler(
         IPlayerRepository playerRepository,
         IMapper mapper,
-        IValidator<Player> playerValidator,
         IUserContext userContext,
         IMediator mediator)
     {
         _playerRepository = playerRepository;
         _mapper = mapper;
-        _playerValidator = playerValidator;
         _userContext = userContext;
         _mediator = mediator;
     }
@@ -57,6 +53,13 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
 
             if (playerNameOrError.IsFailure)
                 return GameErrors.PlayerInvalidName(playerNameOrError.Error);
+            
+            // Check uniqueness
+            var isUnique = await _playerRepository.NameIsUniqueAsync(player.GameId, playerNameOrError.Value,
+                player.Id, cancellationToken: cancellationToken);
+
+            if (!isUnique)
+                return GameErrors.PlayerInvalidName("Name must be unique");
 
             player.SetName(playerNameOrError.Value);
         }
@@ -76,14 +79,6 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, R
                     NewValue = tracker.Value
                 });
             }
-        }
-
-        // Validate
-        var result = await _playerValidator.ValidateAsync(player, cancellationToken);
-
-        if (!result.IsValid)
-        {
-            return ApplicationError.Validation<Player>(result);
         }
 
         var updatedPlayer = await _playerRepository.UpdateAsync(player, cancellationToken);

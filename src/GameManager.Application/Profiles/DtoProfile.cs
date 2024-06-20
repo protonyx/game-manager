@@ -36,10 +36,7 @@ public class DtoProfile : Profile
             .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.Turns, opt => opt.Ignore())
             .ForMember(t => t.TrackerHistory, opt => opt.Ignore());
-        CreateMap<Tracker, TrackerDTO>()
-            .ReverseMap()
-            .ForMember(t => t.Id, opt => opt.Ignore())
-            .ForMember(t => t.GameId, opt => opt.Ignore());
+        CreateMap<Tracker, TrackerDTO>();
         CreateMap<TrackerHistory, TrackerHistoryDTO>()
             .ForMember(t => t.SecondsSinceGameStart, opt => opt.Ignore());
         CreateMap<Turn, TurnDTO>()

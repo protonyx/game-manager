@@ -1,12 +1,10 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts.Persistence;
+﻿using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayer;
 
-public class GetPlayerQueryHandler : IRequestHandler<GetPlayerQuery, Result<PlayerDTO, ApplicationError>>
+public class GetPlayerQueryHandler : IQueryHandler<GetPlayerQuery, PlayerDTO>
 {
     private readonly IPlayerRepository _playerRepository;
 

@@ -1,8 +1,9 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
+using GameManager.Application.Errors;
 
 namespace GameManager.Application.Features.Games.Commands.PruneGames;
 
-public class PruneGamesCommandHandler : IRequestHandler<PruneGamesCommand, UnitResult<ApplicationError>>
+public class PruneGamesCommandHandler : ICommandHandler<PruneGamesCommand>
 {
     private readonly IGameRepository _gameRepository;
 

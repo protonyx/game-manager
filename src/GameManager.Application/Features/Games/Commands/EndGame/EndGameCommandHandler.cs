@@ -5,7 +5,7 @@ using GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.EndGame;
 
-public class EndGameCommandHandler : IRequestHandler<EndGameCommand, UnitResult<ApplicationError>>
+public class EndGameCommandHandler : ICommandHandler<EndGameCommand>
 {
     private readonly IGameRepository _gameRepository;
 

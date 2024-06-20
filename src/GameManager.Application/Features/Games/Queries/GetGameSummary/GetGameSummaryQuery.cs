@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
-public class GetGameSummaryQuery : IRequest<Result<GameSummaryDTO, ApplicationError>>
+public class GetGameSummaryQuery : IQuery<GameSummaryDTO>
 {
     public Guid GameId { get; }
 

@@ -1,8 +1,8 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 
 namespace GameManager.Application.Features.Games.Commands.PruneGames;
 
-public class PruneGamesCommand : IRequest<UnitResult<ApplicationError>>
+public class PruneGamesCommand : ICommand
 {
     public TimeSpan RetentionPeriod { get; }
 

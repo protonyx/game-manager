@@ -35,13 +35,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
             .AnyAsync(cancellationToken);
     }
 
-    public override Task<Game> CreateAsync(Game entity, CancellationToken cancellationToken = default)
-    {
-        entity.UpdateETag();
-        
-        return base.CreateAsync(entity, cancellationToken);
-    }
-
     public override Task<Game> UpdateAsync(Game entity, CancellationToken cancellationToken = default)
     {
         if (entity.CurrentTurn != null)
@@ -53,8 +46,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
                 _context.Attach(entity.CurrentTurn);
             }
         }
-        
-        entity.UpdateETag();
 
         return base.UpdateAsync(entity, cancellationToken);
     }

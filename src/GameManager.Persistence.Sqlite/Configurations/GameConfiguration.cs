@@ -14,8 +14,11 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Name)
+            .HasConversion(
+                v => v.Value,
+                v => GameName.From(v).Value)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(GameName.MaximumLength);
 
         builder.Property(t => t.EntryCode)
             .HasConversion(

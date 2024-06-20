@@ -5,7 +5,7 @@ using GameManager.Application.Features.Games.Notifications.GameUpdated;
 
 namespace GameManager.Application.Features.Games.Commands.StartGame;
 
-public class StartGameCommandHandler : IRequestHandler<StartGameCommand, UnitResult<ApplicationError>>
+public class StartGameCommandHandler : ICommandHandler<StartGameCommand>
 {
     private readonly IGameRepository _gameRepository;
 

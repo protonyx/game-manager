@@ -1,9 +1,9 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 
-public class GetPlayerTurnsQuery : IRequest<Result<IReadOnlyList<TurnDTO>, ApplicationError>>
+public class GetPlayerTurnsQuery : IQuery<IReadOnlyList<TurnDTO>>
 {
     public Guid PlayerId { get; }
 

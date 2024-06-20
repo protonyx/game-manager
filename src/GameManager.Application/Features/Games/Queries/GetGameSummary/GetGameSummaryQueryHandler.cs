@@ -1,9 +1,10 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
+using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
-public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, Result<GameSummaryDTO, ApplicationError>>
+public class GetGameSummaryQueryHandler : IQueryHandler<GetGameSummaryQuery, GameSummaryDTO>
 {
     private readonly IGameRepository _gameRepository;
 
@@ -49,7 +50,7 @@ public class GetGameSummaryQueryHandler : IRequestHandler<GetGameSummaryQuery, R
         var ret = new GameSummaryDTO()
         {
             Id = game.Id,
-            Name = game.Name,
+            Name = game.Name.Value,
             CreatedDate = game.CreatedDate,
             StartedDate = game.StartedDate,
             CompletedDate = game.CompletedDate,

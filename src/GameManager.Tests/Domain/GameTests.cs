@@ -9,7 +9,7 @@ public class GameTests
     public void Game_InPreparingState_CanBeStarted()
     {
         // Arrange
-        var game = new Game("Test", new GameOptions());
+        var game = new Game(GameName.From("Test").Value, new GameOptions());
         var player1 = new Player(PlayerName.From("Player 1").Value, game);
 
         // Act

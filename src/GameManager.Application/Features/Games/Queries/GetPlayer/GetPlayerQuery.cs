@@ -1,9 +1,9 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayer;
 
-public class GetPlayerQuery : IRequest<Result<PlayerDTO, ApplicationError>>
+public class GetPlayerQuery : IQuery<PlayerDTO>
 {
     public Guid PlayerId { get; }
 

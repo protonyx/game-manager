@@ -2,6 +2,7 @@ using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Features.Games.Commands.StartGame;
 using GameManager.Domain.Common;
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Tests.Commands;
 
@@ -12,8 +13,9 @@ public class StartGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-
-        var game = new Game(fixture.Create<string>(), new GameOptions());
+        
+        var gameName = GameName.From(fixture.Create<string>());
+        var game = new Game(gameName.Value, new GameOptions());
         var players = fixture.BuildPlayer(game)
             .CreateMany(2)
             .ToList();

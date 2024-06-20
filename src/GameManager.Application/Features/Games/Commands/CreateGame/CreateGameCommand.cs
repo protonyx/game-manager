@@ -1,14 +1,20 @@
-﻿using GameManager.Application.Errors;
+﻿using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;
 
-public class CreateGameCommand : IRequest<Result<CreateGameCommandResponse, ApplicationError>>
+public class CreateGameCommand : ICommand<CreateGameCommandResponse>
 {
-    public CreateGameDTO Game { get; }
+    public string Name { get; set; } = string.Empty;
 
-    public CreateGameCommand(CreateGameDTO game)
-    {
-        Game = game;
-    }
+    public GameOptionsDTO? Options { get; set; }
+
+    public ICollection<CreateTrackerDTO> Trackers { get; set; } = new List<CreateTrackerDTO>();
+}
+
+public class CreateTrackerDTO
+{
+    public string Name { get; set; } = string.Empty;
+
+    public int StartingValue { get; set; }
 }
