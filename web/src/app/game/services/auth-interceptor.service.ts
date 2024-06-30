@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { first, mergeMap, Observable, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectCredentials } from '../state/game.selectors';
