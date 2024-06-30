@@ -17,11 +17,7 @@ import { MetaReducer, ActionReducer, provideStore } from '@ngrx/store';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AuthInterceptorService } from './app/game/services/auth-interceptor.service';
-import {
-  HTTP_INTERCEPTORS,
-  withInterceptorsFromDi,
-  provideHttpClient,
-} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 
