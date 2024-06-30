@@ -10,6 +10,7 @@ public class DtoProfile : Profile
     public DtoProfile()
     {
         CreateMap<Game, GameDTO>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.EntryCode, opt => opt.MapFrom(t => t.EntryCode.Value))
             .ForMember(t => t.LastTurnStartTime, opt => opt.MapFrom(t => t.CurrentTurn.StartTime))
             .ReverseMap()
