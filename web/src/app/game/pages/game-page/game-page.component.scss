@@ -2,8 +2,8 @@
 @import '../../../variables.scss';
 
 mat-expansion-panel.is-active {
-  border-left: 5px solid mat.get-color-from-palette($primary-palette);
-  background: mat.get-color-from-palette(
+  border-left: 5px solid mat.m2-get-color-from-palette($primary-palette);
+  background: mat.m2-get-color-from-palette(
     $primary-palette,
     'lighter'
   ) !important;
