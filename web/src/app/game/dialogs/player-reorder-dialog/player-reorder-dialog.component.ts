@@ -41,7 +41,7 @@ export class PlayerReorderDialogComponent implements OnDestroy {
 
   newPlayers: Player[] = [];
 
-  columnsToDisplay = ['position', 'order', 'name'];
+  columnsToDisplay = ['position', 'name'];
   dragDisabled = true;
 
   constructor(private store: Store) {

@@ -1,52 +1,38 @@
 <h2 mat-dialog-title>Reorder Players</h2>
 <mat-dialog-content>
-  <table
-    mat-table
+  <mat-table
     #table
     [dataSource]="newPlayers"
     cdkDropList
     [cdkDropListData]="newPlayers"
-    (cdkDropListDropped)="dropTable($event, table)"
-    [cdkDropListDisabled]="dragDisabled">
+    (cdkDropListDropped)="dropTable($event, table)">
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
-        <mat-icon
-          class="dragCursor"
-          (mousedown)="dragDisabled = false"
-          cdkDragHandle
-          >reorder
-        </mat-icon>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="order">
-      <th mat-header-cell *matHeaderCellDef>Order</th>
-      <td mat-cell *matCellDef="let element">
-        <ng-container>
-          {{ element.order }}
-        </ng-container>
-      </td>
+      <mat-header-cell *matHeaderCellDef> Order </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <mat-icon class="drag-cursor">reorder</mat-icon>
+        <span>{{ element.order }}</span>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
-      <td mat-cell *matCellDef="let element">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let element">
         {{ element.name }}
-      </td>
+      </mat-cell>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-    <tr
-      mat-row
+    <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+    <mat-row
       *matRowDef="let row; columns: columnsToDisplay"
       cdkDrag
-      [cdkDragData]="row"></tr>
-  </table>
+      [cdkDragData]="row"></mat-row>
+  </mat-table>
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-  <button mat-stroked-button color="primary" [mat-dialog-close]="newPlayers">
+  <button mat-stroked-button
+          color="primary"
+          [mat-dialog-close]="newPlayers">
     Save
   </button>
 </mat-dialog-actions>
