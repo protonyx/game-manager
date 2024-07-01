@@ -29,7 +29,8 @@
         [players]="players$ | async"
         [currentPlayer]="vm.currentPlayer"
         [isHost]="isHost$ | async"
-        (editPlayer)="onPlayerEdit($event)"></app-player-list>
+        (editPlayer)="onPlayerEdit($event)"
+        (kickPlayer)="onPlayerKick($event)"></app-player-list>
 
       <mat-action-row *ngIf="isHost$ | async">
         <button mat-button color="primary" (click)="onReorder()">

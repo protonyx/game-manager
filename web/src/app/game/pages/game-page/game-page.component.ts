@@ -102,6 +102,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
     this.store.dispatch(GameActions.editPlayer({ playerId: player.id }));
   }
 
+  onPlayerKick(player: Player): void {
+    this.store.dispatch(GameActions.removePlayer({ playerId: player.id}));
+  }
+
   onTrackerUpdate(player: Player, trackerValue: TrackerValue): void {
     this.store.dispatch(
       GameActions.updateTracker({

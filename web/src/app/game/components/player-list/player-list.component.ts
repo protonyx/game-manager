@@ -10,13 +10,15 @@ import { Game, Player, Tracker } from '../../models/models';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from "@angular/material/menu";
+import {MatButtonModule} from "@angular/material/button";
 
 @Component({
   selector: 'app-player-list',
   templateUrl: './player-list.component.html',
   styleUrls: ['./player-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatIconModule],
+  imports: [CommonModule, MatTableModule, MatIconModule, MatMenuModule, MatButtonModule],
 })
 export class PlayerListComponent implements OnChanges {
   @Input()
@@ -33,6 +35,9 @@ export class PlayerListComponent implements OnChanges {
 
   @Output()
   public editPlayer: EventEmitter<Player> = new EventEmitter<Player>();
+
+  @Output()
+  public kickPlayer: EventEmitter<Player> = new EventEmitter<Player>();
 
   dataSource: MatTableDataSource<Player> = new MatTableDataSource();
 
@@ -83,5 +88,9 @@ export class PlayerListComponent implements OnChanges {
 
   handleEditPlayer(player: Player): void {
     this.editPlayer.emit(player);
+  }
+
+  handleKickPlayer(player: Player): void {
+    this.kickPlayer.emit(player);
   }
 }
