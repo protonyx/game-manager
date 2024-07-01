@@ -34,7 +34,7 @@ public class ReorderPlayersCommandTests
         {
             user.AddGameId(game.Id)
                 .AddPlayerId(players[0].Id)
-                .AddAdminRole();
+                .AddHostRole();
         });
 
         var sut = fixture.Create<ReorderPlayersCommandHandler>();

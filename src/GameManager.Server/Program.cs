@@ -107,8 +107,8 @@ builder.Services.AddAuthentication(opt =>
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
 builder.Services.AddAuthorization();
-builder.Services.AddSingleton<IAuthorizationHandler, GameAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, PlayerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, GameAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PlayerAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();

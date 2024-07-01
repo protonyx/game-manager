@@ -58,13 +58,15 @@ public static class ClaimsPrincipalExtensions
         return user.HasClaim(GameManagerClaimTypes.PlayerId, playerId.ToString());
     }
 
-    public static bool IsAuthorizedToModifyPlayer(this ClaimsPrincipal user, Guid playerId)
+    public static bool IsAuthorizedToModifyPlayer(this ClaimsPrincipal user, Guid playerId,
+        Guid gameId)
     {
-        return user.HasPlayerClaim(playerId) || user.IsAdmin();
+        return user.HasPlayerClaim(playerId) || user.IsHostForGame(gameId) || user.IsAdmin();
     }
 
-    public static bool IsAuthorizedToViewPlayer(this ClaimsPrincipal user, Guid playerId)
+    public static bool IsAuthorizedToViewPlayer(this ClaimsPrincipal user, Guid playerId,
+        Guid gameId)
     {
-        return user.HasPlayerClaim(playerId) || user.IsAdmin();
+        return user.HasPlayerClaim(playerId) || user.HasGameClaim(gameId) || user.IsAdmin();
     }
 }

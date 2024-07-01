@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using GameManager.Application.Contracts;
+﻿using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Messages;
-using MediatR;
 
 namespace GameManager.Application.Features.Games.Notifications.PlayerUpdated;
 

@@ -41,7 +41,7 @@ public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, P
 
         if (_userContext.User == null
             || !_userContext.User.IsAuthorizedToViewGame(player.GameId)
-            || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id))
+            || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id, player.GameId))
         {
             return GameErrors.PlayerNotAuthorized("update player");
         }

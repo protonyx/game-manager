@@ -16,11 +16,11 @@ public class PruneGamesCommandHandler : ICommandHandler<PruneGamesCommand>
     {
         var olderThan = DateTime.UtcNow.Subtract(request.RetentionPeriod);
 
-        var games = await _gameRepository.FindAsync(olderThan);
+        var games = await _gameRepository.FindAsync(olderThan, cancellationToken);
 
         foreach (var game in games)
         {
-            await _gameRepository.DeleteAsync(game);
+            await _gameRepository.DeleteAsync(game, cancellationToken);
         }
 
         return UnitResult.Success<ApplicationError>();
