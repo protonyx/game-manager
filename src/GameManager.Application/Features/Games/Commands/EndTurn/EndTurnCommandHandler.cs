@@ -42,7 +42,7 @@ public class EndTurnCommandHandler : ICommandHandler<EndTurnCommand>
             return GameErrors.GameNotFound(request.GameId);
         }
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(game.Id, cancellationToken);
         var requestPlayerId = _userContext.User?.GetPlayerId();
         var requestPlayer = players.FirstOrDefault(t => t.Id == requestPlayerId);
 

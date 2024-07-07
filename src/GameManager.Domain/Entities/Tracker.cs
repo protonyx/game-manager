@@ -1,6 +1,8 @@
+using GameManager.Domain.Common;
+
 namespace GameManager.Domain.Entities;
 
-public class Tracker
+public class Tracker : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 

@@ -48,7 +48,7 @@ public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
         await _mediator.Publish(new PlayerDeletedNotification(playerToDelete), cancellationToken);
 
         // Update player order for remaining players
-        var players = await _playerRepository.GetPlayersByGameIdAsync(playerToDelete.GameId, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(playerToDelete.GameId, cancellationToken);
 
         for (int i = 0; i < players.Count; i++)
         {

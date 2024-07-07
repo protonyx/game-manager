@@ -4,13 +4,17 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using GameManager.Application;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
+using GameManager.Application.Profiles;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
 using GameManager.Server.Authorization;
+using GameManager.Server.DataLoaders;
 using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
+using GameManager.Server.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
@@ -106,10 +110,34 @@ builder.Services.AddAuthentication(opt =>
         };
         options.EventsType = typeof(CustomJwtBearerEvents);
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy(AuthorizationPolicyNames.Admin, policy =>
+    {
+        policy.RequireRole(GameManagerRoles.Admin);
+    });
+    opt.AddPolicy(AuthorizationPolicyNames.ViewGame, policy =>
+    {
+        policy.AddRequirements(new GameAuthorizationRequirement(modify: false));
+    });
+    opt.AddPolicy(AuthorizationPolicyNames.ModifyGame, policy =>
+    {
+        policy.AddRequirements(new GameAuthorizationRequirement(modify: true));
+    });
+});
 builder.Services.AddScoped<IAuthorizationHandler, GameAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, GameResourceAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, PlayerAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
+
+builder.Services.AddGraphQLServer()
+    .AddAuthorization()
+    .AddQueryType<Query>()
+    .AddType<GameType>()
+    .AddType<PlayerTrackerValueType>()
+    .AddDataLoader<PlayerByIdDataLoader>()
+    .AddDataLoader<GameByIdDataLoader>()
+    .AddDataLoader<TrackerByIdDataLoader>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddSingleton<ITokenService>(tokenService);
@@ -134,6 +162,11 @@ else
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(DtoProfile), typeof(GraphQlProfile));
+});
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();
@@ -244,6 +277,7 @@ app.UseSwaggerGen();
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapHub<GameHub>("/hubs/game");
+app.MapGraphQL();
 app.MapFallbackToFile("index.html");
 app.MapGet("/version", async ctx =>
 {

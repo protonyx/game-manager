@@ -24,7 +24,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .CountAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Player>> GetPlayersByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Player>> GetByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         var players = await _context.Set<Player>()
             .AsQueryable()
@@ -35,6 +35,18 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
             .ToListAsync(cancellationToken);
 
         return players;
+    }
+
+    public async Task<IReadOnlyList<Guid>> GetIdsByGameAsync(Guid gameId, CancellationToken cancellationToken = default)
+    {
+        var playerIds = await _context.Set<Player>()
+            .AsQueryable()
+            .AsNoTracking()
+            .Where(p => gameId == p.GameId && p.Active)
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
+
+        return playerIds;
     }
 
     public async Task<bool> NameIsUniqueAsync(Guid gameId, PlayerName name, Guid? playerId = null, CancellationToken cancellationToken = default)

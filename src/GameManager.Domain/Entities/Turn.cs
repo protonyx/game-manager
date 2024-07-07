@@ -1,6 +1,8 @@
-﻿namespace GameManager.Domain.Entities;
+﻿using GameManager.Domain.Common;
 
-public class Turn
+namespace GameManager.Domain.Entities;
+
+public class Turn : IEntity<Guid>
 {
     public Guid Id { get; set; }
 

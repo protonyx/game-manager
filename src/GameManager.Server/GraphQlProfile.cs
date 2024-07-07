@@ -1,0 +1,22 @@
+﻿using AutoMapper;
+using GameManager.Domain.Entities;
+using GameManager.Server.Models;
+
+namespace GameManager.Server;
+
+public class GraphQlProfile : Profile
+{
+    public GraphQlProfile()
+    {
+        CreateMap<Game, GameModel>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
+            .ForMember(t => t.EntryCode, opt => opt.MapFrom(t => t.EntryCode.Value));
+        CreateMap<Tracker, GameTrackerModel>();
+        
+        CreateMap<Player, PlayerModel>()
+            .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
+            .ForMember(t => t.Trackers, opt => opt.MapFrom(t => t.TrackerValues));
+        CreateMap<TrackerValue, PlayerTrackerValueModel>()
+            .ForMember(t => t.Name, opt => opt.Ignore());
+    }
+}

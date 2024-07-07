@@ -6,7 +6,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public record Game
+public record Game : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 
