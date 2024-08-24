@@ -37,9 +37,6 @@ public class GameHub : Hub<IGameClientNotificationService>
 
         if (playerId.HasValue)
         {
-            // Add the connection to a group named with the Player ID
-            await Groups.AddToGroupAsync(Context.ConnectionId, playerId.Value.ToString());
-
             _logger.LogInformation("Player {PlayerId} connected", playerId.Value);
 
             var notification = new PlayerConnectedNotification(playerId.Value, Context.ConnectionId);

@@ -18,6 +18,7 @@ using GameManager.Server.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
@@ -67,6 +68,7 @@ var signalr = builder.Services.AddSignalR()
     {
         opt.PayloadSerializerSettings.Converters.Add(new StringEnumConverter());
     });
+builder.Services.AddSingleton<IUserIdProvider, PlayerUserIdProvider>();
 
 builder.Services.AddSingleton<IGameClientNotificationService, GameHubClientNotificationService>();
 
