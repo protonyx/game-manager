@@ -33,6 +33,7 @@ import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
 import { PatchOperation } from '../models/patch';
+import {selectCurrentPlayerId} from "./game.selectors";
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -505,11 +506,14 @@ export const clearCredentialsOnAuthenticationError = createEffect(
 );
 
 export const clearCredentialsWhenKicked = createEffect(
-  (actions$ = inject(Actions), store = inject(Store)) => {
+  (actions$ = inject(Actions), store = inject(Store), router = inject(Router)) => {
     return actions$.pipe(
       ofType(GameHubActions.playerLeft),
-      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
-      filter(([action, player]) => !!player && player.id === action.playerId),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayerId)),
+      filter(([action, playerId]) => action.playerId === playerId),
+      tap(() => {
+          router.navigate(['game', 'join']);
+      }),
       map(() => GameActions.clearCredentials()),
     );
   },
