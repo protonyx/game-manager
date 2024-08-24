@@ -16,9 +16,14 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
         _mapper = mapper;
     }
 
-    public Task Handle(PlayerUpdatedNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(PlayerUpdatedNotification notification, CancellationToken cancellationToken)
     {
         var player = notification.Player;
+
+        // Do not notify if the player is no longer active
+        if (!player.Active)
+            return;
+        
         var dto = _mapper.Map<PlayerDTO>(player);
 
         var message = new PlayerUpdatedMessage()
@@ -28,6 +33,6 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
             Player = dto
         };
 
-        return _gameClientNotificationService.PlayerUpdated(message, cancellationToken);
+        await _gameClientNotificationService.PlayerUpdated(message, cancellationToken);
     }
 }

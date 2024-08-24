@@ -68,19 +68,16 @@ public class EndTurnCommandHandler : ICommandHandler<EndTurnCommand>
             return GameErrors.PlayerNotAuthorized("end the turn");
         }
 
-        var nextPlayer = players.FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
+        var nextPlayer = players
+            .Where(t => t.Active)
+            .FirstOrDefault(t => t.Order > currentPlayer.Order) ?? players.First();
 
-        var turn = new Turn()
+        var turn = game.SetCurrentTurn(nextPlayer);
+
+        if (turn != null)
         {
-            PlayerId = currentPlayer.Id,
-            StartTime = game.CurrentTurn?.StartTime ?? utcNow,
-            EndTime = utcNow
-        };
-        turn.Duration = turn.EndTime - turn.StartTime;
-
-        await _turnRepository.CreateAsync(turn, cancellationToken);
-
-        game.SetCurrentTurn(nextPlayer);
+            await _turnRepository.CreateAsync(turn, cancellationToken);
+        }
 
         var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
 
