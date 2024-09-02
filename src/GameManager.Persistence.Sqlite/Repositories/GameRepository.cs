@@ -12,6 +12,13 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     {
     }
 
+    public IQueryable<Game> Query()
+    {
+        return _context.Set<Game>()
+            .AsQueryable()
+            .AsNoTracking();
+    }
+
     public async Task<IReadOnlyList<Game>> FindAsync(DateTime? olderThan = null, CancellationToken cancellationToken = default)
     {
         IQueryable<Game> query = _context.Set<Game>()

@@ -12,7 +12,9 @@ public class GameType : ObjectType<GameModel>
 {
     protected override void Configure(IObjectTypeDescriptor<GameModel> descriptor)
     {
-        descriptor.Authorize(AuthorizationPolicyNames.ViewGame, ApplyPolicy.AfterResolver);
+        descriptor.Field(t => t.CurrentTurnPlayer)
+            .ResolveWith<GameResolvers>(t => t.GetCurrentPlayerAsync(default!, default!, default!))
+            .Name("currentTurnPlayer");
         
         descriptor.Field(t => t.Players)
             .ResolveWith<GameResolvers>(t => t.GetPlayersAsync(default!,  default!, default!, default!))
@@ -23,13 +25,23 @@ public class GameType : ObjectType<GameModel>
     {
         public async Task<IReadOnlyList<PlayerModel>> GetPlayersAsync(
             [Parent] GameModel game,
-            [Service] IPlayerRepository playerRepository,
+            IPlayerRepository playerRepository,
             PlayerByIdDataLoader playerById,
             CancellationToken cancellationToken)
         {
             var playerIds = await playerRepository.GetIdsByGameAsync(game.Id, cancellationToken);
 
             return await playerById.LoadAsync(playerIds, cancellationToken);
+        }
+
+        public async Task<PlayerModel?> GetCurrentPlayerAsync(
+            [Parent] GameModel game,
+            PlayerByIdDataLoader playerById,
+            CancellationToken cancellationToken)
+        {
+            return game.CurrentTurnPlayerId.HasValue
+                ? await playerById.LoadAsync(game.CurrentTurnPlayerId!.Value, cancellationToken)
+                : null;
         }
     }
 }

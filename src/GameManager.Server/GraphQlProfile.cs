@@ -10,7 +10,9 @@ public class GraphQlProfile : Profile
     {
         CreateMap<Game, GameModel>()
             .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
-            .ForMember(t => t.EntryCode, opt => opt.MapFrom(t => t.EntryCode.Value));
+            .ForMember(t => t.EntryCode, opt => opt.MapFrom(t => t.EntryCode.Value))
+            .ForMember(t => t.CurrentTurnPlayer, opt => opt.Ignore())
+            .ForMember(t => t.Players, opt => opt.Ignore());
         CreateMap<Tracker, GameTrackerModel>();
         
         CreateMap<Player, PlayerModel>()

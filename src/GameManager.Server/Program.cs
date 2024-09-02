@@ -6,6 +6,7 @@ using FastEndpoints.Swagger;
 using GameManager.Application;
 using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Profiles;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
@@ -134,9 +135,11 @@ builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuth
 
 builder.Services.AddGraphQLServer()
     .AddAuthorization()
+    .AddFiltering()
     .AddQueryType<Query>()
     .AddType<GameType>()
     .AddType<PlayerTrackerValueType>()
+    .RegisterService<IPlayerRepository>(ServiceKind.Synchronized)
     .AddDataLoader<PlayerByIdDataLoader>()
     .AddDataLoader<GameByIdDataLoader>()
     .AddDataLoader<TrackerByIdDataLoader>();
