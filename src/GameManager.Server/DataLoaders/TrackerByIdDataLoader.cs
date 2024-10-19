@@ -12,10 +12,11 @@ public class TrackerByIdDataLoader : BatchDataLoader<Guid, GameTrackerModel>
     private readonly IMapper _mapper;
     
     public TrackerByIdDataLoader(
-        IBatchScheduler batchScheduler,
         ITrackerRepository trackerRepository,
-        IMapper mapper)
-        : base(batchScheduler)
+        IMapper mapper,
+        IBatchScheduler batchScheduler,
+        DataLoaderOptions options)
+        : base(batchScheduler, options)
     {
         _trackerRepository = trackerRepository;
         _mapper = mapper;

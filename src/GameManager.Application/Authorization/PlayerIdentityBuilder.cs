@@ -7,13 +7,15 @@ namespace GameManager.Application.Authorization;
 public class PlayerIdentityBuilder : IPlayerIdentityBuilder
 {
 
+    private readonly string _authenticationType;
+    
     private const string RoleClaim = "role";
 
     private readonly ConcurrentBag<Claim> _claims = new();
 
-    public PlayerIdentityBuilder()
+    public PlayerIdentityBuilder(string authenticationType = "internal")
     {
-
+        _authenticationType = authenticationType;
     }
 
     public IPlayerIdentityBuilder AddGameId(Guid gameId)
@@ -47,7 +49,7 @@ public class PlayerIdentityBuilder : IPlayerIdentityBuilder
     public ClaimsIdentity Build()
     {
         return new ClaimsIdentity(_claims, roleType: RoleClaim, nameType: ClaimTypes.Name,
-            authenticationType: "internal");
+            authenticationType: _authenticationType);
     }
 
     public static ClaimsPrincipal CreatePrincipal(Action<IPlayerIdentityBuilder> builderAction)

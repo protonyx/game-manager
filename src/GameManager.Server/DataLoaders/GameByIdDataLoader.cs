@@ -12,10 +12,11 @@ public class GameByIdDataLoader : BatchDataLoader<Guid, GameModel>
     private readonly IMapper _mapper;
     
     public GameByIdDataLoader(
-        IBatchScheduler batchScheduler,
         IGameRepository gameRepository,
-        IMapper mapper)
-        : base(batchScheduler)
+        IMapper mapper,
+        IBatchScheduler batchScheduler,
+        DataLoaderOptions options)
+        : base(batchScheduler, options)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;

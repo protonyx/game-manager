@@ -112,11 +112,16 @@ builder.Services.AddAuthentication(opt =>
             IssuerSigningKey = tokenService.GetSigningKey()
         };
         options.EventsType = typeof(CustomJwtBearerEvents);
+    })
+    .AddBasic(options =>
+    {
+        builder.Configuration.Bind("Admin", options);
     });
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy(AuthorizationPolicyNames.Admin, policy =>
     {
+        policy.AddAuthenticationSchemes("Basic");
         policy.RequireRole(GameManagerRoles.Admin);
     });
     opt.AddPolicy(AuthorizationPolicyNames.ViewGame, policy =>
@@ -134,12 +139,16 @@ builder.Services.AddScoped<IAuthorizationHandler, PlayerAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddGraphQLServer()
-    .AddAuthorization()
+    .AddAuthorization(opt =>
+    {
+        var test = opt.GetPolicy(AuthorizationPolicyNames.Admin);
+        var canbasic = test.AuthenticationSchemes.Contains("Basic");
+    })
     .AddFiltering()
     .AddQueryType<Query>()
     .AddType<GameType>()
     .AddType<PlayerTrackerValueType>()
-    .RegisterService<IPlayerRepository>(ServiceKind.Synchronized)
+    //.RegisterService<IPlayerRepository>(ServiceKind.Synchronized)
     .AddDataLoader<PlayerByIdDataLoader>()
     .AddDataLoader<GameByIdDataLoader>()
     .AddDataLoader<TrackerByIdDataLoader>();
@@ -262,20 +271,16 @@ app.UseFastEndpoints(c =>
     c.Versioning.Prefix = "v";
     c.Versioning.DefaultVersion = 1;
     c.Versioning.PrependToRoute = true;
-    c.Errors.UseProblemDetails();
+    c.Errors.UseProblemDetails(x =>
+    {
+        x.TitleTransformer = pd => pd.Status switch
+        {
+            StatusCodes.Status403Forbidden => "Forbidden",
+            _ => "One or more validation errors occurred."
+        };
+    });
     c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
         new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id, statusCode);
-    ProblemDetails.TitleTransformer = pd =>
-    {
-        if (pd.Status == StatusCodes.Status403Forbidden)
-        {
-            return "Forbidden";
-        }
-        else
-        {
-            return "One or more validation errors occurred.";
-        }
-    };
 });
 app.UseSwaggerGen();
 

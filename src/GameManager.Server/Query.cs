@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper.QueryableExtensions;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Authorization;
 using GameManager.Server.DataLoaders;
 using GameManager.Server.Models;
-using HotChocolate;
 using HotChocolate.Authorization;
-using HotChocolate.Data.Filters;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +16,8 @@ public class Query
     [UsePaging(MaxPageSize = 100, IncludeTotalCount = true, AllowBackwardPagination = false)]
     [UseFiltering]
     public async Task<Connection<GameModel>> GetGames(
-        [Service] IGameRepository gameRepository,
-        [Service] IMapper mapper,
+        IGameRepository gameRepository,
+        IMapper mapper,
         IResolverContext resolverContext,
         string? after,
         int? first,
@@ -59,8 +56,9 @@ public class Query
         var pageInfo = new ConnectionPageInfo(endCursor != null, false, null,
             endCursor);
 
-        return new Connection<GameModel>(edges, pageInfo,
-            async ct => await totalQuery.CountAsync(ct));
+        var totalCount = await totalQuery.CountAsync(cancellationToken);
+
+        return new Connection<GameModel>(edges, pageInfo, totalCount);
     }
 
     [Authorize(AuthorizationPolicyNames.ViewGame, ApplyPolicy.BeforeResolver)]
