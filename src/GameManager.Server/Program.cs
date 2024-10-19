@@ -97,7 +97,7 @@ var tokenService = new TokenService(builder.Configuration);
 
 builder.Services.AddAuthentication(opt =>
     {
-        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultScheme = "SchemeSelector";
     })
     .AddJwtBearer(options =>
     {
@@ -116,12 +116,35 @@ builder.Services.AddAuthentication(opt =>
     .AddBasic(options =>
     {
         builder.Configuration.Bind("Admin", options);
+    })
+    .AddPolicyScheme("SchemeSelector", "SchemeSelector", options =>
+    {
+        options.ForwardDefaultSelector = context =>
+        {
+            string authorization = context.Request.Headers.Authorization;
+            if (string.IsNullOrEmpty(authorization))
+            {
+                return null;
+            }
+            
+            if (authorization.StartsWith("Bearer "))
+            {
+                return JwtBearerDefaults.AuthenticationScheme;
+            }
+            else if (authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Basic";
+            }
+
+            return null;
+        };
     });
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy(AuthorizationPolicyNames.Admin, policy =>
     {
-        policy.AddAuthenticationSchemes("Basic");
+        policy.AuthenticationSchemes.Add("Basic");
+        policy.RequireAuthenticatedUser();
         policy.RequireRole(GameManagerRoles.Admin);
     });
     opt.AddPolicy(AuthorizationPolicyNames.ViewGame, policy =>
@@ -139,11 +162,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PlayerAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddGraphQLServer()
-    .AddAuthorization(opt =>
-    {
-        var test = opt.GetPolicy(AuthorizationPolicyNames.Admin);
-        var canbasic = test.AuthenticationSchemes.Contains("Basic");
-    })
+    .AddAuthorization()
     .AddFiltering()
     .AddQueryType<Query>()
     .AddType<GameType>()
