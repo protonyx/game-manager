@@ -8,14 +8,14 @@ RUN dotnet build "GameManager.Server/GameManager.Server.csproj" -c Release /p:In
 
 RUN dotnet publish "GameManager.Server/GameManager.Server.csproj" -c Release /p:InformationalVersion=$version -o /app/publish
 
-FROM node:18 as build-web
+FROM node:20-alpine as build-web
 WORKDIR /src
 
 COPY ["web/package.json", "web/package-lock.json", "./"]
 RUN npm install
 
 COPY ./web ./
-RUN npm run build --configuration=production
+RUN npm run build -- --configuration=production
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
