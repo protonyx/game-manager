@@ -15,8 +15,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
+using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -40,7 +42,7 @@ catch (Exception)
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+var redisConnectionString = builder.Configuration.GetConnectionString("cache");
 
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
@@ -140,63 +142,63 @@ builder.Services.AddSqlitePersistenceServices();
 
 builder.Services.AddHostedService<GamePruningService>();
 
-// TODO: Switch to using OTEL_EXPORTER_OTLP_ENDPOINT
-var otlpEndpoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
+// Telemetry
 var resources = ResourceBuilder.CreateDefault()
     .AddService("game-manager",
         serviceInstanceId: Environment.MachineName,
         serviceVersion: version);
 
-var otelBuilder = builder.Services.AddOpenTelemetry()
+builder.Logging.AddOpenTelemetry(opt =>
+{
+    opt.IncludeFormattedMessage = true;
+    opt.IncludeScopes = true;
+    opt.SetResourceBuilder(resources);
+});
+
+var otel = builder.Services.AddOpenTelemetry()
     .WithMetrics(mb =>
     {
         mb.SetResourceBuilder(resources);
         mb.AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation();
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation();
         mb.AddPrometheusExporter(prom =>
         {
             prom.ScrapeEndpointPath = "/metrics";
         });
-    });
-
-if (!string.IsNullOrWhiteSpace(otlpEndpoint))
-{
-    otelBuilder
-        .WithTracing(tb =>
-        {
-            tb.SetResourceBuilder(resources);
-            tb.AddAspNetCoreInstrumentation(opt =>
-                {
-                    opt.Filter = hc => !hc.Request.Method.Equals("OPTIONS")
-                                       && !hc.Request.Path.StartsWithSegments("/health")
-                                       && !hc.Request.Path.StartsWithSegments("/metrics");
-                })
-                .AddHttpClientInstrumentation()
-                .AddEntityFrameworkCoreInstrumentation();
-
-            if (!string.IsNullOrWhiteSpace(redisConnectionString))
-            {
-                tb.AddRedisInstrumentation();
-            }
-
-            tb.AddOtlpExporter(otlp =>
-            {
-                otlp.Endpoint = new Uri(otlpEndpoint);
-                otlp.Protocol = OtlpExportProtocol.Grpc;
-            });
-        });
-
-    builder.Logging.AddOpenTelemetry(opt =>
+    })
+    .WithTracing(tb =>
     {
-        opt.IncludeFormattedMessage = true;
-        opt.SetResourceBuilder(resources);
-        opt.AddOtlpExporter(otlp =>
+        if (builder.Environment.IsDevelopment())
         {
-            otlp.Endpoint = new Uri(otlpEndpoint);
-            otlp.Protocol = OtlpExportProtocol.Grpc;
-        });
+            tb.SetSampler(new AlwaysOnSampler());
+        }
+
+        tb.SetResourceBuilder(resources);
+        tb.AddAspNetCoreInstrumentation(opt =>
+            {
+                opt.Filter = hc => !hc.Request.Method.Equals("OPTIONS")
+                                   && !hc.Request.Path.StartsWithSegments("/health")
+                                   && !hc.Request.Path.StartsWithSegments("/metrics");
+            })
+            .AddHttpClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation();
+
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            tb.AddRedisInstrumentation();
+        }
     });
+
+var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+
+if (useOtlpExporter)
+{
+    otel.UseOtlpExporter();
 }
 
 var app = builder.Build();
@@ -252,6 +254,7 @@ app.MapGet("/version", async ctx =>
         Version = version
     });
 });
+app.MapHealthChecks("/health");
 
 app.Run();
 
