@@ -19,7 +19,7 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
     public async Task Test_CreateNewGame()
     {
         // Arrange
-        var client = App.CreateClient(new WebApplicationFactoryClientOptions()
+        var client = App.CreateClient(new ClientOptions()
         {
             BaseAddress = new("http://localhost/api/v1/")
         });
