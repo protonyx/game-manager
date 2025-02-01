@@ -32,7 +32,7 @@ public class EndTurnCommandTests
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player2.Id), CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
+        playerRepo.Setup(t => t.GetByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
@@ -75,7 +75,7 @@ public class EndTurnCommandTests
         gameRepo.Setup(t => t.UpdateAsync(It.Is<Game>(g => g.CurrentTurn.PlayerId == player1.Id), CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
+        playerRepo.Setup(t => t.GetByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {
@@ -115,7 +115,7 @@ public class EndTurnCommandTests
         gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
+        playerRepo.Setup(t => t.GetByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(new List<Player>() { player1, player2 });
         fixture.SetUser(user =>
         {

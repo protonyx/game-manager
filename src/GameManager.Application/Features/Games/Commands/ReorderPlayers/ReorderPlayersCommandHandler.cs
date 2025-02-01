@@ -41,7 +41,7 @@ public class ReorderPlayersCommandHandler : ICommandHandler<ReorderPlayersComman
             return GameErrors.PlayerNotAuthorized();
         }
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(request.GameId, cancellationToken);
 
         var newIdList = request.PlayerIds;
         var existingIdSet = players.Where(p => p.Active).Select(p => p.Id).ToHashSet();

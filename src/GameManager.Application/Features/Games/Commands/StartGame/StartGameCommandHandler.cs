@@ -40,7 +40,7 @@ public class StartGameCommandHandler : ICommandHandler<StartGameCommand>
                 GameErrors.GameAlreadyInProgress())
             .Tap(async g =>
             {
-                var players = await _playerRepository.GetPlayersByGameIdAsync(g.Id, cancellationToken);
+                var players = await _playerRepository.GetByGameIdAsync(g.Id, cancellationToken);
                 var firstPlayer = players.OrderBy(t => t.Order).First();
 
                 g.Start(firstPlayer);

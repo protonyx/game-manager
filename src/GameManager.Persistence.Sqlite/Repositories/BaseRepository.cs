@@ -1,9 +1,10 @@
 ﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameManager.Persistence.Sqlite.Repositories;
 
-public class BaseRepository<T> : IAsyncRepository<T> where T : class
+public class BaseRepository<T> : IAsyncRepository<T> where T : class, IEntity<Guid>
 {
     protected readonly DbContext _context;
 
@@ -17,6 +18,15 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class
         T? t = await _context.Set<T>().FindAsync(id);
 
         return t;
+    }
+
+    public virtual async Task<IReadOnlyList<T>> GetManyByIdAsync(IReadOnlyList<Guid> keys, CancellationToken cancellationToken = default)
+    {
+        var entities = await _context.Set<T>().AsQueryable()
+            .Where(t => keys.Contains(t.Id))
+            .ToListAsync(cancellationToken);
+
+        return entities;
     }
 
     public virtual async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)

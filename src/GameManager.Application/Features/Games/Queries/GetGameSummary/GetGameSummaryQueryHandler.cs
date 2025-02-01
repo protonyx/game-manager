@@ -43,7 +43,7 @@ public class GetGameSummaryQueryHandler : IQueryHandler<GetGameSummaryQuery, Gam
             return GameErrors.GameNotComplete();
         }
 
-        var players = await _playerRepository.GetPlayersByGameIdAsync(game.Id, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(game.Id, cancellationToken);
         var turns = await _turnRepository.GetTurnsByGameId(request.GameId, cancellationToken);
         var trackerHistory = await _trackerHistoryRepository.GetHistoryByGameId(request.GameId, cancellationToken);
 

@@ -24,7 +24,7 @@ public class ReorderPlayersCommandTests
         gameRepo.Setup(t => t.GetByIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(game);
         var playerRepo = fixture.Freeze<Mock<IPlayerRepository>>();
-        playerRepo.Setup(t => t.GetPlayersByGameIdAsync(game.Id, CancellationToken.None))
+        playerRepo.Setup(t => t.GetByGameIdAsync(game.Id, CancellationToken.None))
             .ReturnsAsync(players);
         playerRepo.Setup(t => t.UpdateManyAsync(It.IsAny<IEnumerable<Player>>(), CancellationToken.None))
             .Callback((IEnumerable<Player> p, CancellationToken ct) => reorderedPlayers = p.ToList())

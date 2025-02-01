@@ -36,7 +36,12 @@ public class JoinGameCommandHandler : ICommandHandler<JoinGameCommand, PlayerCre
         if (entryCodeOrError.IsFailure)
             return GameErrors.InvalidEntryCode();
 
-        var game = await _gameRepository.GetGameByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
+        var gameId = await _gameRepository.GetIdByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
+
+        if (!gameId.HasValue)
+            return GameErrors.InvalidEntryCode();
+        
+        var game = await _gameRepository.GetByIdAsync(gameId.Value, cancellationToken);
 
         if (game == null)
             return GameErrors.InvalidEntryCode();

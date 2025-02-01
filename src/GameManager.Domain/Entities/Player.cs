@@ -3,7 +3,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public class Player
+public class Player : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 

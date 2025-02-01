@@ -18,7 +18,7 @@ public class GetPlayerListQueryHandler : IQueryHandler<GetPlayerListQuery, IRead
 
     public async Task<Result<IReadOnlyList<PlayerDTO>, ApplicationError>> Handle(GetPlayerListQuery request, CancellationToken cancellationToken)
     {
-        var players = await _playerRepository.GetPlayersByGameIdAsync(request.GameId, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(request.GameId, cancellationToken);
 
         var ret = players.Select(_mapper.Map<PlayerDTO>).ToList();
 

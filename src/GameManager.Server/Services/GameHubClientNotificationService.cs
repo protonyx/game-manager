@@ -48,7 +48,7 @@ public class GameHubClientNotificationService : IGameClientNotificationService
 
     public Task UpdateCredentials(PlayerCredentialsDTO message, CancellationToken cancellationToken)
     {
-        return _hubContext.Clients.Group(message.PlayerId.ToString())
+        return _hubContext.Clients.User(message.PlayerId.ToString())
             .SendAsync(nameof(IGameClientNotificationService.UpdateCredentials),
                 message,
                 cancellationToken: cancellationToken);

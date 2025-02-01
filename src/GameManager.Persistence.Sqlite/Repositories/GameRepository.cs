@@ -12,6 +12,13 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     {
     }
 
+    public IQueryable<Game> Query()
+    {
+        return _context.Set<Game>()
+            .AsQueryable()
+            .AsNoTracking();
+    }
+
     public async Task<IReadOnlyList<Game>> FindAsync(DateTime? olderThan = null, CancellationToken cancellationToken = default)
     {
         IQueryable<Game> query = _context.Set<Game>()
@@ -35,6 +42,16 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
             .AnyAsync(cancellationToken);
     }
 
+    public async Task<Guid?> GetIdByEntryCodeAsync(EntryCode entryCode, CancellationToken cancellationToken = default)
+    {
+        var gameId = await _context.Set<Game>()
+            .Where(t => t.EntryCode.Equals(entryCode))
+            .Select(t => t.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return gameId;
+    }
+
     public override Task<Game> UpdateAsync(Game entity, CancellationToken cancellationToken = default)
     {
         if (entity.CurrentTurn != null)
@@ -53,15 +70,6 @@ public class GameRepository : BaseRepository<Game>, IGameRepository
     public override async Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Game>().FindAsync(new object?[] { gameId }, cancellationToken);
-    }
-
-    public async Task<Game?> GetGameByEntryCodeAsync(EntryCode entryCode, CancellationToken cancellationToken = default)
-    {
-        var game = await _context.Set<Game>()
-            .Where(t => t.EntryCode.Equals(entryCode))
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return game;
     }
 
     public Task<bool> EntryCodeExistsAsync(EntryCode entryCode, CancellationToken cancellationToken = default)

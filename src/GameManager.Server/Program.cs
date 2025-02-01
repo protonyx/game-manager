@@ -4,16 +4,22 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using GameManager.Application;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
+using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Profiles;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
 using GameManager.Server.Authorization;
+using GameManager.Server.DataLoaders;
 using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
+using GameManager.Server.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -65,6 +71,7 @@ var signalr = builder.Services.AddSignalR()
     {
         opt.PayloadSerializerSettings.Converters.Add(new StringEnumConverter());
     });
+builder.Services.AddSingleton<IUserIdProvider, PlayerUserIdProvider>();
 
 builder.Services.AddSingleton<IGameClientNotificationService, GameHubClientNotificationService>();
 
@@ -92,7 +99,7 @@ var tokenService = new TokenService(builder.Configuration);
 
 builder.Services.AddAuthentication(opt =>
     {
-        opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultScheme = "SchemeSelector";
     })
     .AddJwtBearer(options =>
     {
@@ -107,11 +114,65 @@ builder.Services.AddAuthentication(opt =>
             IssuerSigningKey = tokenService.GetSigningKey()
         };
         options.EventsType = typeof(CustomJwtBearerEvents);
+    })
+    .AddBasic(options =>
+    {
+        builder.Configuration.Bind("Admin", options);
+    })
+    .AddPolicyScheme("SchemeSelector", "SchemeSelector", options =>
+    {
+        options.ForwardDefaultSelector = context =>
+        {
+            string authorization = context.Request.Headers.Authorization;
+            if (string.IsNullOrEmpty(authorization))
+            {
+                return null;
+            }
+            
+            if (authorization.StartsWith("Bearer "))
+            {
+                return JwtBearerDefaults.AuthenticationScheme;
+            }
+            else if (authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Basic";
+            }
+
+            return null;
+        };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy(AuthorizationPolicyNames.Admin, policy =>
+    {
+        policy.AuthenticationSchemes.Add("Basic");
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole(GameManagerRoles.Admin);
+    });
+    opt.AddPolicy(AuthorizationPolicyNames.ViewGame, policy =>
+    {
+        policy.AddRequirements(new GameAuthorizationRequirement(modify: false));
+    });
+    opt.AddPolicy(AuthorizationPolicyNames.ModifyGame, policy =>
+    {
+        policy.AddRequirements(new GameAuthorizationRequirement(modify: true));
+    });
+});
 builder.Services.AddScoped<IAuthorizationHandler, GameAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, GameResourceAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, PlayerAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemAuthorizationMiddlewareResultHandler>();
+
+builder.Services.AddGraphQLServer()
+    .AddAuthorization()
+    .AddFiltering()
+    .AddQueryType<Query>()
+    .AddType<GameType>()
+    .AddType<PlayerTrackerValueType>()
+    //.RegisterService<IPlayerRepository>(ServiceKind.Synchronized)
+    .AddDataLoader<PlayerByIdDataLoader>()
+    .AddDataLoader<GameByIdDataLoader>()
+    .AddDataLoader<TrackerByIdDataLoader>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddSingleton<ITokenService>(tokenService);
@@ -136,6 +197,11 @@ else
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(DtoProfile), typeof(GraphQlProfile));
+});
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();
@@ -226,26 +292,23 @@ app.UseFastEndpoints(c =>
     c.Versioning.Prefix = "v";
     c.Versioning.DefaultVersion = 1;
     c.Versioning.PrependToRoute = true;
-    c.Errors.UseProblemDetails();
+    c.Errors.UseProblemDetails(x =>
+    {
+        x.TitleTransformer = pd => pd.Status switch
+        {
+            StatusCodes.Status403Forbidden => "Forbidden",
+            _ => "One or more validation errors occurred."
+        };
+    });
     c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
         new ProblemDetails(failures, ctx.Request.Path, Activity.Current.Id, statusCode);
-    ProblemDetails.TitleTransformer = pd =>
-    {
-        if (pd.Status == StatusCodes.Status403Forbidden)
-        {
-            return "Forbidden";
-        }
-        else
-        {
-            return "One or more validation errors occurred.";
-        }
-    };
 });
 app.UseSwaggerGen();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapHub<GameHub>("/hubs/game");
+app.MapGraphQL();
 app.MapFallbackToFile("index.html");
 app.MapGet("/version", async ctx =>
 {

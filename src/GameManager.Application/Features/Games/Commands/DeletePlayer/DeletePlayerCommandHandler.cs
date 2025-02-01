@@ -1,6 +1,7 @@
 ﻿using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
+using GameManager.Application.Features.Games.Notifications.GameUpdated;
 using GameManager.Application.Features.Games.Notifications.PlayerDeleted;
 using GameManager.Application.Features.Games.Notifications.PlayerPromoted;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
@@ -11,16 +12,24 @@ public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
 {
     private readonly IPlayerRepository _playerRepository;
 
+    private readonly IGameRepository _gameRepository;
+
+    private readonly ITurnRepository _turnRepository;
+
     private readonly IUserContext _userContext;
 
     private readonly IMediator _mediator;
 
     public DeletePlayerCommandHandler(
         IPlayerRepository playerRepository,
+        IGameRepository gameRepository,
+        ITurnRepository turnRepository,
         IUserContext userContext,
         IMediator mediator)
     {
         _playerRepository = playerRepository;
+        _gameRepository = gameRepository;
+        _turnRepository = turnRepository;
         _userContext = userContext;
         _mediator = mediator;
     }
@@ -46,10 +55,43 @@ public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
         await _playerRepository.UpdateAsync(playerToDelete, cancellationToken);
 
         await _mediator.Publish(new PlayerDeletedNotification(playerToDelete), cancellationToken);
+        
+        var game = await _gameRepository.GetByIdAsync(playerToDelete.GameId, cancellationToken);
+        var players = await _playerRepository.GetByGameIdAsync(playerToDelete.GameId, cancellationToken);
+        
+        // If the player to delete is currently in a turn, advance to the next turn first
+        if (game.CheckCurrentTurn(playerToDelete))
+        {
+            var eligiblePlayers = players
+                .Where(t => t.Active && t.Id != playerToDelete.Id)
+                .ToArray();
+            
+            var nextTurn = eligiblePlayers
+                               .FirstOrDefault(t => t.Order > playerToDelete.Order)
+                           ?? eligiblePlayers.FirstOrDefault();
 
+            if (nextTurn != null)
+            {
+                // Advance & record turn
+                var turn = game.SetCurrentTurn(nextTurn);
+
+                if (turn != null)
+                {
+                    await _turnRepository.CreateAsync(turn, cancellationToken);
+                }
+            }
+            else
+            {
+                // No more players, end game
+                game.Complete();
+            }
+            
+            var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);
+
+            await _mediator.Publish(new GameUpdatedNotification(updatedGame), cancellationToken);
+        }
+        
         // Update player order for remaining players
-        var players = await _playerRepository.GetPlayersByGameIdAsync(playerToDelete.GameId, cancellationToken);
-
         for (int i = 0; i < players.Count; i++)
         {
             players[i].SetOrder(i + 1);
@@ -58,13 +100,13 @@ public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
         // If the deleted player was an admin and there are any remaining players, promote the next player to admin
         if (playerToDelete.IsHost)
         {
-            var nextPlayer = players.Where(t => t.Active).MinBy(t => t.JoinedDate);
+            var nextHost = players.Where(t => t.Active).MinBy(t => t.JoinedDate);
 
-            if (nextPlayer != null)
+            if (nextHost != null)
             {
-                nextPlayer.Promote();
+                nextHost.Promote();
                 
-                await _mediator.Publish(new PlayerPromotedNotification(nextPlayer),
+                await _mediator.Publish(new PlayerPromotedNotification(nextHost),
                     cancellationToken);
             }
         }

@@ -6,7 +6,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public record Game
+public record Game : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 
@@ -106,11 +106,29 @@ public record Game
         return Result.Success();
     }
 
-    public void SetCurrentTurn(Player currentPlayer)
+    public Turn? SetCurrentTurn(Player currentPlayer)
     {
+        var previousTurn = CurrentTurn;
+        var currentTime = DateTime.UtcNow;
+        
         CurrentTurn = new CurrentTurnDetails(currentPlayer);
-        LastModified = DateTime.UtcNow;
+        LastModified = currentTime;
         UpdateETag();
+
+        return previousTurn != null
+            ? new Turn()
+            {
+                PlayerId = previousTurn.PlayerId,
+                StartTime = previousTurn.StartTime,
+                EndTime = currentTime,
+                Duration = currentTime - previousTurn.StartTime
+            }
+            : null;
+    }
+
+    public bool CheckCurrentTurn(Player player)
+    {
+        return CurrentTurn != null && CurrentTurn.PlayerId == player.Id;
     }
 
     public Result AddTracker(string name, int startingValue)

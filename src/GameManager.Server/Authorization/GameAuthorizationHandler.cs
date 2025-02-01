@@ -14,24 +14,27 @@ public class GameAuthorizationHandler : AuthorizationHandler<GameAuthorizationRe
 
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, GameAuthorizationRequirement requirement)
     {
+        // REST Query
         var routeValues = _httpContextAccessor.HttpContext.Request.RouteValues;
         var user = _httpContextAccessor.HttpContext.User;
 
         if (!string.IsNullOrWhiteSpace(requirement.GameIdRouteParameterName)
             && routeValues.TryGetValue(requirement.GameIdRouteParameterName, out object? value)
             && value != null
-            && Guid.TryParse(value.ToString(), out Guid gameId)
-            && (requirement.Modify
-                ? user.IsAuthorizedToModifyGame(gameId)
-                : user.IsAuthorizedToViewGame(gameId)))
+            && Guid.TryParse(value.ToString(), out Guid gameId))
         {
-            context.Succeed(requirement);
+            if (requirement.Modify
+                    ? user.IsAuthorizedToModifyGame(gameId)
+                    : user.IsAuthorizedToViewGame(gameId))
+            {
+                context.Succeed(requirement);
+            }
+            else
+            {
+                context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this game"));
+            }
         }
-        else
-        {
-            context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this game"));
-        }
-
+        
         return Task.CompletedTask;
     }
 }
