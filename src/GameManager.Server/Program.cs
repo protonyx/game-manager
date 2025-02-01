@@ -124,21 +124,14 @@ builder.Services.AddAuthentication(opt =>
         options.ForwardDefaultSelector = context =>
         {
             string authorization = context.Request.Headers.Authorization;
-            if (string.IsNullOrEmpty(authorization))
-            {
-                return null;
-            }
-            
-            if (authorization.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(authorization) || authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 return JwtBearerDefaults.AuthenticationScheme;
             }
-            else if (authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                return "Basic";
+                return BasicAuthenticationHandler.BasicAuthenticationSchemeName;
             }
-
-            return null;
         };
     });
 builder.Services.AddAuthorization(opt =>

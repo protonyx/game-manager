@@ -6,7 +6,7 @@ public static class AuthenticationHandlerExtensions
 {
     public static AuthenticationBuilder AddBasic(this AuthenticationBuilder builder,
         Action<BasicAuthenticationHandlerOptions> configureOptions) =>
-        builder.AddBasic("Basic", "Basic", configureOptions);
+        builder.AddBasic(BasicAuthenticationHandler.BasicAuthenticationSchemeName, "Basic", configureOptions);
     
     public static AuthenticationBuilder AddBasic(this AuthenticationBuilder builder,
         string authenticationScheme,

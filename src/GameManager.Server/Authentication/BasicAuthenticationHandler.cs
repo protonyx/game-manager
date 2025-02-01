@@ -9,6 +9,8 @@ namespace GameManager.Server.Authentication;
 
 public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationHandlerOptions>
 {
+    public const string BasicAuthenticationSchemeName = "Basic";
+    
     public BasicAuthenticationHandler(
         IOptionsMonitor<BasicAuthenticationHandlerOptions> options,
         ILoggerFactory loggerFactory,
