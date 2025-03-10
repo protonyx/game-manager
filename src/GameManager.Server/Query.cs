@@ -2,6 +2,7 @@
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Authorization;
 using GameManager.Server.DataLoaders;
+using GameManager.Server.Filters;
 using GameManager.Server.Models;
 using HotChocolate.Authorization;
 using HotChocolate.Resolvers;
@@ -14,7 +15,7 @@ public class Query
 {
     [Authorize(AuthorizationPolicyNames.Admin)]
     [UsePaging(MaxPageSize = 100, IncludeTotalCount = true, AllowBackwardPagination = false)]
-    [UseFiltering]
+    [UseFiltering(typeof(GameFilterType))]
     public async Task<Connection<GameModel>> GetGames(
         IGameRepository gameRepository,
         IMapper mapper,
