@@ -24,4 +24,6 @@ public class GameModel
     public ICollection<GameTrackerModel> Trackers { get; set; } = new List<GameTrackerModel>();
 
     public IReadOnlyList<PlayerModel> Players { get; set; } = new List<PlayerModel>();
+    
+    public IReadOnlyList<TurnModel> Turns { get; set; } = new List<TurnModel>();
 }

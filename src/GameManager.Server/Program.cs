@@ -164,8 +164,10 @@ builder.Services.AddGraphQLServer()
     .AddType<PlayerTrackerValueType>()
     //.RegisterService<IPlayerRepository>(ServiceKind.Synchronized)
     .AddDataLoader<PlayerByIdDataLoader>()
+    .AddDataLoader<PlayersByGameIdDataLoader>()
     .AddDataLoader<GameByIdDataLoader>()
-    .AddDataLoader<TrackerByIdDataLoader>();
+    .AddDataLoader<TrackerByIdDataLoader>()
+    .AddDataLoader<TurnsByGameIdDataLoader>();
 
 builder.Services.AddScoped<CustomJwtBearerEvents>();
 builder.Services.AddSingleton<ITokenService>(tokenService);
