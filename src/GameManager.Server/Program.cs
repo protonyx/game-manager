@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
@@ -46,9 +47,10 @@ catch (Exception)
 }
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults("game-manager", version);
 
 // Add services to the container.
-var redisConnectionString = builder.Configuration.GetConnectionString("cache");
+
 
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
@@ -175,19 +177,23 @@ builder.Services.AddSingleton<ITokenService>(tokenService);
 // Caching
 builder.Services.AddMemoryCache();
 
+var redisConnectionString = builder.Configuration.GetConnectionString("cache");
+
 if (string.IsNullOrWhiteSpace(redisConnectionString))
 {
     builder.Services.AddDistributedMemoryCache();
 }
 else
 {
-    var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
-    builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
-    builder.Services.AddStackExchangeRedisCache(opt =>
-    {
-        opt.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnectionMultiplexer);
-    });
-    signalr.AddStackExchangeRedis(redisConnectionString);
+    builder.AddRedisDistributedCache("cache");
+
+// var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+// builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
+// builder.Services.AddStackExchangeRedisCache(opt =>
+// {
+//     opt.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnectionMultiplexer);
+// });
+    signalr.AddStackExchangeRedis(redisConnectionString); // TODO: Aspire?
 }
 
 builder.Services.AddHttpContextAccessor();
@@ -203,70 +209,13 @@ builder.Services.AddSqlitePersistenceServices();
 
 builder.Services.AddHostedService<GamePruningService>();
 
-// Health Checks
-builder.Services.AddHealthChecks()
-    .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
-
-// Telemetry
-var resources = ResourceBuilder.CreateDefault()
-    .AddService("game-manager",
-        serviceInstanceId: Environment.MachineName,
-        serviceVersion: version);
-
-builder.Logging.AddOpenTelemetry(opt =>
-{
-    opt.IncludeFormattedMessage = true;
-    opt.IncludeScopes = true;
-    opt.SetResourceBuilder(resources);
-});
-
-var otel = builder.Services.AddOpenTelemetry()
-    .WithMetrics(mb =>
-    {
-        mb.SetResourceBuilder(resources);
-        mb.AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddRuntimeInstrumentation();
-        mb.AddPrometheusExporter(prom =>
-        {
-            prom.ScrapeEndpointPath = "/metrics";
-        });
-    })
-    .WithTracing(tb =>
-    {
-        if (builder.Environment.IsDevelopment())
-        {
-            tb.SetSampler(new AlwaysOnSampler());
-        }
-
-        tb.SetResourceBuilder(resources);
-        tb.AddAspNetCoreInstrumentation(opt =>
-            {
-                opt.Filter = hc => !hc.Request.Method.Equals("OPTIONS")
-                                   && !hc.Request.Path.StartsWithSegments("/health")
-                                   && !hc.Request.Path.StartsWithSegments("/metrics");
-            })
-            .AddHttpClientInstrumentation()
-            .AddEntityFrameworkCoreInstrumentation();
-
-        if (!string.IsNullOrWhiteSpace(redisConnectionString))
-        {
-            tb.AddRedisInstrumentation();
-        }
-    });
-
-var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-
-if (useOtlpExporter)
-{
-    otel.UseOtlpExporter();
-}
 
 var app = builder.Build();
 
 // Run migrations
-using (var scope = app.Services.CreateScope())
+if (!EF.IsDesignTime)
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<GameContext>();
     db.Database.Migrate();
 }
@@ -300,8 +249,6 @@ app.UseFastEndpoints(c =>
 });
 app.UseSwaggerGen();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
 app.MapHub<GameHub>("/hubs/game");
 app.MapGraphQL();
 app.MapFallbackToFile("index.html");
@@ -312,7 +259,7 @@ app.MapGet("/version", async ctx =>
         Version = version
     });
 });
-app.MapHealthChecks("/health");
+app.MapDefaultEndpoints();
 
 app.Run();
 

@@ -3,7 +3,8 @@ using Projects;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache")
-    .WithRedisInsight();
+    .WithRedisInsight()
+    .WithLifetime(ContainerLifetime.Persistent);
 
 var api = builder.AddProject<GameManager_Server>("api")
     .WithReference(cache)

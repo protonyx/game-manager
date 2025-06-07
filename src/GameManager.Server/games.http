@@ -24,12 +24,13 @@ Content-Type: application/json
  %}
 
 ### Join Game
+@entryCode=QN0C
 POST {{baseUrl}}/api/{{version}}/Games/Join
 Content-Type: application/json
 
 {
   "entryCode": "{{entryCode}}",
-  "name": "Player 1",
+  "name": "Player Test",
   "observer": false
 }
 
