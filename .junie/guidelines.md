@@ -63,6 +63,17 @@ The backend uses xUnit v3 as the testing framework with additional libraries:
 - FastEndpoints.Testing for API endpoint testing
 - Microsoft.AspNetCore.Mvc.Testing for integration testing
 
+Use these guidelines when writing tests:
+- All test dependencies must be registered with the test fixture by calling `fixture.Freeze` with the `Mock` type as the type argument
+- Never mock `IUserContext`, instead use the `SetUser` extension for AutoFixture to configure the User Principal:
+  ```
+  fixture.SetUser(user =>
+  {
+    user.AddGameId(game.Id)
+        .AddPlayerId(player.Id);
+  })
+  ```
+
 #### Running Backend Tests
 ```
 dotnet test src/GameManager.Tests/GameManager.Tests.csproj
