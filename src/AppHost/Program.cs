@@ -3,7 +3,10 @@ using Projects;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache")
-    .WithRedisInsight()
+    .WithRedisInsight(c =>
+    {
+        c.WithExternalHttpEndpoints();
+    })
     .WithLifetime(ContainerLifetime.Persistent);
 
 var api = builder.AddProject<GameManager_Server>("api")
