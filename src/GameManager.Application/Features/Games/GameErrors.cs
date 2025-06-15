@@ -39,15 +39,15 @@ public static class GameErrors
             errorCode: ErrorCodes.GameInvalidId);
 
     public static ApplicationError GameNotInProgress(Guid gameId)
-        => ApplicationError.Failure("Game not in progress",
+        => ApplicationError.Validation("Game not in progress",
             errorCode: ErrorCodes.GameInvalidState);
 
     public static ApplicationError GameAlreadyInProgress() =>
-        ApplicationError.Failure("Game already in progress",
+        ApplicationError.Validation("Game already in progress",
             errorCode: ErrorCodes.GameInvalidState);
 
     public static ApplicationError GameNotComplete() =>
-        ApplicationError.Failure("Game not complete",
+        ApplicationError.Validation("Game not complete",
             errorCode: ErrorCodes.GameInvalidState);
 
     public static ApplicationError PlayerNotFound(Guid? playerId)

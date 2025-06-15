@@ -28,7 +28,7 @@ public record Game : IEntity<Guid>
     public DateTime? StartedDate { get; private set; }
 
     public DateTime? CompletedDate { get; private set; }
-    
+
     public DateTime? LastModified { get; private set; }
 
     public ETag ETag { get; private set; } = ETag.Empty();
@@ -93,7 +93,8 @@ public record Game : IEntity<Guid>
     {
         if (State != GameState.InProgress)
         {
-            return Result.Failure("Invalid game state");
+            // Return a validation error message (string) for the Result
+            return Result.Failure("Game must be in progress to complete.");
         }
 
         State = GameState.Complete;
@@ -110,7 +111,7 @@ public record Game : IEntity<Guid>
     {
         var previousTurn = CurrentTurn;
         var currentTime = DateTime.UtcNow;
-        
+
         CurrentTurn = new CurrentTurnDetails(currentPlayer);
         LastModified = currentTime;
         UpdateETag();
@@ -137,7 +138,7 @@ public record Game : IEntity<Guid>
 
         if (trackerOrError.IsFailure)
             return Result.Failure($"Failed to add tracker: {trackerOrError.Error}");
-        
+
         this._trackers.Add(trackerOrError.Value);
         LastModified = DateTime.UtcNow;
         UpdateETag();
