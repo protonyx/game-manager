@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+@import '../../../variables.scss';
+
+.turn-card {
+  border-left: 5px solid;
+  transition: all 0.3s ease;
+  
+  .player-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  .my-turn {
+    font-weight: bold;
+    color: mat.m2-get-color-from-palette($primary-palette);
+  }
+  
+  .turn-icon {
+    vertical-align: middle;
+    margin-left: 8px;
+    color: mat.m2-get-color-from-palette($primary-palette);
+  }
+  
+  .turn-progress {
+    margin: 16px 0;
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      
+      .time-elapsed {
+        font-weight: 500;
+      }
+      
+      .progress-percentage {
+        font-weight: bold;
+      }
+    }
+    
+    .turn-progress-bar {
+      height: 8px;
+      border-radius: 4px;
+    }
+  }
+  
+  .timer-container {
+    margin: 16px 0;
+  }
+  
+  .player-info {
+    margin-top: 16px;
+    
+    .info-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      
+      mat-icon {
+        margin-right: 8px;
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+  }
+  
+  mat-card-actions {
+    padding: 16px;
+    display: flex;
+    justify-content: flex-end;
+    
+    button {
+      margin-left: 8px;
+    }
+  }
+}

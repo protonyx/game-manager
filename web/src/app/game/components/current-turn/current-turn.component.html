@@ -1,18 +1,81 @@
-<h1 *ngIf="isMyTurn">Your Turn!</h1>
-<h2 *ngIf="!isMyTurn">{{ currentTurn?.name }} is currently playing.</h2>
-<p *ngIf="nextTurn">Up Next: {{ nextTurn!.name }}</p>
+<mat-card class="turn-card" [ngStyle]="{'border-left-color': getPlayerColor(currentTurn)}">
+  <mat-card-header>
+    <!-- Player avatar with color -->
+    <div mat-card-avatar class="player-avatar" [ngStyle]="{'background-color': getPlayerColor(currentTurn)}">
+      <mat-icon>person</mat-icon>
+    </div>
 
-<app-turn-timer
-  *ngIf="game && game.lastTurnStartTime"
-  [startTime]="game!.lastTurnStartTime"></app-turn-timer>
+    <!-- Turn information -->
+    <mat-card-title>
+      <span *ngIf="isMyTurn" class="my-turn">Your Turn!</span>
+      <span *ngIf="!isMyTurn">{{ currentTurn?.name }}'s Turn</span>
+      <mat-icon *ngIf="isMyTurn" class="turn-icon">play_arrow</mat-icon>
+    </mat-card-title>
 
-<mat-action-row>
-  <button
-    mat-raised-button
-    type="button"
-    color="accent"
-    (click)="onEndTurn()"
-    *ngIf="isMyTurn">
-    End Turn
-  </button>
-</mat-action-row>
+    <mat-card-subtitle *ngIf="nextTurn">
+      Up Next: {{ nextTurn!.name }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Turn progress indicators -->
+    <div class="turn-progress">
+      <div class="progress-info">
+        <span class="time-elapsed">Time: {{ formatTurnDuration() }}</span>
+        <span class="progress-percentage">{{ turnProgress.toFixed(0) }}%</span>
+      </div>
+
+      <mat-progress-bar 
+        [value]="turnProgress" 
+        [color]="turnProgress > 75 ? 'warn' : 'primary'"
+        class="turn-progress-bar">
+      </mat-progress-bar>
+    </div>
+
+    <!-- Original turn timer for compatibility -->
+    <div class="timer-container">
+      <app-turn-timer
+        *ngIf="game && game.lastTurnStartTime"
+        [startTime]="game!.lastTurnStartTime">
+      </app-turn-timer>
+    </div>
+
+    <!-- Additional player information -->
+    <div class="player-info" *ngIf="currentTurn">
+      <div class="info-item">
+        <mat-icon>format_list_numbered</mat-icon>
+        <span>Turn Order: {{ currentTurn.order }}</span>
+      </div>
+
+      <div class="info-item" *ngIf="currentTurn.state === 'Connected'">
+        <mat-icon>wifi</mat-icon>
+        <span>Connected</span>
+      </div>
+
+      <div class="info-item" *ngIf="currentTurn.state === 'Disconnected'">
+        <mat-icon>wifi_off</mat-icon>
+        <span>Disconnected</span>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button
+      mat-raised-button
+      type="button"
+      color="accent"
+      (click)="onEndTurn()"
+      *ngIf="isMyTurn">
+      End Turn
+    </button>
+
+    <button
+      mat-raised-button
+      type="button"
+      color="primary"
+      (click)="onEndTurn()"
+      *ngIf="!isMyTurn && isHost">
+      Force End Turn
+    </button>
+  </mat-card-actions>
+</mat-card>

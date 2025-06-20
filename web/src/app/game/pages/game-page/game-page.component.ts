@@ -18,6 +18,10 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { GameControlComponent } from '../../components/game-control/game-control.component';
 import { MatButtonModule } from '@angular/material/button';
 import { LetDirective } from '@ngrx/component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCardModule } from '@angular/material/card';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Observable, map } from 'rxjs';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -34,6 +38,8 @@ const selectIsCurrentPlayerTurn = createSelector(
     CommonModule,
     MatButtonModule,
     MatExpansionModule,
+    MatGridListModule,
+    MatCardModule,
     GameControlComponent,
     PlayerListComponent,
     CurrentTurnComponent,
@@ -54,9 +60,35 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   isMyTurn$ = this.store.select(selectIsCurrentPlayerTurn);
 
+  // Grid layout configuration based on screen size
+  cols$: Observable<number> = this.breakpointObserver
+    .observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
+    .pipe(
+      map(result => {
+        if (result.breakpoints[Breakpoints.XSmall]) {
+          return 1; // 1 column for extra small devices
+        } else if (result.breakpoints[Breakpoints.Small]) {
+          return 1; // 1 column for small devices
+        } else if (result.breakpoints[Breakpoints.Medium]) {
+          return 2; // 2 columns for medium devices
+        } else {
+          return 2; // 2 columns for large and extra large devices
+        }
+      })
+    );
+
+  // Column spans for different components based on screen size
+  leftColSpan$: Observable<number> = this.cols$.pipe(
+    map(cols => cols === 1 ? 1 : 1) // Full width on small screens, 1/2 width on larger screens
+  );
+
+  rightColSpan$: Observable<number> = this.cols$.pipe(
+    map(cols => cols === 1 ? 1 : 1) // Full width on small screens, 1/2 width on larger screens
+  );
+
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit(): void {
     // Request a web lock to prevent tab from sleeping

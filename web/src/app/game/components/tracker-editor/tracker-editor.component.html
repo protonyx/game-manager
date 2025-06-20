@@ -1,62 +1,62 @@
-<form [formGroup]="trackerForm">
-  <table>
-    <ng-container *ngFor="let tracker of trackers">
-      <tr>
-        <td>
-          <button
-            mat-stroked-button
-            color="warn"
-            (click)="updateTracker(tracker.id, -10)">
-            -10
-          </button>
-        </td>
-        <td>
-          <button
-            mat-stroked-button
-            color="warn"
-            (click)="updateTracker(tracker.id, -5)">
-            -5
-          </button>
-        </td>
-        <td>
-          <button
-            mat-stroked-button
-            color="warn"
-            (click)="updateTracker(tracker.id, -1)">
-            -1
-          </button>
-        </td>
-        <td>
-          <mat-form-field class="full-width">
-            <mat-label>{{ tracker.name }}</mat-label>
-            <input matInput [formControlName]="tracker.id" />
+<form [formGroup]="trackerForm" class="tracker-form">
+  <div class="trackers-container">
+    <mat-card *ngFor="let tracker of trackers" class="tracker-card">
+      <mat-card-header>
+        <mat-card-title>{{ tracker.name }}</mat-card-title>
+        <mat-card-subtitle>Current value: {{ trackerForm.get(tracker.id)?.value }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="tracker-controls">
+          <!-- Slider for value adjustment -->
+          <div class="slider-container">
+            <button 
+              mat-icon-button 
+              color="warn" 
+              (click)="updateTracker(tracker.id, -1)"
+              aria-label="Decrease value">
+              <mat-icon>remove</mat-icon>
+            </button>
+
+            <mat-slider
+              [min]="getMinValue(tracker.id)"
+              [max]="getMaxValue(tracker.id)"
+              [step]="1"
+              [discrete]="true"
+              class="tracker-slider">
+              <input 
+                matSliderThumb
+                [formControlName]="tracker.id"
+                (valueChange)="setTrackerValue(tracker.id, $event)">
+            </mat-slider>
+
+            <button 
+              mat-icon-button 
+              color="primary" 
+              (click)="updateTracker(tracker.id, 1)"
+              aria-label="Increase value">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+
+          <!-- Direct input for precise value -->
+          <mat-form-field class="value-input">
+            <input 
+              matInput 
+              type="number" 
+              [formControlName]="tracker.id"
+              (change)="setTrackerValue(tracker.id, trackerForm.get(tracker.id)?.value)" />
           </mat-form-field>
-        </td>
-        <td>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="updateTracker(tracker.id, 1)">
-            +1
-          </button>
-        </td>
-        <td>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="updateTracker(tracker.id, 5)">
-            +5
-          </button>
-        </td>
-        <td>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="updateTracker(tracker.id, 10)">
-            +10
-          </button>
-        </td>
-      </tr>
-    </ng-container>
-  </table>
+        </div>
+
+        <!-- Quick adjustment buttons -->
+        <div class="quick-buttons">
+          <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -10)">-10</button>
+          <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -5)">-5</button>
+          <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 5)">+5</button>
+          <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 10)">+10</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </form>

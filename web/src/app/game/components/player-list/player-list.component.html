@@ -1,57 +1,64 @@
-<table mat-table [dataSource]="dataSource">
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td mat-cell *matCellDef="let element">
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
+<div class="player-list-container">
+  <!-- Search input -->
+  <mat-form-field class="search-field">
+    <mat-label>Search players</mat-label>
+    <input matInput [(ngModel)]="searchText" (keyup)="applyFilter($event)" placeholder="Search by name">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <!-- Card-based player list -->
+  <div class="player-cards-container">
+    <mat-card *ngFor="let player of filteredPlayers" class="player-card" [class.player-is-active]="checkIsPlayerTurn(player)">
+      <mat-card-header>
+        <div mat-card-avatar class="player-avatar">
+          {{ player.order }}
+        </div>
+        <mat-card-title>
+          {{ player.name }} 
+          <span *ngIf="checkIsMe(player)" class="me-indicator">(me)</span>
+          <mat-icon *ngIf="player.state === 'Disconnected'" class="disconnected-icon">signal_wifi_off</mat-icon>
+        </mat-card-title>
+        <mat-card-subtitle *ngIf="checkIsPlayerTurn(player)" class="turn-indicator">Current Turn</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Player trackers -->
+        <div class="tracker-list" *ngIf="trackers.length > 0">
+          <div *ngFor="let tracker of trackers" class="tracker-item">
+            <span class="tracker-name">{{ tracker.name }}:</span>
+            <span class="tracker-value">{{ getTrackerValue(player, tracker.id) }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="isHost">
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Player actions">
+          <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="handleEditPlayer(element)">
-                <mat-icon>edit</mat-icon>
-                <span>Edit</span>
-            </button>
-            <button mat-menu-item (click)="handleKickPlayer(element)">
-                <mat-icon>person_remove</mat-icon>
-                <span>Kick</span>
-            </button>
+          <button mat-menu-item (click)="handleEditPlayer(player)">
+            <mat-icon>edit</mat-icon>
+            <span>Edit</span>
+          </button>
+          <button mat-menu-item (click)="handleKickPlayer(player)">
+            <mat-icon>person_remove</mat-icon>
+            <span>Kick</span>
+          </button>
         </mat-menu>
-    </td>
-  </ng-container>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 
-  <ng-container matColumnDef="order">
-    <th mat-header-cell *matHeaderCellDef>Order</th>
-    <td mat-cell *matCellDef="let element">
-      <!--
-            <ng-container *ngIf="checkIsPlayerTurn(element)">
-                <span matBadge="*" matBadgeOverlap="false">{{ element.order }}</span>
-            </ng-container>
-            -->
-      <ng-container>
-        {{ element.order }}
-      </ng-container>
-    </td>
-  </ng-container>
+  <!-- No results message -->
+  <div *ngIf="filteredPlayers.length === 0" class="no-results">
+    No players found matching "{{ searchText }}"
+  </div>
 
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let element">
-      {{ element.name }} <span *ngIf="checkIsMe(element)">(me)</span>
-      <mat-icon *ngIf="element.state === 'Disconnected'">
-        signal_wifi_off
-      </mat-icon>
-    </td>
-  </ng-container>
-
-  <ng-container *ngFor="let tracker of trackers" [matColumnDef]="tracker.id">
-    <th mat-header-cell *matHeaderCellDef>{{ tracker.name }}</th>
-    <td mat-cell *matCellDef="let element">
-      {{ getTrackerValue(element, tracker.id) }}
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-  <tr
-    mat-row
-    [class.player-is-active]="checkIsPlayerTurn(row)"
-    *matRowDef="let row; columns: columnsToDisplay"></tr>
-</table>
+  <!-- Pagination -->
+  <mat-paginator 
+    [length]="dataSource.data.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    aria-label="Select page">
+  </mat-paginator>
+</div>

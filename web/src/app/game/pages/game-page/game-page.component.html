@@ -2,75 +2,93 @@
   *ngrxLet="{
     game: game$,
     currentPlayer: currentPlayer$,
-    trackers: trackers$
+    trackers: trackers$,
+    cols: cols$,
+    leftColSpan: leftColSpan$,
+    rightColSpan: rightColSpan$
   } as vm">
-  <mat-accordion multi="true">
-    <mat-expansion-panel *ngIf="isHost$ | async" [expanded]="false">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Game Control</mat-panel-title>
-      </mat-expansion-panel-header>
+  <div class="game-page-container">
+    <!-- Responsive grid layout -->
+    <div class="game-grid" [ngClass]="{'single-column': vm.cols === 1, 'two-columns': vm.cols === 2}">
 
-      <app-game-control
-        [game]="vm.game"
-        [isHost]="isHost$ | async"
-        (startGame)="onStartGame(vm.game)"
-        (advanceTurn)="onEndTurn(vm.game)"
-        (endGame)="onEndGame(vm.game)">
-      </app-game-control>
-    </mat-expansion-panel>
+      <!-- Left column (players and game control) -->
+      <div class="left-column">
+        <!-- Game Control (only for host) -->
+        <mat-card *ngIf="isHost$ | async" class="game-control-card">
+          <mat-card-header>
+            <mat-card-title>Game Control</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-game-control
+              [game]="vm.game"
+              [isHost]="isHost$ | async"
+              (startGame)="onStartGame(vm.game)"
+              (advanceTurn)="onEndTurn(vm.game)"
+              (endGame)="onEndGame(vm.game)">
+            </app-game-control>
+          </mat-card-content>
+        </mat-card>
 
-    <mat-expansion-panel [expanded]="true">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Player List</mat-panel-title>
-      </mat-expansion-panel-header>
+        <!-- Player List -->
+        <mat-card class="player-list-card">
+          <mat-card-header>
+            <mat-card-title>Player List</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-player-list
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer"
+              [isHost]="isHost$ | async"
+              (editPlayer)="onPlayerEdit($event)"
+              (kickPlayer)="onPlayerKick($event)">
+            </app-player-list>
+          </mat-card-content>
+          <mat-card-actions *ngIf="isHost$ | async">
+            <button mat-button color="primary" (click)="onReorder()">
+              Reorder
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
 
-      <app-player-list
-        [game]="vm.game"
-        [players]="players$ | async"
-        [currentPlayer]="vm.currentPlayer"
-        [isHost]="isHost$ | async"
-        (editPlayer)="onPlayerEdit($event)"
-        (kickPlayer)="onPlayerKick($event)"></app-player-list>
+      <!-- Right column (current turn and trackers) -->
+      <div class="right-column">
+        <!-- Current Turn -->
+        <mat-card 
+          *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+          class="current-turn-card"
+          [class.is-active]="isMyTurn$ | async">
+          <mat-card-header>
+            <mat-card-title>Current Turn</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-current-turn
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer"
+              [isHost]="isHost$ | async"
+              (endTurn)="onEndTurn(vm.game)">
+            </app-current-turn>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-action-row *ngIf="isHost$ | async">
-        <button mat-button color="primary" (click)="onReorder()">
-          Reorder
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel
-      *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-      [expanded]="true"
-      [class.is-active]="isMyTurn$ | async">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Current Turn</mat-panel-title>
-      </mat-expansion-panel-header>
-      <app-current-turn
-        [game]="vm.game"
-        [players]="players$ | async"
-        [currentPlayer]="vm.currentPlayer"
-        [isHost]="isHost$ | async"
-        (endTurn)="onEndTurn(vm.game)">
-      </app-current-turn>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel
-      [expanded]="true"
-      *ngIf="
-        vm.game?.state === 'InProgress' &&
-        vm.trackers &&
-        vm.trackers.length > 0 &&
-        vm.currentPlayer
-      ">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Trackers</mat-panel-title>
-      </mat-expansion-panel-header>
-      <app-tracker-editor
-        [trackers]="vm.trackers"
-        [player]="vm.currentPlayer"
-        (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-      </app-tracker-editor>
-    </mat-expansion-panel>
-  </mat-accordion>
+        <!-- Trackers -->
+        <mat-card 
+          *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+          class="trackers-card">
+          <mat-card-header>
+            <mat-card-title>Trackers</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-tracker-editor
+              [trackers]="vm.trackers"
+              [player]="vm.currentPlayer"
+              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+            </app-tracker-editor>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
 </ng-container>
