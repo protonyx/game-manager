@@ -32,7 +32,7 @@ public class JoinGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        
+
         var gameName = GameName.From(fixture.Create<string>());
         var game = new Game(gameName.Value, new GameOptions());
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();

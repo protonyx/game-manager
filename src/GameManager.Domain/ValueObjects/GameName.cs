@@ -1,9 +1,9 @@
-﻿namespace GameManager.Domain.ValueObjects;
+namespace GameManager.Domain.ValueObjects;
 
 public class GameName
 {
     public const int MinimumLength = 3;
-    
+
     public const int MaximumLength = 50;
 
     public string Value { get; }
@@ -11,13 +11,21 @@ public class GameName
     public static Result<GameName> From(string value)
     {
         string trimmedValue = value.Trim();
-        
+
         if (string.IsNullOrWhiteSpace(trimmedValue))
+        {
             return Result.Failure<GameName>("Name is required");
+        }
+
         if (trimmedValue.Length < MinimumLength)
+        {
             return Result.Failure<GameName>("Name is too short");
+        }
+
         if (trimmedValue.Length > MaximumLength)
+        {
             return Result.Failure<GameName>("Name is too long");
+        }
 
         return new GameName(trimmedValue);
     }

@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts;
+using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Messages;
 
@@ -22,8 +22,10 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
 
         // Do not notify if the player is no longer active
         if (!player.Active)
+        {
             return;
-        
+        }
+
         var dto = _mapper.Map<PlayerDTO>(player);
 
         var message = new PlayerUpdatedMessage()

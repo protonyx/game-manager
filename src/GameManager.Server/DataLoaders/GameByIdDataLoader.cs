@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Models;
 using GreenDonut;
@@ -10,7 +10,7 @@ public class GameByIdDataLoader : BatchDataLoader<Guid, GameModel>
     private readonly IGameRepository _gameRepository;
 
     private readonly IMapper _mapper;
-    
+
     public GameByIdDataLoader(
         IGameRepository gameRepository,
         IMapper mapper,

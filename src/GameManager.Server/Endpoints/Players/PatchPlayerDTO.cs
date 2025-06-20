@@ -1,4 +1,4 @@
-﻿using GameManager.Server.DTO;
+using GameManager.Server.DTO;
 
 namespace GameManager.Server.Endpoints.Players;
 

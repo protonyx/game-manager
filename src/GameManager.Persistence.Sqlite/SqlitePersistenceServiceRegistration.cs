@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Persistence.Sqlite.Repositories;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

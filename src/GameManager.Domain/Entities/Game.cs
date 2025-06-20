@@ -137,9 +137,11 @@ public record Game : IEntity<Guid>
         var trackerOrError = Tracker.Create(this, name, startingValue);
 
         if (trackerOrError.IsFailure)
+        {
             return Result.Failure($"Failed to add tracker: {trackerOrError.Error}");
+        }
 
-        this._trackers.Add(trackerOrError.Value);
+        _trackers.Add(trackerOrError.Value);
         LastModified = DateTime.UtcNow;
         UpdateETag();
 

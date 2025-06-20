@@ -1,4 +1,4 @@
-﻿namespace GameManager.Server.Authorization;
+namespace GameManager.Server.Authorization;
 
 public static class AuthorizationPolicyNames
 {

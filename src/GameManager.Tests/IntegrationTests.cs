@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FastEndpoints.Testing;
 using GameManager.Application.Features.Games.Commands.CreateGame;
@@ -45,10 +45,10 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
         // Create Game
         var content = new StringContent(JsonConvert.SerializeObject(newGame));
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var gameResponse = await client.PostAsync("Games", content);
+        var gameResponse = await client.PostAsync("Games", content, TestContext.Current.CancellationToken);
 
         gameResponse.EnsureSuccessStatusCode();
-        var game = JsonConvert.DeserializeObject<GameDTO>(await gameResponse.Content.ReadAsStringAsync());
+        var game = JsonConvert.DeserializeObject<GameDTO>(await gameResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         Assert.True(game != null);
         Assert.True(game!.EntryCode.Length == 4);
 
@@ -61,10 +61,10 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
 
         //var content2 = new StringContent(JsonConvert.SerializeObject(newPlayer));
         //content2.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var playerResponse = await client.PostAsJsonAsync("Games/Join", newPlayer);
+        var playerResponse = await client.PostAsJsonAsync("Games/Join", newPlayer, cancellationToken: TestContext.Current.CancellationToken);
 
         playerResponse.EnsureSuccessStatusCode();
-        var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync());
+        var player = JsonConvert.DeserializeObject<PlayerCredentialsDTO>(await playerResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
 
         Assert.NotNull(player);
         Assert.True(!string.IsNullOrWhiteSpace(player!.Token));
@@ -72,8 +72,8 @@ public class IntegrationTests(GameManagerApp App) : TestBase<GameManagerApp>
         // Get game players
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", player.Token);
 
-        var playersResponse = await client.GetAsync($"Games/{game.Id}/Players");
-        var players = JsonConvert.DeserializeObject<List<PlayerDTO>>(await playersResponse.Content.ReadAsStringAsync());
+        var playersResponse = await client.GetAsync($"Games/{game.Id}/Players", TestContext.Current.CancellationToken);
+        var players = JsonConvert.DeserializeObject<List<PlayerDTO>>(await playersResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
 
         Assert.NotNull(players);
         Assert.Contains(players, p => p.Id == player.PlayerId);

@@ -1,4 +1,4 @@
-﻿namespace GameManager.Domain.Entities;
+namespace GameManager.Domain.Entities;
 
 public class CurrentTurnDetails
 {

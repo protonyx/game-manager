@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 
@@ -7,7 +7,7 @@ namespace GameManager.Application.Features.Games.Notifications.PlayerPromoted;
 public class PlayerPromotedNotificationHandler : INotificationHandler<PlayerPromotedNotification>
 {
     private readonly IGameClientNotificationService _notificationService;
-    
+
     private readonly ITokenService _tokenService;
 
     public PlayerPromotedNotificationHandler(
@@ -24,14 +24,14 @@ public class PlayerPromotedNotificationHandler : INotificationHandler<PlayerProm
         var identityBuilder = new PlayerIdentityBuilder();
         identityBuilder.AddGameId(notification.Player.GameId)
             .AddPlayerId(notification.Player.Id);
-        
+
         if (notification.Player.IsHost)
         {
             identityBuilder.AddHostRole();
         }
-        
+
         var token = _tokenService.GenerateToken(identityBuilder.Build());
-        
+
         var playerCredentials = new PlayerCredentialsDTO
         {
             GameId = notification.Player.GameId,

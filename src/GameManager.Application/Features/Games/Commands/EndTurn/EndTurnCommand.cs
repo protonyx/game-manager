@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts;
+using GameManager.Application.Contracts;
 
 namespace GameManager.Application.Features.Games.Commands.EndTurn;
 

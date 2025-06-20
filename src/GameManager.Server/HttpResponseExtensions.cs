@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.ValueObjects;
+using GameManager.Domain.ValueObjects;
 using Microsoft.Net.Http.Headers;
 
 namespace GameManager.Server;

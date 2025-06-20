@@ -8,7 +8,7 @@ public class PlayerIdentityBuilder : IPlayerIdentityBuilder
 {
 
     private readonly string _authenticationType;
-    
+
     private const string RoleClaim = "role";
 
     private readonly ConcurrentBag<Claim> _claims = new();

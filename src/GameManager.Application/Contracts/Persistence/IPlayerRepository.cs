@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.ValueObjects;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Contracts.Persistence;
 

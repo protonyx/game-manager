@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Domain.Entities;

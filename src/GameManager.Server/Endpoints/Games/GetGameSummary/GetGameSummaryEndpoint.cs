@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Features.Games.Queries.GetGameSummary;
 using GameManager.Server.Authorization;
 

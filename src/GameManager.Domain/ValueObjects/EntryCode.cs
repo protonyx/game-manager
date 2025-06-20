@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace GameManager.Domain.ValueObjects;
 
@@ -18,7 +18,7 @@ public class EntryCode
         {
             throw new ArgumentOutOfRangeException(nameof(length), length, "Requested entry code length is too large");
         }
-        
+
         var charSet = new HashSet<char>(ValidEntryCodeCharacters);
 
         var sb = new StringBuilder(length);
@@ -39,11 +39,16 @@ public class EntryCode
     public static Result<EntryCode> From(string value)
     {
         string trimmedValue = value.Trim();
-        
+
         if (string.IsNullOrWhiteSpace(trimmedValue))
+        {
             return Result.Failure<EntryCode>("Entry code is empty");
+        }
+
         if (trimmedValue.Length > MaximumLength)
+        {
             return Result.Failure<EntryCode>("Entry code is too long");
+        }
 
         return new EntryCode(value);
     }

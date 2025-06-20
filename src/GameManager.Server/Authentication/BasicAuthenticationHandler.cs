@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using GameManager.Application.Authorization;
@@ -10,7 +10,7 @@ namespace GameManager.Server.Authentication;
 public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationHandlerOptions>
 {
     public const string BasicAuthenticationSchemeName = "Basic";
-    
+
     public BasicAuthenticationHandler(
         IOptionsMonitor<BasicAuthenticationHandlerOptions> options,
         ILoggerFactory loggerFactory,
@@ -27,7 +27,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticat
             var token = authorizationHeader.Substring("Basic ".Length).Trim();
             var credentialsAsEncodedString = Encoding.UTF8.GetString(Convert.FromBase64String(token));
             var credentials = credentialsAsEncodedString.Split(':');
-            
+
             if (credentials[0].Equals(Options.AdminUsername)
                 && credentials[1].Equals(Options.AdminPassword))
             {
@@ -39,7 +39,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticat
                 return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Scheme.Name)));
             }
         }
-        
+
         //Response.StatusCode = 401;
         //Response.Headers.Append("WWW-Authenticate", "Basic realm=\"game-manager\"");
         return Task.FromResult(AuthenticateResult.Fail("Invalid Authorization Header"));

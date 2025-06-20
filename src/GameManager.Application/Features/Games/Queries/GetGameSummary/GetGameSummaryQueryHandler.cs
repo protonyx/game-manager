@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts;
+using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 
@@ -67,7 +67,7 @@ public class GetGameSummaryQueryHandler : IQueryHandler<GetGameSummaryQuery, Gam
                     {
                         var thDto = _mapper.Map<TrackerHistoryDTO>(t);
                         var timeDiff = thDto.ChangedTime - (game.StartedDate ?? game.CreatedDate);
-                        thDto.SecondsSinceGameStart = (int)Math.Abs(timeDiff.TotalSeconds);
+                        thDto.SecondsSinceGameStart = (int) Math.Abs(timeDiff.TotalSeconds);
 
                         return thDto;
                     })

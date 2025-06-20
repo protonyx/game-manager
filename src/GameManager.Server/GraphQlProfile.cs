@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using GameManager.Domain.Entities;
 using GameManager.Server.Models;
 
@@ -16,7 +16,7 @@ public class GraphQlProfile : Profile
             .ForMember(t => t.Turns, opt => opt.Ignore());
         CreateMap<Tracker, GameTrackerModel>();
         CreateMap<Turn, TurnModel>();
-        
+
         CreateMap<Player, PlayerModel>()
             .ForMember(t => t.Name, opt => opt.MapFrom(t => t.Name.Value))
             .ForMember(t => t.Trackers, opt => opt.MapFrom(t => t.TrackerValues));

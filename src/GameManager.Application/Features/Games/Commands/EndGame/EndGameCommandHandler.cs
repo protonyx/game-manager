@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.Notifications.GameUpdated;

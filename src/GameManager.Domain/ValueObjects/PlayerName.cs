@@ -5,19 +5,27 @@ public class PlayerName
     public const int MinimumLength = 3;
 
     public const int MaximumLength = 20;
-    
+
     public string Value { get; }
 
     public static Result<PlayerName> From(string value)
     {
         string trimmedValue = value.Trim();
-        
+
         if (string.IsNullOrWhiteSpace(trimmedValue))
+        {
             return Result.Failure<PlayerName>("Name is required");
+        }
+
         if (trimmedValue.Length < MinimumLength)
+        {
             return Result.Failure<PlayerName>("Name is too short");
+        }
+
         if (trimmedValue.Length > MaximumLength)
+        {
             return Result.Failure<PlayerName>("Name is too long");
+        }
 
         return new PlayerName(trimmedValue);
     }

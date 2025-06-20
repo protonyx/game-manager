@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 

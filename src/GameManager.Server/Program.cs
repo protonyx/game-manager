@@ -100,9 +100,9 @@ builder.Services.AddCors(opt =>
 var tokenService = new TokenService(builder.Configuration);
 
 builder.Services.AddAuthentication(opt =>
-    {
-        opt.DefaultScheme = "SchemeSelector";
-    })
+{
+    opt.DefaultScheme = "SchemeSelector";
+})
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -187,12 +187,12 @@ else
 {
     builder.AddRedisDistributedCache("cache");
 
-// var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
-// builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
-// builder.Services.AddStackExchangeRedisCache(opt =>
-// {
-//     opt.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnectionMultiplexer);
-// });
+    // var redisConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+    // builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnectionMultiplexer);
+    // builder.Services.AddStackExchangeRedisCache(opt =>
+    // {
+    //     opt.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnectionMultiplexer);
+    // });
     signalr.AddStackExchangeRedis(redisConnectionString); // TODO: Aspire?
 }
 

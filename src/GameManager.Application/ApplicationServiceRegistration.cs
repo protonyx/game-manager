@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentValidation;
 using GameManager.Application.Pipelines;
 using GameManager.Application.Profiles;
@@ -14,9 +14,9 @@ public static class ApplicationServiceRegistration
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(typeof(ApplicationServiceRegistration).Assembly);
-            #if DEBUG
+#if DEBUG
             cfg.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
-            #endif
+#endif
             cfg.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 

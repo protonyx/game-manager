@@ -1,4 +1,4 @@
-﻿namespace GameManager.Application.Features.Games.Notifications.PlayerPromoted;
+namespace GameManager.Application.Features.Games.Notifications.PlayerPromoted;
 
 public class PlayerPromotedNotification : INotification
 {

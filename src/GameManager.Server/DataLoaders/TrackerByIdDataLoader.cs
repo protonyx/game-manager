@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Models;
 using GreenDonut;
@@ -10,7 +10,7 @@ public class TrackerByIdDataLoader : BatchDataLoader<Guid, GameTrackerModel>
     private readonly ITrackerRepository _trackerRepository;
 
     private readonly IMapper _mapper;
-    
+
     public TrackerByIdDataLoader(
         ITrackerRepository trackerRepository,
         IMapper mapper,

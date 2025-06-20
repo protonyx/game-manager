@@ -19,9 +19,11 @@ using Xunit;
 
 namespace GameManager.Tests.Commands;
 
-public class PatchPlayerEndpointTests {
+public class PatchPlayerEndpointTests
+{
     [Fact]
-    public async Task PatchPlayer_Should_Update_Player_Properties() {
+    public async Task PatchPlayer_Should_Update_Player_Properties()
+    {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var game = new Game(GameName.From("Test Game").Value, new GameOptions());
@@ -36,7 +38,8 @@ public class PatchPlayerEndpointTests {
         var mapperMock = fixture.Freeze<Mock<IMapper>>();
         mapperMock.Setup(m => m.Map<PlayerDTO>(player)).Returns(playerDto);
 
-        fixture.SetUser(user => {
+        fixture.SetUser(user =>
+        {
             user.AddGameId(game.Id)
                 .AddPlayerId(player.Id)
                 .AddHostRole();
@@ -55,12 +58,13 @@ public class PatchPlayerEndpointTests {
     }
 
     [Fact]
-    public async Task PatchPlayer_Should_Return_NotFound_If_Player_Does_Not_Exist() {
+    public async Task PatchPlayer_Should_Return_NotFound_If_Player_Does_Not_Exist()
+    {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var playerId = Guid.NewGuid();
         var repoMock = fixture.Freeze<Mock<IPlayerRepository>>();
-        repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync((Player?)null);
+        repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync((Player?) null);
 
         var handler = fixture.Create<UpdatePlayerCommandHandler>();
         var command = new UpdatePlayerCommand(playerId, new PlayerDTO { Name = "New Name" });

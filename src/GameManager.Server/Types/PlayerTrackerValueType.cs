@@ -1,4 +1,4 @@
-﻿using GameManager.Server.DataLoaders;
+using GameManager.Server.DataLoaders;
 using GameManager.Server.Models;
 using HotChocolate;
 using HotChocolate.Types;
@@ -11,7 +11,7 @@ public class PlayerTrackerValueType : ObjectType<PlayerTrackerValueModel>
     {
         descriptor.Field(t => t.Name)
             .ResolveWith<PlayerTrackerValueResolvers>(
-                t => t.GetTrackerNameAsync( default!, default!, default!))
+                t => t.GetTrackerNameAsync(default!, default!, default!))
             .Name("name");
     }
 

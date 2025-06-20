@@ -1,4 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Authorization;
 using GameManager.Server.DataLoaders;
@@ -27,13 +27,13 @@ public class Query
         IQueryable<GameModel> query = gameRepository.Query()
             .ProjectTo<GameModel>(mapper.ConfigurationProvider)
             .OrderBy(t => t.Id);
-        
+
         // Apply filters
         //var filters = resolverContext.GetFilterContext();
         query = query.Filter(resolverContext);
 
         var totalQuery = query;
-        
+
         if (!string.IsNullOrWhiteSpace(after))
         {
             var cursor = Guid.Parse(after);

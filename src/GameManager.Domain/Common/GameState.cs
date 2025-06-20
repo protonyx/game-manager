@@ -1,4 +1,4 @@
-﻿namespace GameManager.Domain.Common;
+namespace GameManager.Domain.Common;
 
 public enum GameState
 {

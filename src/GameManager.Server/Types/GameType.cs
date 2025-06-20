@@ -1,4 +1,4 @@
-﻿using GameManager.Server.DataLoaders;
+using GameManager.Server.DataLoaders;
 using GameManager.Server.Models;
 
 namespace GameManager.Server.Types;
@@ -15,7 +15,7 @@ public class GameType : ObjectType<GameModel>
                 return dataLoader.LoadAsync(parent.CurrentTurnPlayerId!.Value, ct);
             })
             .Name("currentTurnPlayer");
-        
+
         descriptor.Field(t => t.Players)
             .Resolve((ctx, ct) =>
             {

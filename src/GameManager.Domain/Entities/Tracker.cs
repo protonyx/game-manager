@@ -14,7 +14,7 @@ public class Tracker : IEntity<Guid>
 
     private Tracker()
     {
-        
+
     }
 
     private Tracker(Game game, string name, int startingValue)
@@ -29,7 +29,9 @@ public class Tracker : IEntity<Guid>
     public static Result<Tracker> Create(Game game, string name, int startingValue = 0)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             return Result.Failure<Tracker>("Name is required");
+        }
 
         return new Tracker(game, name, startingValue);
     }

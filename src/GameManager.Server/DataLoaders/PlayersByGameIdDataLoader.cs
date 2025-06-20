@@ -6,7 +6,7 @@ namespace GameManager.Server.DataLoaders;
 public class PlayersByGameIdDataLoader : BatchDataLoader<Guid, PlayerModel[]>
 {
     private readonly IPlayerRepository _repository;
-    
+
     private readonly IMapper _mapper;
 
     public PlayersByGameIdDataLoader(

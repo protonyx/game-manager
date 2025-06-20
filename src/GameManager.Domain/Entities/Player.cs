@@ -101,7 +101,9 @@ public class Player : IEntity<Guid>
     public Result SetOrder(int newOrder)
     {
         if (newOrder < 0)
+        {
             return Result.Failure("Order cannot be negative");
+        }
 
         Order = newOrder;
 

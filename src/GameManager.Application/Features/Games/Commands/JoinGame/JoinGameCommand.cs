@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;

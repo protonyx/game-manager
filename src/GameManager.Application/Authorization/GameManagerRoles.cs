@@ -1,4 +1,4 @@
-﻿namespace GameManager.Application.Authorization;
+namespace GameManager.Application.Authorization;
 
 public class GameManagerRoles
 {

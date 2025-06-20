@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using AutoFixture.AutoMoq;
 using AutoFixture.Dsl;
 using GameManager.Application.Authorization;

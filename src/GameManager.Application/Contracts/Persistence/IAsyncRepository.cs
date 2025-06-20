@@ -1,4 +1,4 @@
-﻿namespace GameManager.Application.Contracts.Persistence;
+namespace GameManager.Application.Contracts.Persistence;
 
 public interface IAsyncRepository<T> where T : class
 {

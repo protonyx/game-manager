@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.Entities;
+using GameManager.Domain.Entities;
 
 namespace GameManager.Application.Contracts.Persistence;
 

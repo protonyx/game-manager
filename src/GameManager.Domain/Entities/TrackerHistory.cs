@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.Common;
+using GameManager.Domain.Common;
 
 namespace GameManager.Domain.Entities;
 

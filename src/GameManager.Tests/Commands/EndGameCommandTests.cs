@@ -50,7 +50,8 @@ public class EndGameCommandTests
     }
 
     [Fact]
-    public async Task EndGameCommand_Should_Fail_If_Not_Host() {
+    public async Task EndGameCommand_Should_Fail_If_Not_Host()
+    {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var gameName = GameName.From("Test Game");
@@ -58,7 +59,8 @@ public class EndGameCommandTests
         var game = new Game(gameName.Value, options);
         game.Start(new Player(PlayerName.From("Host").Value, game));
         var playerId = Guid.NewGuid();
-        fixture.SetUser(user => {
+        fixture.SetUser(user =>
+        {
             user.AddGameId(game.Id);
             user.AddPlayerId(playerId);
             // No host role
@@ -117,7 +119,7 @@ public class EndGameCommandTests
             user.AddHostRole();
         });
         var gameRepo = fixture.Freeze<Mock<IGameRepository>>();
-        gameRepo.Setup(r => r.GetByIdAsync(gameId, It.IsAny<CancellationToken>())).ReturnsAsync((Game)null!);
+        gameRepo.Setup(r => r.GetByIdAsync(gameId, It.IsAny<CancellationToken>())).ReturnsAsync((Game) null!);
 
         var handler = fixture.Create<EndGameCommandHandler>();
         var command = new EndGameCommand(gameId);

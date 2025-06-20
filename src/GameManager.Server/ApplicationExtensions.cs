@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Errors;
 
 namespace GameManager.Server;

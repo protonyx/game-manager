@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.Hosting;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-    
+
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder,
         string serviceName,
         string serviceVersion) where TBuilder : IHostApplicationBuilder
@@ -73,7 +73,7 @@ public static class Extensions
                 {
                     tracing.SetSampler(new AlwaysOnSampler());
                 }
-                
+
                 tracing.AddSource(builder.Environment.ApplicationName)
                     .AddAspNetCoreInstrumentation(opt =>
                     {
@@ -88,7 +88,7 @@ public static class Extensions
             })
             .WithLogging(logging =>
             {
-                
+
             });
 
         builder.AddOpenTelemetryExporters();
@@ -105,7 +105,7 @@ public static class Extensions
         {
             builder.Services.AddOpenTelemetry().UseOtlpExporter();
         }
-        
+
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {

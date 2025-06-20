@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Features.Games.Commands.ReorderPlayers;
 using GameManager.Server.Authorization;
 

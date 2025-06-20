@@ -22,9 +22,11 @@ using Xunit;
 
 namespace GameManager.Tests.Commands;
 
-public class DeletePlayerCommandTests {
+public class DeletePlayerCommandTests
+{
     [Fact]
-    public async Task DeletePlayerCommand_Should_Delete_Player_Successfully() {
+    public async Task DeletePlayerCommand_Should_Delete_Player_Successfully()
+    {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
         var game = new Game(GameName.From("TestGame").Value, new GameOptions());
@@ -48,7 +50,8 @@ public class DeletePlayerCommandTests {
         var turnRepoMock = fixture.Freeze<Mock<ITurnRepository>>();
         turnRepoMock.Setup(r => r.CreateAsync(It.IsAny<Turn>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Turn());
 
-        fixture.SetUser(user => {
+        fixture.SetUser(user =>
+        {
             user.AddGameId(game.Id)
                 .AddPlayerId(player1.Id)
                 .AddHostRole();

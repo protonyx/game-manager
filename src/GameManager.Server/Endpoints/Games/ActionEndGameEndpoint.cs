@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Features.Games.Commands.EndGame;
 using GameManager.Server.Authorization;
 

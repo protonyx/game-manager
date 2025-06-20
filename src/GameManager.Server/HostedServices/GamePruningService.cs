@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Features.Games.Commands.PruneGames;
+using GameManager.Application.Features.Games.Commands.PruneGames;
 
 namespace GameManager.Server.HostedServices;
 

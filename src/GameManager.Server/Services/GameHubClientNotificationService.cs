@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts;
+using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Messages;
 using Microsoft.AspNetCore.SignalR;

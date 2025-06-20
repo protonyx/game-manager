@@ -54,7 +54,7 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         var query = _context.Set<Player>()
             .AsQueryable()
             .Where(p => p.GameId == gameId && p.Active)
-            .Where(p => ((string)(object)p.Name).ToLower() == name.Value.ToLower());
+            .Where(p => ((string) (object) p.Name).ToLower() == name.Value.ToLower());
 
         if (playerId.HasValue)
         {

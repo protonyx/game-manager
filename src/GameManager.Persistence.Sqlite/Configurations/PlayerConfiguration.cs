@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.Entities;
+using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

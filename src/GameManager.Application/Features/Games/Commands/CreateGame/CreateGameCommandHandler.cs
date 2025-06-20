@@ -24,8 +24,10 @@ public class CreateGameCommandHandler : ICommandHandler<CreateGameCommand, Creat
         var gameNameOrError = GameName.From(request.Name);
 
         if (gameNameOrError.IsFailure)
+        {
             return GameErrors.GameInvalidName(gameNameOrError.Error);
-        
+        }
+
         var game = new Game(gameNameOrError.Value, options);
 
         foreach (var tracker in request.Trackers)
@@ -33,7 +35,9 @@ public class CreateGameCommandHandler : ICommandHandler<CreateGameCommand, Creat
             var trackerAddResult = game.AddTracker(tracker.Name, tracker.StartingValue);
 
             if (trackerAddResult.IsFailure)
+            {
                 return GameErrors.GameInvalidTracker(trackerAddResult.Error);
+            }
         }
 
         while (await _gameRepository.EntryCodeExistsAsync(game.EntryCode!, cancellationToken))
@@ -42,7 +46,9 @@ public class CreateGameCommandHandler : ICommandHandler<CreateGameCommand, Creat
             var result = game.RegenerateEntryCode();
 
             if (result.IsFailure)
+            {
                 return ApplicationError.Failure(result.Error);
+            }
         }
 
         game = await _gameRepository.CreateAsync(game, cancellationToken);

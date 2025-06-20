@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Contracts.Persistence;
 using GameManager.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -66,6 +66,8 @@ public class BaseRepository<T> : IAsyncRepository<T> where T : class, IEntity<Gu
     {
         T? t = await GetByIdAsync(id, cancellationToken);
         if (t != null)
+        {
             await DeleteAsync(t, cancellationToken);
+        }
     }
 }

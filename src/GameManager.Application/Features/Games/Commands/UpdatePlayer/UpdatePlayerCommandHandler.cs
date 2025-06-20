@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
@@ -52,14 +52,18 @@ public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, P
             var playerNameOrError = PlayerName.From(request.Player.Name);
 
             if (playerNameOrError.IsFailure)
+            {
                 return GameErrors.PlayerInvalidName(playerNameOrError.Error);
-            
+            }
+
             // Check uniqueness
             var isUnique = await _playerRepository.NameIsUniqueAsync(player.GameId, playerNameOrError.Value,
                 player.Id, cancellationToken: cancellationToken);
 
             if (!isUnique)
+            {
                 return GameErrors.PlayerInvalidName("Name must be unique");
+            }
 
             player.SetName(playerNameOrError.Value);
         }

@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GameManager.Server.Services;

@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts.Persistence;
 using Microsoft.AspNetCore.Authorization;
 

@@ -1,4 +1,4 @@
-﻿namespace GameManager.Domain.ValueObjects;
+namespace GameManager.Domain.ValueObjects;
 
 public class ETag
 {
@@ -25,14 +25,14 @@ public class ETag
     public static ETag From(object value)
     {
         var temp = value?.ToString();
-        
+
         if (string.IsNullOrWhiteSpace(temp))
         {
             return Empty();
         }
 
         temp = temp.Trim();
-        
+
         if (temp.StartsWith("W/"))
         {
             return new ETag(temp.Substring(3, temp.Length - 4), true);
@@ -41,7 +41,7 @@ public class ETag
         {
             return new ETag(temp.Substring(1, temp.Length - 2));
         }
-        
+
         return new ETag(temp);
     }
 
@@ -54,9 +54,9 @@ public class ETag
     {
         return etag.ToString();
     }
-    
+
     private bool Equals(ETag other)
-        => string.Equals(other.ToString(), this.ToString(), StringComparison.OrdinalIgnoreCase);
+        => string.Equals(other.ToString(), ToString(), StringComparison.OrdinalIgnoreCase);
 
     public override bool Equals(object? obj)
         => ReferenceEquals(this, obj) || obj is ETag other && Equals(other);

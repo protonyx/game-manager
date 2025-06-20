@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
@@ -34,17 +34,23 @@ public class JoinGameCommandHandler : ICommandHandler<JoinGameCommand, PlayerCre
         var entryCodeOrError = EntryCode.From(request.EntryCode);
 
         if (entryCodeOrError.IsFailure)
+        {
             return GameErrors.InvalidEntryCode();
+        }
 
         var gameId = await _gameRepository.GetIdByEntryCodeAsync(entryCodeOrError.Value, cancellationToken);
 
         if (!gameId.HasValue)
+        {
             return GameErrors.InvalidEntryCode();
-        
+        }
+
         var game = await _gameRepository.GetByIdAsync(gameId.Value, cancellationToken);
 
         if (game == null)
+        {
             return GameErrors.InvalidEntryCode();
+        }
 
         // Generate token
         var identityBuilder = new PlayerIdentityBuilder();
@@ -60,15 +66,19 @@ public class JoinGameCommandHandler : ICommandHandler<JoinGameCommand, PlayerCre
             var playerNameOrError = PlayerName.From(request.Name);
 
             if (playerNameOrError.IsFailure)
+            {
                 return GameErrors.PlayerInvalidName(playerNameOrError.Error);
+            }
 
             var newPlayer = new Player(playerNameOrError.Value, game);
-            
+
             // Check uniqueness
             var isUnique = await _playerRepository.NameIsUniqueAsync(game.Id, playerNameOrError.Value, cancellationToken: cancellationToken);
 
             if (!isUnique)
+            {
                 return GameErrors.PlayerInvalidName("Name must be unique");
+            }
 
             // Promote the player if they are the first
             var existingPlayerCount = await _playerRepository.GetActivePlayerCountAsync(game.Id, cancellationToken);

@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 
 namespace GameManager.Server.Endpoints;
 

@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Authorization;
 

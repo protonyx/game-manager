@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Features.Games.DTO;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.CreateGame;

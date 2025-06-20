@@ -58,7 +58,7 @@ public class BasicTests
         isAuthForGame.Should().BeTrue();
         isAuthForPlayer.Should().BeTrue();
     }
-    
+
     [Fact]
     public void PlayerIdentityBuilder_ForDifferentGame_IsAuthReturnsFalse()
     {

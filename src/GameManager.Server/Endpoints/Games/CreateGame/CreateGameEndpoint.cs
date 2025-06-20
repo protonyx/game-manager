@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Features.Games.Commands.CreateGame;
 using GameManager.Application.Features.Games.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,9 +27,11 @@ public class CreateGameEndpoint : Endpoint<CreateGameCommand, Results<CreatedAtR
         CancellationToken ct)
     {
         var result = await _mediator.Send(req, ct);
-        
+
         if (result.IsSuccess)
+        {
             HttpContext.Response.SetETag(result.Value.ETag);
+        }
 
         return result.IsSuccess
             ? TypedResults.CreatedAtRoute(result.Value.Game, nameof(GetGameEndpoint),

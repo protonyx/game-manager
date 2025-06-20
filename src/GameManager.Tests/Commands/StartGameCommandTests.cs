@@ -13,7 +13,7 @@ public class StartGameCommandTests
     {
         // Arrange
         var fixture = TestUtils.GetTestFixture();
-        
+
         var gameName = GameName.From(fixture.Create<string>());
         var game = new Game(gameName.Value, new GameOptions());
         var players = fixture.BuildPlayer(game)

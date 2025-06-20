@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Errors;
+using GameManager.Application.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameManager.Server;

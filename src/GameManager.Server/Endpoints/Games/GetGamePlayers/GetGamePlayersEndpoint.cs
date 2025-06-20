@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayerList;
 using GameManager.Server.Authorization;

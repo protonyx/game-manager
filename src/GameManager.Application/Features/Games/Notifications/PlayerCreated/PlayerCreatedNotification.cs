@@ -1,4 +1,4 @@
-﻿using GameManager.Domain.Entities;
+using GameManager.Domain.Entities;
 using MediatR;
 
 namespace GameManager.Application.Features.Games.Notifications.PlayerCreated;

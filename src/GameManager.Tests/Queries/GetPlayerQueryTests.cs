@@ -50,7 +50,7 @@ public class GetPlayerQueryTests
         // Arrange
         var playerId = Guid.NewGuid();
         var repoMock = new Mock<IPlayerRepository>();
-        repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync((Player?)null);
+        repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync((Player?) null);
         var mapperMock = new Mock<IMapper>();
         var handler = new GetPlayerQueryHandler(repoMock.Object, mapperMock.Object);
         var query = new GetPlayerQuery(playerId);

@@ -1,4 +1,4 @@
-﻿namespace GameManager.Server.Models;
+namespace GameManager.Server.Models;
 
 public class PlayerTrackerValueModel
 {

@@ -1,4 +1,4 @@
-﻿using GameManager.Application.Authorization;
+using GameManager.Application.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GameManager.Server.Authorization;
@@ -34,7 +34,7 @@ public class GameAuthorizationHandler : AuthorizationHandler<GameAuthorizationRe
                 context.Fail(new AuthorizationFailureReason(this, "User is not authorized for this game"));
             }
         }
-        
+
         return Task.CompletedTask;
     }
 }
