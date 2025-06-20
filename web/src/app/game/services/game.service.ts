@@ -10,6 +10,7 @@ import {
 } from '../models/models';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PatchOperation } from '../models/patch';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +64,7 @@ export class GameService {
     return this.http.put<Player>(url, player);
   }
 
-  public patchPlayer(playerId: string, ops: unknown[]): Observable<Player> {
+  public patchPlayer(playerId: string, ops: PatchOperation[]): Observable<Player> {
     const url = this.apiUrl(`Players/${playerId}`);
 
     const headers = new HttpHeaders({
@@ -73,15 +74,6 @@ export class GameService {
     return this.http.patch<Player>(url, ops, {
       headers: headers,
     });
-  }
-
-  public setPlayerOrder(
-    playerId: string,
-    newOrder: number,
-  ): Observable<Player> {
-    const ops = [{ op: 'replace', path: '/order', value: newOrder }];
-
-    return this.patchPlayer(playerId, ops);
   }
 
   public setPlayerName(playerId: string, newName: string): Observable<Player> {

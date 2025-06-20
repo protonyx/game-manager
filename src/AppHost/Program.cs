@@ -18,6 +18,7 @@ var app = builder.AddNpmApp("angular", "../../web")
     .WaitFor(api)
     .WithHttpEndpoint(env: "PORT", port: 4200)
     .WithExternalHttpEndpoints()
-    .PublishAsDockerFile();
+    .PublishAsDockerFile()
+    .WithExplicitStart();
 
 builder.Build().Run();

@@ -48,5 +48,11 @@ namespace GameManager.Domain.ValueObjects
         {
             return Value.GetHashCode();
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

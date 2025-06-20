@@ -48,4 +48,10 @@ public class PlayerName
     {
         return Value.GetHashCode();
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return Value;
+    }
 }
