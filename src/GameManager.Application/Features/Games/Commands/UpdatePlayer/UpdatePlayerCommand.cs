@@ -7,9 +7,9 @@ public class UpdatePlayerCommand : ICommand<PlayerDTO>
 {
     public Guid PlayerId { get; }
 
-    public PlayerDTO Player { get; }
+    public UpdatePlayerDTO Player { get; }
 
-    public UpdatePlayerCommand(Guid playerId, PlayerDTO player)
+    public UpdatePlayerCommand(Guid playerId, UpdatePlayerDTO player)
     {
         PlayerId = playerId;
         Player = player;

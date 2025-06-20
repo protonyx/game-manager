@@ -48,7 +48,8 @@ public class DeletePlayerCommandTests
         gameRepoMock.Setup(r => r.UpdateAsync(game, It.IsAny<CancellationToken>())).ReturnsAsync(game);
 
         var turnRepoMock = fixture.Freeze<Mock<ITurnRepository>>();
-        turnRepoMock.Setup(r => r.CreateAsync(It.IsAny<Turn>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Turn());
+        turnRepoMock.Setup(r => r.CreateAsync(It.IsAny<Turn>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Turn turn, CancellationToken ct) => turn);
 
         fixture.SetUser(user =>
         {

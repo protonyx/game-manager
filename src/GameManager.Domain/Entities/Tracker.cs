@@ -1,14 +1,15 @@
 using GameManager.Domain.Common;
+using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public class Tracker : IEntity<Guid>
+public record Tracker : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 
     public Guid GameId { get; private set; }
 
-    public string Name { get; private set; }
+    public required TrackerName Name { get; init; }
 
     public int StartingValue { get; private set; }
 
@@ -17,22 +18,14 @@ public class Tracker : IEntity<Guid>
 
     }
 
-    private Tracker(Game game, string name, int startingValue)
-    : this()
+    public static Result<Tracker> Create(Game game, TrackerName name, int startingValue = 0)
     {
-        Id = Guid.NewGuid();
-        GameId = game.Id;
-        Name = name;
-        StartingValue = startingValue;
-    }
-
-    public static Result<Tracker> Create(Game game, string name, int startingValue = 0)
-    {
-        if (string.IsNullOrWhiteSpace(name))
+        return new Tracker()
         {
-            return Result.Failure<Tracker>("Name is required");
-        }
-
-        return new Tracker(game, name, startingValue);
+            Id = Guid.NewGuid(),
+            GameId = game.Id,
+            Name = name,
+            StartingValue = startingValue
+        };
     }
 }

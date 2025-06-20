@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace GameManager.Domain.ValueObjects;
 
+[DebuggerDisplay("{Value}")]
 public class GameName
 {
     public const int MinimumLength = 3;

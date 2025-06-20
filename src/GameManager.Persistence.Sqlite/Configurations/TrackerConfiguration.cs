@@ -1,4 +1,5 @@
 using GameManager.Domain.Entities;
+using GameManager.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +12,13 @@ public class TrackerConfiguration : IEntityTypeConfiguration<Tracker>
         builder.ToTable("Trackers");
 
         builder.HasKey(t => t.Id);
+
+        builder.Property(t => t.Name)
+            .HasConversion(
+                v => v.Value,
+                v => TrackerName.From(v).Value)
+            .IsRequired()
+            .HasMaxLength(TrackerName.MaximumLength);
 
         builder.HasOne<Game>()
             .WithMany(t => t.Trackers)

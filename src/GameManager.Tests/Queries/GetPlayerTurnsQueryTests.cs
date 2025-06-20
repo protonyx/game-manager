@@ -22,8 +22,8 @@ public class GetPlayerTurnsQueryTests
         var playerId = Guid.NewGuid();
         var turns = new List<Turn>
         {
-            new Turn { Id = Guid.NewGuid(), PlayerId = playerId, StartTime = DateTime.UtcNow.AddMinutes(-10), EndTime = DateTime.UtcNow.AddMinutes(-5), Duration = TimeSpan.FromMinutes(5) },
-            new Turn { Id = Guid.NewGuid(), PlayerId = playerId, StartTime = DateTime.UtcNow.AddMinutes(-4), EndTime = DateTime.UtcNow, Duration = TimeSpan.FromMinutes(4) }
+            Turn.Create(playerId, DateTime.UtcNow.AddMinutes(-10), DateTime.UtcNow.AddMinutes(-5)).Value,
+            Turn.Create(playerId, DateTime.UtcNow.AddMinutes(-4), DateTime.UtcNow).Value,
         };
         var turnDtos = new List<TurnDTO>
         {

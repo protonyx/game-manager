@@ -14,7 +14,7 @@ public class TrackerHistory : IEntity<Guid>
 
     public int NewValue { get; set; }
 
-    public virtual Player Player { get; set; }
+    public virtual Player? Player { get; set; }
 
-    public virtual Tracker Tracker { get; set; }
+    public virtual Tracker? Tracker { get; set; }
 }

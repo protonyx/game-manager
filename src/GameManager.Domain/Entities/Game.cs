@@ -107,7 +107,7 @@ public record Game : IEntity<Guid>
         return Result.Success();
     }
 
-    public Turn? SetCurrentTurn(Player currentPlayer)
+    public Result<Turn> SetCurrentTurn(Player currentPlayer)
     {
         var previousTurn = CurrentTurn;
         var currentTime = DateTime.UtcNow;
@@ -116,15 +116,12 @@ public record Game : IEntity<Guid>
         LastModified = currentTime;
         UpdateETag();
 
-        return previousTurn != null
-            ? new Turn()
-            {
-                PlayerId = previousTurn.PlayerId,
-                StartTime = previousTurn.StartTime,
-                EndTime = currentTime,
-                Duration = currentTime - previousTurn.StartTime
-            }
-            : null;
+        if (previousTurn == null)
+        {
+            return Result.Failure<Turn>("No previous turn");
+        }
+
+        return Turn.Create(previousTurn.PlayerId, previousTurn.StartTime, currentTime);
     }
 
     public bool CheckCurrentTurn(Player player)
@@ -134,7 +131,14 @@ public record Game : IEntity<Guid>
 
     public Result AddTracker(string name, int startingValue)
     {
-        var trackerOrError = Tracker.Create(this, name, startingValue);
+        var trackerNameOrError = TrackerName.From(name);
+
+        if (trackerNameOrError.IsFailure)
+        {
+            return trackerNameOrError;
+        }
+
+        var trackerOrError = Tracker.Create(this, trackerNameOrError.Value, startingValue);
 
         if (trackerOrError.IsFailure)
         {

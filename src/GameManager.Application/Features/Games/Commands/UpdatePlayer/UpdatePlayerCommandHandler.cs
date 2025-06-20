@@ -8,42 +8,35 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 
-public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, PlayerDTO>
+public class UpdatePlayerCommandHandler(
+    IPlayerRepository playerRepository,
+    IGameRepository gameRepository,
+    IMapper mapper,
+    IUserContext userContext,
+    IMediator mediator)
+    : ICommandHandler<UpdatePlayerCommand, PlayerDTO>
 {
-    private readonly IPlayerRepository _playerRepository;
-
-    private readonly IMapper _mapper;
-
-    private readonly IUserContext _userContext;
-
-    private readonly IMediator _mediator;
-
-    public UpdatePlayerCommandHandler(
-        IPlayerRepository playerRepository,
-        IMapper mapper,
-        IUserContext userContext,
-        IMediator mediator)
-    {
-        _playerRepository = playerRepository;
-        _mapper = mapper;
-        _userContext = userContext;
-        _mediator = mediator;
-    }
-
     public async Task<Result<PlayerDTO, ApplicationError>> Handle(UpdatePlayerCommand request, CancellationToken cancellationToken)
     {
-        var player = await _playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
+        var player = await playerRepository.GetByIdAsync(request.PlayerId, cancellationToken);
 
         if (player == null)
         {
             return GameErrors.PlayerNotFound(request.PlayerId);
         }
 
-        if (_userContext.User == null
-            || !_userContext.User.IsAuthorizedToViewGame(player.GameId)
-            || !_userContext.User.IsAuthorizedToModifyPlayer(player.Id, player.GameId))
+        if (userContext.User == null
+            || !userContext.User.IsAuthorizedToViewGame(player.GameId)
+            || !userContext.User.IsAuthorizedToModifyPlayer(player.Id, player.GameId))
         {
             return GameErrors.PlayerNotAuthorized("update player");
+        }
+
+        var game = await gameRepository.GetByIdAsync(player.GameId, cancellationToken);
+
+        if (game == null)
+        {
+            return GameErrors.GameNotFound(player.GameId);
         }
 
         // Update Name
@@ -57,7 +50,7 @@ public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, P
             }
 
             // Check uniqueness
-            var isUnique = await _playerRepository.NameIsUniqueAsync(player.GameId, playerNameOrError.Value,
+            var isUnique = await playerRepository.NameIsUniqueAsync(player.GameId, playerNameOrError.Value,
                 player.Id, cancellationToken: cancellationToken);
 
             if (!isUnique)
@@ -72,29 +65,33 @@ public class UpdatePlayerCommandHandler : ICommandHandler<UpdatePlayerCommand, P
         var pendingTrackerNotifications = new List<PlayerTrackerUpdatedNotification>();
         foreach (var tracker in request.Player.TrackerValues)
         {
-            var trackerResult = player.SetTracker(tracker.Key, tracker.Value);
-
-            if (trackerResult.IsSuccess)
+            // Validate that the input is a valid tracker ID
+            if (game.Trackers.Any(t => t.Id.Equals(tracker.Key)))
             {
-                pendingTrackerNotifications.Add(new PlayerTrackerUpdatedNotification()
+                var trackerResult = player.SetTracker(tracker.Key, tracker.Value);
+
+                if (trackerResult.IsSuccess)
                 {
-                    PlayerId = player.Id,
-                    TrackerId = tracker.Key,
-                    NewValue = tracker.Value
-                });
+                    pendingTrackerNotifications.Add(new PlayerTrackerUpdatedNotification()
+                    {
+                        PlayerId = player.Id,
+                        TrackerId = tracker.Key,
+                        NewValue = tracker.Value
+                    });
+                }
             }
         }
 
-        var updatedPlayer = await _playerRepository.UpdateAsync(player, cancellationToken);
+        var updatedPlayer = await playerRepository.UpdateAsync(player, cancellationToken);
 
-        await _mediator.Publish(new PlayerUpdatedNotification(updatedPlayer), cancellationToken);
+        await mediator.Publish(new PlayerUpdatedNotification(updatedPlayer), cancellationToken);
 
         foreach (var pendingNotification in pendingTrackerNotifications)
         {
-            await _mediator.Publish(pendingNotification, cancellationToken);
+            await mediator.Publish(pendingNotification, cancellationToken);
         }
 
-        var dto = _mapper.Map<PlayerDTO>(updatedPlayer);
+        var dto = mapper.Map<PlayerDTO>(updatedPlayer);
 
         return dto;
     }

@@ -5,15 +5,9 @@ using GameManager.Server.Authorization;
 
 namespace GameManager.Server.Endpoints.Players;
 
-public class UpdatePlayerEndpoint : Endpoint<PlayerDTO, Results<Ok<PlayerDTO>, ProblemDetails>>
+public class UpdatePlayerEndpoint(IMediator mediator)
+    : Endpoint<UpdatePlayerDTO, Results<Ok<PlayerDTO>, ProblemDetails>>
 {
-    private readonly IMediator _mediator;
-
-    public UpdatePlayerEndpoint(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     public override void Configure()
     {
         Put("{Id}");
@@ -29,10 +23,10 @@ public class UpdatePlayerEndpoint : Endpoint<PlayerDTO, Results<Ok<PlayerDTO>, P
         Version(1);
     }
 
-    public override async Task<Results<Ok<PlayerDTO>, ProblemDetails>> ExecuteAsync(PlayerDTO req, CancellationToken ct)
+    public override async Task<Results<Ok<PlayerDTO>, ProblemDetails>> ExecuteAsync(UpdatePlayerDTO req, CancellationToken ct)
     {
         var id = Route<Guid>("Id");
-        var result = await _mediator.Send(new UpdatePlayerCommand(id, req), ct);
+        var result = await mediator.Send(new UpdatePlayerCommand(id, req), ct);
 
         return result.IsSuccess
             ? TypedResults.Ok(result.Value)

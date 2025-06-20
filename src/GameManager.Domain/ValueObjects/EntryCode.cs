@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace GameManager.Domain.ValueObjects;
 
+[DebuggerDisplay("{Value}")]
 public class EntryCode
 {
     private const string ValidEntryCodeCharacters = "ABCEFHJKMNPQRTWXY0123456789";

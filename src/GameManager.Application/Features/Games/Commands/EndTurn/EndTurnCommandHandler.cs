@@ -74,9 +74,9 @@ public class EndTurnCommandHandler : ICommandHandler<EndTurnCommand>
 
         var turn = game.SetCurrentTurn(nextPlayer);
 
-        if (turn != null)
+        if (turn.IsSuccess)
         {
-            await _turnRepository.CreateAsync(turn, cancellationToken);
+            await _turnRepository.CreateAsync(turn.Value, cancellationToken);
         }
 
         var updatedGame = await _gameRepository.UpdateAsync(game, cancellationToken);

@@ -81,9 +81,9 @@ public class DeletePlayerCommandHandler : ICommandHandler<DeletePlayerCommand>
                 // Advance & record turn
                 var turn = game.SetCurrentTurn(nextTurn);
 
-                if (turn != null)
+                if (turn.IsSuccess)
                 {
-                    await _turnRepository.CreateAsync(turn, cancellationToken);
+                    await _turnRepository.CreateAsync(turn.Value, cancellationToken);
                 }
             }
             else

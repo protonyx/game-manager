@@ -3,7 +3,7 @@ using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
 
-public class Player : IEntity<Guid>
+public record Player : IEntity<Guid>
 {
     public Guid Id { get; private set; }
 
@@ -19,11 +19,11 @@ public class Player : IEntity<Guid>
 
     public DateTime JoinedDate { get; private set; }
 
-    private List<PlayerConnection> _connections = new();
+    private readonly List<PlayerConnection> _connections = new();
 
     public IReadOnlyList<PlayerConnection> Connections => _connections.ToList();
 
-    private List<TrackerValue> _trackerValues = new();
+    private readonly List<TrackerValue> _trackerValues = new();
 
     public IReadOnlyList<TrackerValue> TrackerValues => _trackerValues.ToList();
 
