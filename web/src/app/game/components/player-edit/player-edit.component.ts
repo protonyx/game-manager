@@ -19,18 +19,17 @@ export interface PlayerEditFormValue {
 }
 
 @Component({
-  selector: 'app-player-edit',
-  templateUrl: './player-edit.component.html',
-  styleUrls: ['./player-edit.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-  ],
+    selector: 'app-player-edit',
+    templateUrl: './player-edit.component.html',
+    styleUrls: ['./player-edit.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+    ]
 })
 export class PlayerEditComponent implements OnChanges {
   @Input()

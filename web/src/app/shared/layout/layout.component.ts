@@ -9,21 +9,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
-  selector: 'app-layout',
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
-  standalone: true,
-  imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    NgIf,
-    MatSidenavModule,
-    MatListModule,
-    RouterLinkActive,
-    RouterLink,
-    RouterOutlet,
-  ],
+    selector: 'app-layout',
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss'],
+    imports: [
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        NgIf,
+        MatSidenavModule,
+        MatListModule,
+        RouterLinkActive,
+        RouterLink,
+        RouterOutlet,
+    ]
 })
 export class LayoutComponent {
   @Input()

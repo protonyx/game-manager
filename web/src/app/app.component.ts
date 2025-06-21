@@ -12,11 +12,10 @@ import { LayoutComponent } from './shared/layout/layout.component';
 import { LayoutActions } from './shared/state/layout.actions';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: true,
-  imports: [CommonModule, LayoutComponent],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    imports: [CommonModule, LayoutComponent]
 })
 export class AppComponent {
   title$ = this.store.select(selectTitle);

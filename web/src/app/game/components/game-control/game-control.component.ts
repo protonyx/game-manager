@@ -5,11 +5,10 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-game-control',
-  templateUrl: './game-control.component.html',
-  styleUrls: ['./game-control.component.scss'],
-  standalone: true,
-  imports: [CommonModule, MatButtonModule, MatExpansionModule],
+    selector: 'app-game-control',
+    templateUrl: './game-control.component.html',
+    styleUrls: ['./game-control.component.scss'],
+    imports: [CommonModule, MatButtonModule, MatExpansionModule]
 })
 export class GameControlComponent {
   @Input()

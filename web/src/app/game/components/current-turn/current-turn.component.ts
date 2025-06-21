@@ -17,20 +17,19 @@ import { TurnTimerComponent } from '../turn-timer/turn-timer.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-current-turn',
-  templateUrl: './current-turn.component.html',
-  styleUrls: ['./current-turn.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    TurnTimerComponent,
-    MatExpansionModule,
-    MatButtonModule,
-    MatCardModule,
-    MatIconModule,
-    MatProgressBarModule,
-    MatBadgeModule,
-  ],
+    selector: 'app-current-turn',
+    templateUrl: './current-turn.component.html',
+    styleUrls: ['./current-turn.component.scss'],
+    imports: [
+        CommonModule,
+        TurnTimerComponent,
+        MatExpansionModule,
+        MatButtonModule,
+        MatCardModule,
+        MatIconModule,
+        MatProgressBarModule,
+        MatBadgeModule,
+    ]
 })
 export class CurrentTurnComponent implements OnChanges {
   @Input()

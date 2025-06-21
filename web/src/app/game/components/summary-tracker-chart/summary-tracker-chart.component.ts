@@ -5,11 +5,10 @@ import * as Highcharts from 'highcharts';
 import { PlayerSummary, TrackerSummary } from '../../models/models';
 
 @Component({
-  selector: 'app-summary-tracker-chart',
-  standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
-  templateUrl: './summary-tracker-chart.component.html',
-  styleUrls: ['./summary-tracker-chart.component.scss'],
+    selector: 'app-summary-tracker-chart',
+    imports: [CommonModule, HighchartsChartModule],
+    templateUrl: './summary-tracker-chart.component.html',
+    styleUrls: ['./summary-tracker-chart.component.scss']
 })
 export class SummaryTrackerChartComponent implements OnChanges {
   Highcharts: typeof Highcharts = Highcharts;

@@ -14,16 +14,15 @@ import { SummaryTrackerChartComponent } from '../../components/summary-tracker-c
 import { CdkTableDataSourceInput } from '@angular/cdk/table';
 
 @Component({
-  selector: 'app-game-summary-page',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatTableModule,
-    SummaryTrackerChartComponent,
-  ],
-  templateUrl: './game-summary-page.component.html',
-  styleUrls: ['./game-summary-page.component.scss'],
+    selector: 'app-game-summary-page',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatTableModule,
+        SummaryTrackerChartComponent,
+    ],
+    templateUrl: './game-summary-page.component.html',
+    styleUrls: ['./game-summary-page.component.scss']
 })
 export class GameSummaryPageComponent {
   title$ = this.store.select(selectSummaryName);

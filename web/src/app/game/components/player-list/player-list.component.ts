@@ -21,22 +21,21 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-player-list',
-  templateUrl: './player-list.component.html',
-  styleUrls: ['./player-list.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatIconModule,
-    MatMenuModule,
-    MatButtonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatPaginatorModule,
-    FormsModule
-  ],
+    selector: 'app-player-list',
+    templateUrl: './player-list.component.html',
+    styleUrls: ['./player-list.component.scss'],
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatIconModule,
+        MatMenuModule,
+        MatButtonModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatPaginatorModule,
+        FormsModule
+    ]
 })
 export class PlayerListComponent implements OnChanges, AfterViewInit {
   @Input()

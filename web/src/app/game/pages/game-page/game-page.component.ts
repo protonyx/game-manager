@@ -30,22 +30,21 @@ const selectIsCurrentPlayerTurn = createSelector(
 );
 
 @Component({
-  selector: 'app-game-page',
-  templateUrl: './game-page.component.html',
-  styleUrls: ['./game-page.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatExpansionModule,
-    MatGridListModule,
-    MatCardModule,
-    GameControlComponent,
-    PlayerListComponent,
-    CurrentTurnComponent,
-    TrackerEditorComponent,
-    LetDirective,
-  ],
+    selector: 'app-game-page',
+    templateUrl: './game-page.component.html',
+    styleUrls: ['./game-page.component.scss'],
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatExpansionModule,
+        MatGridListModule,
+        MatCardModule,
+        GameControlComponent,
+        PlayerListComponent,
+        CurrentTurnComponent,
+        TrackerEditorComponent,
+        LetDirective,
+    ]
 })
 export class GamePageComponent implements OnInit, OnDestroy {
   currentPlayer$ = this.store.select(selectCurrentPlayer);

@@ -22,21 +22,20 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-tracker-editor',
-  templateUrl: './tracker-editor.component.html',
-  styleUrls: ['./tracker-editor.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSliderModule,
-    MatIconModule,
-    MatCardModule,
-  ],
+    selector: 'app-tracker-editor',
+    templateUrl: './tracker-editor.component.html',
+    styleUrls: ['./tracker-editor.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSliderModule,
+        MatIconModule,
+        MatCardModule,
+    ]
 })
 export class TrackerEditorComponent implements OnChanges {
   @Input()
