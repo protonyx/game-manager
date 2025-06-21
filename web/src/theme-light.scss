@@ -2,5 +2,6 @@
 
 @import 'app/variables.scss';
 
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 @include mat.all-component-themes($my-light-theme);
