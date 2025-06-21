@@ -9,7 +9,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
-  
+
   @media (max-width: 599px) {
     grid-template-columns: 1fr;
   }
@@ -17,40 +17,49 @@
 
 .tracker-card {
   margin-bottom: 16px;
-  
+
   mat-card-header {
     margin-bottom: 8px;
   }
-  
+
   .tracker-controls {
     display: flex;
     flex-direction: column;
     margin-bottom: 16px;
-    
-    .slider-container {
+
+    .controls-container {
       display: flex;
       align-items: center;
       width: 100%;
       margin-bottom: 8px;
-      
-      .tracker-slider {
-        flex: 1;
-        margin: 0 8px;
-      }
+      justify-content: center;
     }
-    
+
     .value-input {
       width: 80px;
-      align-self: flex-end;
+      margin: 0 8px;
+    }
+
+    .center-align {
+      text-align: center;
+    }
+
+    input.center-align {
+      -moz-appearance: textfield;
+    }
+
+    input.center-align::-webkit-outer-spin-button,
+    input.center-align::-webkit-inner-spin-button {
+      display: none;
     }
   }
-  
+
   .quick-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: space-between;
-    
+
     button {
       flex: 1;
       min-width: 60px;

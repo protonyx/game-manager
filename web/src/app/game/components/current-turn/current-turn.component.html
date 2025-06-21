@@ -21,7 +21,12 @@
     <!-- Turn progress indicators -->
     <div class="turn-progress">
       <div class="progress-info">
-        <span class="time-elapsed">Time: {{ formatTurnDuration() }}</span>
+        <span class="time-elapsed">Time:
+            <app-turn-timer
+                *ngIf="game && game.lastTurnStartTime"
+                [startTime]="game!.lastTurnStartTime">
+            </app-turn-timer>
+        </span>
         <span class="progress-percentage">{{ turnProgress.toFixed(0) }}%</span>
       </div>
 
@@ -30,14 +35,6 @@
         [color]="turnProgress > 75 ? 'warn' : 'primary'"
         class="turn-progress-bar">
       </mat-progress-bar>
-    </div>
-
-    <!-- Original turn timer for compatibility -->
-    <div class="timer-container">
-      <app-turn-timer
-        *ngIf="game && game.lastTurnStartTime"
-        [startTime]="game!.lastTurnStartTime">
-      </app-turn-timer>
     </div>
 
     <!-- Additional player information -->

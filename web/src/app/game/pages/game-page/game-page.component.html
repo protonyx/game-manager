@@ -57,8 +57,7 @@
         <!-- Current Turn -->
         <mat-card 
           *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-          class="current-turn-card"
-          [class.is-active]="isMyTurn$ | async">
+          class="current-turn-card">
           <mat-card-header>
             <mat-card-title>Current Turn</mat-card-title>
           </mat-card-header>
