@@ -1,17 +1,15 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HighchartsChartModule } from 'highcharts-angular';
-import * as Highcharts from 'highcharts';
+import { HighchartsChartComponent, ChartConstructorType } from 'highcharts-angular';
 import { PlayerSummary, TrackerSummary } from '../../models/models';
 
 @Component({
     selector: 'app-summary-tracker-chart',
-    imports: [CommonModule, HighchartsChartModule],
+    imports: [CommonModule, HighchartsChartComponent],
     templateUrl: './summary-tracker-chart.component.html',
     styleUrls: ['./summary-tracker-chart.component.scss']
 })
 export class SummaryTrackerChartComponent implements OnChanges {
-  Highcharts: typeof Highcharts = Highcharts;
 
   @Input()
   public tracker: TrackerSummary | undefined;
@@ -19,11 +17,13 @@ export class SummaryTrackerChartComponent implements OnChanges {
   @Input()
   public players: PlayerSummary[] | undefined | null;
 
+  chartConstructor: ChartConstructorType = 'chart';
+
   chartOptions: Highcharts.Options | undefined;
 
   ngOnChanges(): void {
     if (!!this.tracker && !!this.players) {
-      this.chartOptions = {
+      this.chartOptions = <Highcharts.Options>{
         chart: {
           height: '300px',
         },
