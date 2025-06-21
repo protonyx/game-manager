@@ -34,7 +34,7 @@ export class GameSummaryPageComponent {
   turnSummaryDataSource$ = this.players$.pipe(
     map((data) => {
       return new MatTableDataSource<PlayerSummary>(
-        <PlayerSummary[]>data,
+        (data as PlayerSummary[]),
       ) as CdkTableDataSourceInput<PlayerSummary>;
     }),
   );

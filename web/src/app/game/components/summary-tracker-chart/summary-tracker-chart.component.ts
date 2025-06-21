@@ -23,7 +23,7 @@ export class SummaryTrackerChartComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (!!this.tracker && !!this.players) {
-      this.chartOptions = <Highcharts.Options>{
+      this.chartOptions = {
         chart: {
           height: '300px',
           type: 'line'
@@ -70,7 +70,7 @@ export class SummaryTrackerChartComponent implements OnChanges {
             ).map((th) => [th.secondsSinceGameStart, th.newValue]),
           };
         }),
-      };
+      } as Highcharts.Options;
     }
   }
 }

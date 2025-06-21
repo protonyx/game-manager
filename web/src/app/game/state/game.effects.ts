@@ -33,7 +33,6 @@ import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
 import { PatchOperation } from '../models/patch';
-import {selectCurrentPlayerId} from "./game.selectors";
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -222,7 +221,7 @@ export const editPlayerDialog = createEffect(
 
             return GamesApiActions.patchPlayer({
               playerId: action.playerId,
-              ops: <PatchOperation[]>result,
+              ops: result as PatchOperation[],
             });
           }),
         );

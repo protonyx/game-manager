@@ -77,7 +77,7 @@ export interface Player {
   order: number;
   name: string;
   state: string;
-  trackerValues: { [key: string]: number };
+  trackerValues: Record<string, number>;
 }
 
 export interface PlayerTurn {

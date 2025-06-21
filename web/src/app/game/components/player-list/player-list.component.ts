@@ -58,10 +58,10 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  dataSource: MatTableDataSource<Player> = new MatTableDataSource();
+  dataSource = new MatTableDataSource<Player>();
 
   // For search functionality
-  searchText: string = '';
+  searchText = '';
 
   // For pagination
   pageSize = 5;

@@ -54,7 +54,7 @@ export const selectSummaryTrackers = createSelector(
   selectSummary,
   (summary) => {
     return summary?.trackers.map((tracker) => {
-      return <TrackerSummary>{
+      return {
         ...tracker,
         trackerHistory: summary.players.reduce((acc, player) => {
           // Starting value
@@ -75,7 +75,7 @@ export const selectSummaryTrackers = createSelector(
           }
           return acc;
         }, new Array<PlayerTrackerHistory>()),
-      };
+      } as TrackerSummary;
     });
   },
 );
@@ -83,14 +83,14 @@ export const selectSummaryTrackers = createSelector(
 export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
   return (
     summary?.players.map((player) => {
-      return <PlayerSummary>{
+      return {
         ...player,
         turnCount: player.turns.length,
         avgTurnDuration:
           player.turns
             .map((t) => t.durationSeconds)
             .reduce((acc, d) => acc + d, 0) / player.turns.length,
-      };
+      } as PlayerSummary;
     }) || new Array<PlayerSummary>()
   );
 });

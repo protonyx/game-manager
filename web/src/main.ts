@@ -31,7 +31,7 @@ export function localStorageSyncReducer(
   })(reducer);
 }
 
-const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
+const metaReducers: MetaReducer<any, any>[] = [localStorageSyncReducer];
 
 bootstrapApplication(AppComponent, {
   providers: [

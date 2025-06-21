@@ -34,7 +34,7 @@ export class PlayerReorderDialogComponent implements OnDestroy {
     .select(selectAllPlayers)
     .pipe(
       tap(
-        (players) => (this.newPlayers = players.map((p) => <Player>{ ...p })),
+        (players) => (this.newPlayers = players.map((p) => ({ ...p } as Player))),
       ),
     );
 

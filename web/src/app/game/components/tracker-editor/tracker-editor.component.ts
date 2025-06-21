@@ -75,17 +75,6 @@ export class TrackerEditorComponent implements OnChanges {
     });
   }
 
-  // Get min and max values for sliders
-  public getMinValue(trackerId: string): number {
-    // Default min value, could be customized per tracker in the future
-    return 0;
-  }
-
-  public getMaxValue(trackerId: string): number {
-    // Default max value, could be customized per tracker in the future
-    return 100;
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['player'] || changes['trackers']) {
       if (this.player && this.trackers) {
