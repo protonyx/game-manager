@@ -1,3 +1,9 @@
+export enum GameState {
+  Preparing = 'Preparing',
+  InProgress = 'InProgress',
+  Complete = 'Complete'
+}
+
 export interface NewGame {
   name: string;
   options: GameOptions;
@@ -15,7 +21,7 @@ export interface Game {
   name: string;
   entryCode: string;
   options: GameOptions;
-  state: string;
+  state: GameState;
   currentTurnPlayerId?: string;
   lastTurnStartTime?: string;
   trackers: Tracker[];

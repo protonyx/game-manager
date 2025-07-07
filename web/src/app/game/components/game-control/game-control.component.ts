@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Game } from '../../models/models';
+import { Game, GameState } from '../../models/models';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
@@ -37,4 +37,6 @@ export class GameControlComponent {
   onEndGame() {
     this.endGame.emit();
   }
+
+  protected readonly GameState = GameState;
 }

@@ -4,7 +4,7 @@
     type="button"
     color="accent"
     (click)="onStartGame()"
-    *ngIf="game?.state === 'Preparing'">
+    *ngIf="game?.state === GameState.Preparing">
     Start Game
   </button>
   <button
@@ -12,7 +12,7 @@
     type="button"
     color="warn"
     (click)="onAdvanceTurn()"
-    *ngIf="game?.state === 'InProgress'">
+    *ngIf="game?.state === GameState.InProgress">
     Force End Turn
   </button>
   <button
@@ -20,7 +20,7 @@
     type="button"
     color="primary"
     (click)="onEndGame()"
-    *ngIf="game?.state === 'InProgress'">
+    *ngIf="game?.state === GameState.InProgress">
     End Game
   </button>
 </mat-action-row>
