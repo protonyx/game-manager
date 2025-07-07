@@ -2,14 +2,13 @@
   <mat-card-header>
     <!-- Player avatar with color -->
     <div mat-card-avatar class="player-avatar" [ngStyle]="{'background-color': getPlayerColor(currentTurn)}">
-      <mat-icon>person</mat-icon>
+        {{ currentPlayer?.order }}
     </div>
 
     <!-- Turn information -->
     <mat-card-title>
       <span *ngIf="isMyTurn" class="my-turn">Your Turn!</span>
       <span *ngIf="!isMyTurn">{{ currentTurn?.name }}'s Turn</span>
-      <mat-icon *ngIf="isMyTurn" class="turn-icon">play_arrow</mat-icon>
     </mat-card-title>
 
     <mat-card-subtitle *ngIf="nextTurn">
@@ -27,32 +26,21 @@
                 [startTime]="game!.lastTurnStartTime">
             </app-turn-timer>
         </span>
-        <span class="progress-percentage">{{ turnProgress.toFixed(0) }}%</span>
+        <span
+          *ngIf="isMyTurn"
+          class="progress-percentage"
+          [class.high-progress]="turnProgress > 75">
+          {{ turnProgress.toFixed(0) }}%
+        </span>
       </div>
 
-      <mat-progress-bar 
-        [value]="turnProgress" 
+      <mat-progress-bar
+        *ngIf="isMyTurn"
+        [value]="turnProgress"
         [color]="turnProgress > 75 ? 'warn' : 'primary'"
-        class="turn-progress-bar">
+        class="turn-progress-bar"
+        [class.high-progress]="turnProgress > 75">
       </mat-progress-bar>
-    </div>
-
-    <!-- Additional player information -->
-    <div class="player-info" *ngIf="currentTurn">
-      <div class="info-item">
-        <mat-icon>format_list_numbered</mat-icon>
-        <span>Turn Order: {{ currentTurn.order }}</span>
-      </div>
-
-      <div class="info-item" *ngIf="currentTurn.state === 'Connected'">
-        <mat-icon>wifi</mat-icon>
-        <span>Connected</span>
-      </div>
-
-      <div class="info-item" *ngIf="currentTurn.state === 'Disconnected'">
-        <mat-icon>wifi_off</mat-icon>
-        <span>Disconnected</span>
-      </div>
     </div>
   </mat-card-content>
 
@@ -60,19 +48,10 @@
     <button
       mat-raised-button
       type="button"
-      color="accent"
+      color="primary"
       (click)="onEndTurn()"
       *ngIf="isMyTurn">
       End Turn
-    </button>
-
-    <button
-      mat-raised-button
-      type="button"
-      color="primary"
-      (click)="onEndTurn()"
-      *ngIf="!isMyTurn && isHost">
-      Force End Turn
     </button>
   </mat-card-actions>
 </mat-card>

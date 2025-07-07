@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
+import { PlayerService } from '../../services/player.service';
 
 @Component({
     selector: 'app-player-list',
@@ -56,6 +57,9 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
   @Output()
   public kickPlayer: EventEmitter<Player> = new EventEmitter<Player>();
 
+  @Output()
+  public reorder = new EventEmitter<void>();
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   dataSource = new MatTableDataSource<Player>();
@@ -72,6 +76,8 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
   get trackers(): Tracker[] {
     return this.game?.trackers || [];
   }
+
+  constructor(private playerService: PlayerService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -134,6 +140,10 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
       : false;
   }
 
+  getPlayerColor(player?: Player): string {
+    return this.playerService.getPlayerColor(player);
+  }
+
   getTrackerValue(player: Player, trackerId: string): string {
     if (trackerId && Object.hasOwn(player.trackerValues, trackerId)) {
       return player.trackerValues[trackerId].toString();
@@ -152,5 +162,9 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
 
   handleKickPlayer(player: Player): void {
     this.kickPlayer.emit(player);
+  }
+
+  handleReorderPlayers() {
+    this.reorder.emit();
   }
 }

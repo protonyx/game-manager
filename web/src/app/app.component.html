@@ -1,8 +1,69 @@
-<app-layout
-  [title]="title$ | async"
-  [entryCode]="entryCode$ | async"
-  [sidenavOpen]="sidenavOpen$ | async"
-  (leaveGame)="onLeaveGame()"
-  (toggleSidenav)="toggleSidenav()"
-  (closeSidenav)="closeSidenav()">
-</app-layout>
+<ng-container
+  *ngrxLet="{
+    game: activeGame$
+  } as vm">
+  <app-layout
+    [title]="title$ | async"
+    [sidenavOpen]="sidenavOpen$ | async"
+    (toggleSidenav)="toggleSidenav()"
+    (closeSidenav)="closeSidenav()">
+    <toolbar-actions>
+      <span *ngIf="isActiveGame$ | async">
+        Entry Code: <strong>{{ vm.game?.entryCode }}</strong>
+      </span>
+    </toolbar-actions>
+    <sidenav-content>
+      <mat-nav-list>
+        @if (activeGame$ | async) {
+          <a
+            mat-list-item
+            [routerLink]="['/game']"
+            routerLinkActive="active"
+            (click)="closeSidenav()">
+            <button mat-icon-button>
+              <mat-icon> home</mat-icon>
+            </button>
+
+            <span> Game </span>
+          </a>
+          <a mat-list-item
+             [routerLink]="['/game/leave']"
+             (click)="onLeaveGame()">
+            <button mat-icon-button>
+              <mat-icon> logout</mat-icon>
+            </button>
+
+            <span> Leave Game </span>
+          </a>
+        } @else {
+          <a
+            mat-list-item
+            [routerLink]="['/game/new']"
+            routerLinkActive="active"
+            (click)="closeSidenav()">
+            <button mat-icon-button>
+              <mat-icon> add</mat-icon>
+            </button>
+
+            <span> Create Game </span>
+          </a>
+
+          <a
+            mat-list-item
+            [routerLink]="['/game/join']"
+            routerLinkActive="active"
+            (click)="closeSidenav()">
+            <button mat-icon-button>
+              <mat-icon> login</mat-icon>
+            </button>
+
+            <span> Join Game </span>
+          </a>
+        }
+      </mat-nav-list>
+    </sidenav-content>
+    <main-content>
+      <router-outlet></router-outlet>
+    </main-content>
+  </app-layout>
+</ng-container>

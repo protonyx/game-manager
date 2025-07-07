@@ -11,17 +11,13 @@ export const layoutFeature = createFeature({
     on(LayoutActions.setTitle, (state, { title }): LayoutState => {
       return { ...state, title: title };
     }),
-    on(LayoutActions.setEntryCode, (state, { entryCode }): LayoutState => {
-      return { ...state, entryCode: entryCode };
-    }),
-    on(LayoutActions.setHeader, (state, { title, entryCode }): LayoutState => {
-      return { ...state, title: title, entryCode: entryCode };
+    on(LayoutActions.setHeader, (state, { title }): LayoutState => {
+      return { ...state, title: title };
     }),
     on(LayoutActions.resetLayout, (state): LayoutState => {
       return {
         ...state,
         title: initialState.title,
-        entryCode: initialState.entryCode,
         sidenavOpen: initialState.sidenavOpen,
       };
     }),
@@ -50,6 +46,5 @@ export const {
   name,
   reducer,
   selectTitle,
-  selectEntryCode,
   selectSidenavOpen,
 } = layoutFeature;

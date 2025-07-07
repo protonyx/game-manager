@@ -1,34 +1,40 @@
-<mat-action-row>
-  <button
-    mat-raised-button
-    type="button"
-    color="accent"
-    (click)="onStartGame()"
-    *ngIf="game?.state === GameState.Preparing">
-    Start Game
-  </button>
-  <button
-    mat-raised-button
-    type="button"
-    color="warn"
-    (click)="onAdvanceTurn()"
-    *ngIf="game?.state === GameState.InProgress">
-    Force End Turn
-  </button>
-  <button
-    mat-raised-button
-    type="button"
-    color="primary"
-    (click)="onEndGame()"
-    *ngIf="game?.state === GameState.InProgress">
-    End Game
-  </button>
-  <button
-    mat-stroked-button
-    type="button"
-    color="primary"
-    (click)="onReorder()"
-    *ngIf="game?.state !== GameState.Complete">
-    Reorder
-  </button>
-</mat-action-row>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Host Controls</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-toolbar class="game-controls">
+      <span>{{game?.name}}</span>
+      <span class="spacer"></span>
+
+      <button
+        mat-icon-button
+        matTooltip="Start Game"
+        color="accent"
+        (click)="onStartGame()"
+        *ngIf="game?.state === GameState.Preparing">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        matTooltip="Force End Turn"
+        color="warn"
+        (click)="onAdvanceTurn()"
+        *ngIf="game?.state === GameState.InProgress">
+        <mat-icon>skip_next</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        matTooltip="End Game"
+        color="primary"
+        (click)="onEndGame()"
+        *ngIf="game?.state === GameState.InProgress">
+        <mat-icon>stop</mat-icon>
+      </button>
+    </mat-toolbar>
+  </mat-card-content>
+</mat-card>
+
+

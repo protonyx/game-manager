@@ -211,14 +211,10 @@ export const editPlayerDialog = createEffect(
 
         return dialogRef.afterClosed().pipe(
           filter(
-            (result: string | PatchOperation[] | undefined) =>
+            (result: PatchOperation[] | undefined) =>
               result !== undefined,
           ),
-          map((result: string | PatchOperation[] | undefined) => {
-            if (result === 'kick') {
-              return GameActions.removePlayer({ playerId: action.playerId });
-            }
-
+          map((result: PatchOperation[] | undefined) => {
             return GamesApiActions.patchPlayer({
               playerId: action.playerId,
               ops: result as PatchOperation[],

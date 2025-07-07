@@ -1,4 +1,23 @@
-<div class="player-list-container">
+<mat-card class="player-list-card">
+  <mat-card-header>
+    <mat-card-title>Players</mat-card-title>
+    <!-- Player list actions menu in header -->
+    <button
+      *ngIf="isHost"
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+      aria-label="Host actions">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="handleReorderPlayers()">
+        <mat-icon>sort</mat-icon>
+        <span>Reorder Players</span>
+      </button>
+    </mat-menu>
+  </mat-card-header>
+
+  <mat-card-content>
   <!-- Search input - only show when there are more than 10 players -->
   <mat-form-field class="search-field" *ngIf="dataSource.data.length > 10">
     <mat-label>Search players</mat-label>
@@ -8,24 +27,28 @@
 
   <!-- Card-based player list -->
   <div class="player-cards-container">
-    <mat-card *ngFor="let player of filteredPlayers" class="player-card" [class.player-is-active]="checkIsPlayerTurn(player)">
+    <mat-card *ngFor="let player of filteredPlayers"
+              class="player-card"
+              [class.player-is-active]="checkIsPlayerTurn(player)"
+              [ngStyle]="{'border-left-color': getPlayerColor(player)}">
       <mat-card-header>
-        <div mat-card-avatar class="player-avatar">
+        <div mat-card-avatar
+             class="player-avatar"
+             [ngStyle]="{'background-color': getPlayerColor(player)}">
           {{ player.order }}
         </div>
         <mat-card-title>
-          {{ player.name }} 
+          {{ player.name }}
           <span *ngIf="checkIsMe(player)" class="me-indicator">(me)</span>
           <mat-icon *ngIf="player.state === 'Disconnected'" class="disconnected-icon">signal_wifi_off</mat-icon>
         </mat-card-title>
         <mat-card-subtitle *ngIf="checkIsPlayerTurn(player)" class="turn-indicator">Current Turn</mat-card-subtitle>
         <!-- Player actions menu in header -->
-        <button 
-          *ngIf="isHost || (game?.state === 'Preparing' && checkIsMe(player))" 
-          mat-icon-button 
-          [matMenuTriggerFor]="menu" 
-          aria-label="Player actions"
-          class="header-menu-button">
+        <button
+          *ngIf="isHost || (game?.state === 'Preparing' && checkIsMe(player))"
+          mat-icon-button
+          [matMenuTriggerFor]="menu"
+          aria-label="Player actions">
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
@@ -59,11 +82,13 @@
   </div>
 
   <!-- Pagination - only show when there's more than 1 page worth of results -->
-  <mat-paginator 
+  <mat-paginator
     *ngIf="dataSource.data.length > pageSize"
     [length]="dataSource.data.length"
     [pageSize]="pageSize"
     [pageSizeOptions]="pageSizeOptions"
     aria-label="Select page">
   </mat-paginator>
-</div>
+
+  </mat-card-content>
+</mat-card>

@@ -3,16 +3,15 @@
     <mat-card *ngFor="let tracker of trackers" class="tracker-card">
       <mat-card-header>
         <mat-card-title>{{ tracker.name }}</mat-card-title>
-        <mat-card-subtitle>Current value: {{ trackerForm.get(tracker.id)?.value }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <div class="tracker-controls">
           <!-- Value adjustment controls -->
           <div class="controls-container">
-            <button 
-              mat-icon-button 
-              color="warn" 
+            <button
+              mat-icon-button
+              color="warn"
               (click)="updateTracker(tracker.id, -1)"
               aria-label="Decrease value">
               <mat-icon>remove</mat-icon>
@@ -20,17 +19,17 @@
 
             <!-- Direct input for precise value -->
             <mat-form-field class="value-input">
-              <input 
-                matInput 
+              <input
+                matInput
                 type="number"
                 class="center-align"
                 [formControlName]="tracker.id"
                 (change)="setTrackerValue(tracker.id, trackerForm.get(tracker.id)?.value)" />
             </mat-form-field>
 
-            <button 
-              mat-icon-button 
-              color="primary" 
+            <button
+              mat-icon-button
+              color="primary"
               (click)="updateTracker(tracker.id, 1)"
               aria-label="Increase value">
               <mat-icon>add</mat-icon>

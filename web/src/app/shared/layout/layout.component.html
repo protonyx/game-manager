@@ -1,4 +1,4 @@
-<div class="navbar-container" [class.example-is-mobile]="mobileQuery.matches">
+<div class="navbar-container" [class.navbar-is-mobile]="mobileQuery.matches">
   <!-- Top Navbar -->
   <mat-toolbar class="navbar" color="primary">
     <button mat-icon-button (click)="toggleSidenav.emit()">
@@ -9,9 +9,9 @@
 
     <span class="navbar-spacer"></span>
 
-    <span *ngIf="entryCode"
-      >Entry Code: <strong>{{ entryCode }}</strong></span
-    >
+    <span>
+        <ng-content select="toolbar-actions"></ng-content>
+    </span>
   </mat-toolbar>
 
   <mat-sidenav-container
@@ -24,58 +24,11 @@
       [fixedInViewport]="mobileQuery.matches"
       (keydown.escape)="closeSidenav.emit()"
       class="sidenav">
-      <mat-nav-list>
-        <a
-          mat-list-item
-          [routerLink]="['/game/new']"
-          routerLinkActive="active"
-          (click)="closeSidenav.emit()"
-          *ngIf="!entryCode">
-          <button mat-icon-button>
-            <mat-icon> add</mat-icon>
-          </button>
-
-          <span> Create Game </span>
-        </a>
-
-        <a
-          mat-list-item
-          [routerLink]="['/game/join']"
-          routerLinkActive="active"
-          (click)="closeSidenav.emit()"
-          *ngIf="!entryCode">
-          <button mat-icon-button>
-            <mat-icon> login</mat-icon>
-          </button>
-
-          <span> Join Game </span>
-        </a>
-
-        <a
-          mat-list-item
-          [routerLink]="['/game']"
-          routerLinkActive="active"
-          (click)="closeSidenav.emit()"
-          *ngIf="entryCode">
-          <button mat-icon-button>
-            <mat-icon> home</mat-icon>
-          </button>
-
-          <span> Game </span>
-        </a>
-
-        <a mat-list-item (click)="onLeaveGame()" *ngIf="entryCode">
-          <button mat-icon-button>
-            <mat-icon> logout</mat-icon>
-          </button>
-
-          <span> Leave Game </span>
-        </a>
-      </mat-nav-list>
+        <ng-content select="sidenav-content"></ng-content>
     </mat-sidenav>
 
     <mat-sidenav-content class="sidenav-content">
-      <router-outlet></router-outlet>
+      <ng-content select="main-content"></ng-content>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

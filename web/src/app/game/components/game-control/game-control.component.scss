@@ -1,12 +1,19 @@
-mat-action-row {
-  margin-left: 12px;
-  margin-right: 12px;
+.game-controls {
+  padding: 0 16px;
+  height: 56px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+
+  .spacer {
+    flex: 1 1 auto; /* This pushes the buttons to the right */
+  }
 
   button {
-    margin-right: 8px; /* Add horizontal spacing between buttons */
-    
-    &:last-child {
-      margin-right: 0; /* Remove margin from the last button */
-    }
+    margin-left: 8px; /* Add horizontal spacing between buttons */
+  }
+
+  span {
+    font-weight: 500;
   }
 }

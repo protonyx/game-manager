@@ -14,62 +14,41 @@
       <!-- Left column (players and game control) -->
       <div class="left-column">
         <!-- Game Control (only for host) -->
-        <mat-card *ngIf="isHost$ | async" class="game-control-card">
-          <mat-card-header>
-            <mat-card-title>Game Control</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-game-control
-              [game]="vm.game"
-              [isHost]="isHost$ | async"
-              (startGame)="onStartGame(vm.game)"
-              (advanceTurn)="onEndTurn(vm.game)"
-              (endGame)="onEndGame(vm.game)"
-              (reorder)="onReorder()">
-            </app-game-control>
-          </mat-card-content>
-        </mat-card>
+        <app-game-control
+          *ngIf="isHost$ | async" class="game-control-card"
+          [game]="vm.game"
+          [isHost]="isHost$ | async"
+          (startGame)="onStartGame(vm.game)"
+          (advanceTurn)="onEndTurn(vm.game)"
+          (endGame)="onEndGame(vm.game)">
+        </app-game-control>
 
         <!-- Player List -->
-        <mat-card class="player-list-card">
-          <mat-card-header>
-            <mat-card-title>Player List</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-player-list
-              [game]="vm.game"
-              [players]="players$ | async"
-              [currentPlayer]="vm.currentPlayer"
-              [isHost]="isHost$ | async"
-              (editPlayer)="onPlayerEdit($event)"
-              (kickPlayer)="onPlayerKick($event)">
-            </app-player-list>
-          </mat-card-content>
-        </mat-card>
+        <app-player-list
+          [game]="vm.game"
+          [players]="players$ | async"
+          [currentPlayer]="vm.currentPlayer"
+          [isHost]="isHost$ | async"
+          (editPlayer)="onPlayerEdit($event)"
+          (kickPlayer)="onPlayerKick($event)"
+          (reorder)="onReorder()">
+        </app-player-list>
       </div>
 
       <!-- Right column (current turn and trackers) -->
       <div class="right-column">
         <!-- Current Turn -->
-        <mat-card 
-          *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-          class="current-turn-card">
-          <mat-card-header>
-            <mat-card-title>Current Turn</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-current-turn
-              [game]="vm.game"
-              [players]="players$ | async"
-              [currentPlayer]="vm.currentPlayer"
-              [isHost]="isHost$ | async"
-              (endTurn)="onEndTurn(vm.game)">
-            </app-current-turn>
-          </mat-card-content>
-        </mat-card>
+          <app-current-turn
+                  *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+                  [game]="vm.game"
+                  [players]="players$ | async"
+                  [currentPlayer]="vm.currentPlayer"
+                  [isHost]="isHost$ | async"
+                  (endTurn)="onEndTurn(vm.game)">
+          </app-current-turn>
 
         <!-- Trackers -->
-        <mat-card 
+        <mat-card
           *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
           class="trackers-card">
           <mat-card-header>
