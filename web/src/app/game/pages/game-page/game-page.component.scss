@@ -1,6 +1,3 @@
-@use '@angular/material' as mat;
-@import '../../../variables.scss';
-
 // Container for the entire game page
 .game-page-container {
   padding: 16px;
@@ -70,8 +67,7 @@ mat-card {
 
   &.current-turn-card {
     &.is-active {
-      border-left: 5px solid mat.m2-get-color-from-palette($primary-palette);
-      background: mat.m2-get-color-from-palette($primary-palette, 'lighter') !important;
+      border-left: 5px solid;
     }
   }
 
@@ -92,10 +88,4 @@ mat-card {
       background-color: rgba(0, 0, 0, 0.03);
     }
   }
-}
-
-// Maintain the active turn styling
-.is-active {
-  border-left: 5px solid mat.m2-get-color-from-palette($primary-palette);
-  background: mat.m2-get-color-from-palette($primary-palette, 'lighter') !important;
 }

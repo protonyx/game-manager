@@ -1,4 +1,6 @@
-<mat-card class="turn-card" [ngStyle]="{'border-left-color': getPlayerColor(currentTurn)}">
+<mat-card class="turn-card"
+          [ngStyle]="{'border-left-color': getPlayerColor(currentTurn)}"
+          [class.is-active]="isMyTurn">
   <mat-card-header>
     <!-- Player avatar with color -->
     <div mat-card-avatar class="player-avatar" [ngStyle]="{'background-color': getPlayerColor(currentTurn)}">

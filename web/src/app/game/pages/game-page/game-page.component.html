@@ -47,21 +47,13 @@
                   (endTurn)="onEndTurn(vm.game)">
           </app-current-turn>
 
-        <!-- Trackers -->
-        <mat-card
-          *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
-          class="trackers-card">
-          <mat-card-header>
-            <mat-card-title>Trackers</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-tracker-editor
-              [trackers]="vm.trackers"
-              [player]="vm.currentPlayer"
-              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-            </app-tracker-editor>
-          </mat-card-content>
-        </mat-card>
+          <!-- Trackers -->
+          <app-tracker-editor
+            *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+            [trackers]="vm.trackers"
+            [player]="vm.currentPlayer"
+            (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+          </app-tracker-editor>
       </div>
     </div>
   </div>

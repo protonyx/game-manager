@@ -1,24 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 
-@import 'app/variables.scss';
+$theme: mat.define-theme(
+    (
+            color: (
+                    primary: mat.$azure-palette,
+            ),
+            density: (
+                    scale: 0,
+            ),
+    )
+);
 
-@include mat.elevation-classes();
-@include mat.app-background();
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-@include mat.all-component-themes($my-light-theme);
-
-@media (prefers-color-scheme: dark) {
-  @include mat.all-component-themes($my-dark-theme);
-}
-
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+          color: mat.$azure-palette,
+          typography: Roboto,
+          density: 0
+  ));
+  @include mat.color-variants-backwards-compatibility($theme);
 }
 
 .sidenav-content {
@@ -34,14 +38,4 @@ body {
   width: 100%;
 }
 
-.login-container {
-  height: 80vh;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  justify-content: center;
-}
 
-.login-actions {
-  margin-left: unset !important;
-}

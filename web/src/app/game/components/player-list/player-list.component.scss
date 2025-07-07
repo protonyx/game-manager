@@ -1,6 +1,3 @@
-@use '@angular/material' as mat;
-@import '../../../variables.scss';
-
 mat-card {
   display: flex;
   flex-direction: column;
@@ -8,18 +5,11 @@ mat-card {
   height: 100%;
 
   mat-card-content {
-    padding: 16px 0;
+    padding: 16px;
     transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
   }
 
   mat-card-header {
-    // Animation for card header
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.03);
-    }
-
     button {
       position: absolute;
       top: 8px;
@@ -60,15 +50,14 @@ mat-card {
       transition: all 0.2s ease-in-out;
       border-left: 0px solid transparent;
       width: 100%;
+      box-shadow: var(--mat-sys-level2);
 
       &.player-is-active {
-        border-left: 5px solid mat.m2-get-color-from-palette($primary-palette);
-        background-color: mat.m2-get-color-from-palette($primary-palette, 300);
-        animation: pulse-border 2s infinite ease-in-out,
-        pulse-background 2s infinite ease-in-out;
+        border-left: 5px solid;
+        background-color: var(--mat-sys-primary-container);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
-        color: mat.m2-get-color-from-palette($primary-palette, 900);
+        color: var(--mat-sys-on-primary-container);
 
         // Animate the border
         //border-left-color: mat.m2-get-color-from-palette($primary-palette);
@@ -84,7 +73,6 @@ mat-card {
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: mat.m2-get-color-from-palette($primary-palette);
         color: white;
         font-weight: bold;
         font-size: 18px;
@@ -96,13 +84,12 @@ mat-card {
       }
 
       .disconnected-icon {
-        color: mat.m2-get-color-from-palette($warn-palette, 500);
+        color: var(--mat-sys-error);
         vertical-align: middle;
         margin-left: 4px;
       }
 
       .turn-indicator {
-        color: mat.m2-get-color-from-palette($primary-palette);
         font-weight: bold;
       }
 
@@ -130,31 +117,6 @@ mat-card {
           }
         }
       }
-    }
-  }
-
-  // Define keyframes for the pulsing animation
-  @keyframes pulse-border {
-    0% {
-      border-left-width: 5px;
-    }
-    50% {
-      border-left-width: 8px;
-    }
-    100% {
-      border-left-width: 5px;
-    }
-  }
-
-  @keyframes pulse-background {
-    0% {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 100);
-    }
-    50% {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 200);
-    }
-    100% {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 100);
     }
   }
 

@@ -1,50 +1,57 @@
-<form [formGroup]="trackerForm" class="tracker-form">
-  <div class="trackers-container">
-    <mat-card *ngFor="let tracker of trackers" class="tracker-card">
-      <mat-card-header>
-        <mat-card-title>{{ tracker.name }}</mat-card-title>
-      </mat-card-header>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Trackers</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="trackerForm" class="tracker-form">
+      <div class="trackers-container">
+        <mat-card *ngFor="let tracker of trackers" class="tracker-card">
+          <mat-card-header>
+            <mat-card-title>{{ tracker.name }}</mat-card-title>
+          </mat-card-header>
 
-      <mat-card-content>
-        <div class="tracker-controls">
-          <!-- Value adjustment controls -->
-          <div class="controls-container">
-            <button
-              mat-icon-button
-              color="warn"
-              (click)="updateTracker(tracker.id, -1)"
-              aria-label="Decrease value">
-              <mat-icon>remove</mat-icon>
-            </button>
+          <mat-card-content>
+            <div class="tracker-controls">
+              <!-- Value adjustment controls -->
+              <div class="controls-container">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="updateTracker(tracker.id, -1)"
+                  aria-label="Decrease value">
+                  <mat-icon>remove</mat-icon>
+                </button>
 
-            <!-- Direct input for precise value -->
-            <mat-form-field class="value-input">
-              <input
-                matInput
-                type="number"
-                class="center-align"
-                [formControlName]="tracker.id"
-                (change)="setTrackerValue(tracker.id, trackerForm.get(tracker.id)?.value)" />
-            </mat-form-field>
+                <!-- Direct input for precise value -->
+                <mat-form-field class="value-input">
+                  <input
+                    matInput
+                    type="number"
+                    class="center-align"
+                    [formControlName]="tracker.id"
+                    (change)="setTrackerValue(tracker.id, trackerForm.get(tracker.id)?.value)" />
+                </mat-form-field>
 
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="updateTracker(tracker.id, 1)"
-              aria-label="Increase value">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-        </div>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="updateTracker(tracker.id, 1)"
+                  aria-label="Increase value">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </div>
 
-        <!-- Quick adjustment buttons -->
-        <div class="quick-buttons">
-          <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -10)">-10</button>
-          <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -5)">-5</button>
-          <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 5)">+5</button>
-          <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 10)">+10</button>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-</form>
+            <!-- Quick adjustment buttons -->
+            <div class="quick-buttons">
+              <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -10)">-10</button>
+              <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -5)">-5</button>
+              <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 5)">+5</button>
+              <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 10)">+10</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

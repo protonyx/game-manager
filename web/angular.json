@@ -35,15 +35,7 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "src/styles.scss",
-              {
-                "input": "src/theme-dark.scss",
-                "inject": false
-              },
-              {
-                "input": "src/theme-light.scss",
-                "inject": false
-              }
+              "src/styles.scss"
             ],
             "scripts": []
           },
