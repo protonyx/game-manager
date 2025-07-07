@@ -23,4 +23,12 @@
     *ngIf="game?.state === GameState.InProgress">
     End Game
   </button>
+  <button
+    mat-stroked-button
+    type="button"
+    color="primary"
+    (click)="onReorder()"
+    *ngIf="game?.state !== GameState.Complete">
+    Reorder
+  </button>
 </mat-action-row>

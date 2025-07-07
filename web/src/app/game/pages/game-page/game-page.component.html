@@ -9,7 +9,7 @@
   } as vm">
   <div class="game-page-container">
     <!-- Responsive grid layout -->
-    <div class="game-grid" [ngClass]="{'single-column': vm.cols === 1, 'two-columns': vm.cols === 2}">
+    <div class="game-grid" [ngClass]="{'single-column': vm.cols === 1, 'two-columns': vm.cols === 2, 'preparing-state': vm.game?.state === 'Preparing'}">
 
       <!-- Left column (players and game control) -->
       <div class="left-column">
@@ -24,7 +24,8 @@
               [isHost]="isHost$ | async"
               (startGame)="onStartGame(vm.game)"
               (advanceTurn)="onEndTurn(vm.game)"
-              (endGame)="onEndGame(vm.game)">
+              (endGame)="onEndGame(vm.game)"
+              (reorder)="onReorder()">
             </app-game-control>
           </mat-card-content>
         </mat-card>
@@ -44,11 +45,6 @@
               (kickPlayer)="onPlayerKick($event)">
             </app-player-list>
           </mat-card-content>
-          <mat-card-actions *ngIf="isHost$ | async">
-            <button mat-button color="primary" (click)="onReorder()">
-              Reorder
-            </button>
-          </mat-card-actions>
         </mat-card>
       </div>
 

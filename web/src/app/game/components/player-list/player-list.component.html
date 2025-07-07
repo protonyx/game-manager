@@ -1,6 +1,6 @@
 <div class="player-list-container">
-  <!-- Search input -->
-  <mat-form-field class="search-field">
+  <!-- Search input - only show when there are more than 10 players -->
+  <mat-form-field class="search-field" *ngIf="dataSource.data.length > 10">
     <mat-label>Search players</mat-label>
     <input matInput [(ngModel)]="searchText" (keyup)="applyFilter($event)" placeholder="Search by name">
     <mat-icon matSuffix>search</mat-icon>
@@ -19,20 +19,13 @@
           <mat-icon *ngIf="player.state === 'Disconnected'" class="disconnected-icon">signal_wifi_off</mat-icon>
         </mat-card-title>
         <mat-card-subtitle *ngIf="checkIsPlayerTurn(player)" class="turn-indicator">Current Turn</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <!-- Player trackers -->
-        <div class="tracker-list" *ngIf="trackers.length > 0">
-          <div *ngFor="let tracker of trackers" class="tracker-item">
-            <span class="tracker-name">{{ tracker.name }}:</span>
-            <span class="tracker-value">{{ getTrackerValue(player, tracker.id) }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-
-      <mat-card-actions *ngIf="isHost">
-        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Player actions">
+        <!-- Player actions menu in header -->
+        <button 
+          *ngIf="isHost || (game?.state === 'Preparing' && checkIsMe(player))" 
+          mat-icon-button 
+          [matMenuTriggerFor]="menu" 
+          aria-label="Player actions"
+          class="header-menu-button">
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
@@ -40,12 +33,23 @@
             <mat-icon>edit</mat-icon>
             <span>Edit</span>
           </button>
-          <button mat-menu-item (click)="handleKickPlayer(player)">
+          <!-- Only show kick option for host -->
+          <button mat-menu-item *ngIf="isHost" (click)="handleKickPlayer(player)">
             <mat-icon>person_remove</mat-icon>
             <span>Kick</span>
           </button>
         </mat-menu>
-      </mat-card-actions>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Player trackers - only show when game is not in Preparing state -->
+        <div class="tracker-list" *ngIf="trackers.length > 0 && game?.state !== 'Preparing'">
+          <div *ngFor="let tracker of trackers" class="tracker-item">
+            <span class="tracker-name">{{ tracker.name }}:</span>
+            <span class="tracker-value">{{ getTrackerValue(player, tracker.id) }}</span>
+          </div>
+        </div>
+      </mat-card-content>
     </mat-card>
   </div>
 
@@ -54,8 +58,9 @@
     No players found matching "{{ searchText }}"
   </div>
 
-  <!-- Pagination -->
+  <!-- Pagination - only show when there's more than 1 page worth of results -->
   <mat-paginator 
+    *ngIf="dataSource.data.length > pageSize"
     [length]="dataSource.data.length"
     [pageSize]="pageSize"
     [pageSizeOptions]="pageSizeOptions"

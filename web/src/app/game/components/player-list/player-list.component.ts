@@ -64,8 +64,8 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
   searchText = '';
 
   // For pagination
-  pageSize = 5;
-  pageSizeOptions: number[] = [5, 10, 25];
+  pageSize = 10;
+  pageSizeOptions: number[] = [10, 25];
 
   columnsToDisplay = ['order', 'name'];
 

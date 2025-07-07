@@ -74,6 +74,12 @@
       font-weight: bold;
     }
 
+    .header-menu-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+
     .tracker-list {
       display: flex;
       flex-direction: column;

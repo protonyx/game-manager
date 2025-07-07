@@ -26,6 +26,9 @@ export class GameControlComponent {
   @Output()
   public endGame: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output()
+  public reorder: EventEmitter<void> = new EventEmitter<void>();
+
   onStartGame(): void {
     this.startGame.emit();
   }
@@ -36,6 +39,10 @@ export class GameControlComponent {
 
   onEndGame() {
     this.endGame.emit();
+  }
+
+  onReorder() {
+    this.reorder.emit();
   }
 
   protected readonly GameState = GameState;

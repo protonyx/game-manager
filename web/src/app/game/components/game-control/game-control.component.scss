@@ -1,0 +1,12 @@
+mat-action-row {
+  margin-left: 12px;
+  margin-right: 12px;
+
+  button {
+    margin-right: 8px; /* Add horizontal spacing between buttons */
+    
+    &:last-child {
+      margin-right: 0; /* Remove margin from the last button */
+    }
+  }
+}
