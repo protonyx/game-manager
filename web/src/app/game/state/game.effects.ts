@@ -33,6 +33,7 @@ import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
 import { PatchOperation } from '../models/patch';
+import { AudioService } from '../../shared/services/audio.service';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -524,6 +525,24 @@ export const resetLayoutAfterClearCredentials = createEffect(
   },
   { functional: true },
 );
+
+export const turnAdvanced = createEffect(
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    audioService = inject(AudioService)
+  ) => {
+    return actions$.pipe(
+      ofType(GameHubActions.gameUpdated),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayerId)),
+      filter(([action, playerId]) => action.game.currentTurnPlayerId === playerId),
+      tap(() => {
+        audioService.playTurnChime();
+      })
+    )
+  },
+  { functional: true, dispatch: false }
+)
 
 export const gameEnded = createEffect(
   (actions$ = inject(Actions)) => {
