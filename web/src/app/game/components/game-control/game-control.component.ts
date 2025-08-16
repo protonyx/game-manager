@@ -49,7 +49,7 @@ export class GameControlComponent {
   stateLabel(state: GameState | undefined | null): string {
     switch (state) {
       case GameState.Preparing:
-        return 'Preparing';
+        return 'Lobby';
       case GameState.InProgress:
         return 'In Progress';
       case GameState.Complete:
