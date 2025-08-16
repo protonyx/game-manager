@@ -53,10 +53,10 @@ export class TrackerEditorComponent implements OnChanges {
   constructor(private fb: FormBuilder) {}
 
   public updateTracker(trackerId: string, delta: number) {
-    const control = this.trackerForm.controls[trackerId];
-
-    let val = control.value;
+    let val = this.player!.trackerValues[trackerId];
     val += delta;
+
+    const control = this.trackerForm.controls[trackerId];
     control.setValue(val);
 
     this.updateTrackers.emit({
@@ -76,15 +76,21 @@ export class TrackerEditorComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['player'] || changes['trackers']) {
-      if (this.player && this.trackers) {
-        this.trackerForm = this.fb.group({});
+    if (changes['trackers'] && this.trackers) {
+      this.trackerForm = this.fb.group({});
+      for (const tracker of this.trackers) {
+        this.trackerForm.addControl(
+          tracker.id,
+          this.fb.control(tracker.startingValue),
+        );
+      }
+    }
 
-        for (const tracker of this.trackers) {
-          this.trackerForm.addControl(
-            tracker.id,
-            this.fb.control(this.player.trackerValues[tracker.id]),
-          );
+    if (changes['player'] && this.player && this.trackers) {
+      for (const tracker of this.trackers) {
+        const control = this.trackerForm.controls[tracker.id];
+        if (control) {
+          control.setValue(this.player.trackerValues[tracker.id]);
         }
       }
     }

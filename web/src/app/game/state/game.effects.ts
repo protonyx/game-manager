@@ -18,7 +18,7 @@ import {
   mergeMap,
   tap,
   filter,
-  concatMap,
+  concatMap, groupBy, debounceTime, switchMap,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.selectors';
@@ -404,20 +404,25 @@ export const updateTracker = createEffect(
     return actions$.pipe(
       ofType(GameActions.updateTracker),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
-      concatMap(([action, player]) =>
-        gameService
-          .setPlayerTracker(
-            player!.id,
-            action.tracker.trackerId,
-            action.tracker.value,
+      // Create a per-tracker stream so we debounce/cancel independently per tracker
+      groupBy(([action, player]) => `${player!.id}:${action.tracker.trackerId}`),
+      mergeMap(group$ =>
+        group$.pipe(
+          // Debounce bursts of clicks on the same tracker
+          debounceTime(300),
+          // On each debounced emission, send the latest value. switchMap cancels in-flight HTTP for this tracker.
+          switchMap(([action, player]) =>
+            gameService
+              .setPlayerTracker(player!.id, action.tracker.trackerId, action.tracker.value)
+              .pipe(
+                map(player => PlayersApiActions.playerUpdated({ player })),
+                // Optional: handle errors without breaking the stream
+                catchError(() => of())
+              )
           )
-          .pipe(
-            map((player) =>
-              PlayersApiActions.playerUpdated({ player: player }),
-            ),
-          ),
-      ),
-    );
+        )
+      )
+    )
   },
   { functional: true },
 );
