@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { TurnTimerComponent } from '../turn-timer/turn-timer.component';
 
 @Component({
   selector: 'app-game-control',
@@ -25,6 +26,7 @@ import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/m
     MatCardHeader,
     MatCardContent,
     MatCardTitle,
+    TurnTimerComponent,
   ],
   standalone: true,
 })
@@ -43,6 +45,19 @@ export class GameControlComponent {
 
   @Output()
   public endGame: EventEmitter<void> = new EventEmitter<void>();
+
+  stateLabel(state: GameState | undefined | null): string {
+    switch (state) {
+      case GameState.Preparing:
+        return 'Preparing';
+      case GameState.InProgress:
+        return 'In Progress';
+      case GameState.Complete:
+        return 'Complete';
+      default:
+        return '';
+    }
+  }
 
   onStartGame(): void {
     this.startGame.emit();

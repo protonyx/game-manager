@@ -30,4 +30,18 @@
   span {
     font-weight: 500;
   }
+
+  .state {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .timer-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    opacity: 0.8;
+  }
 }
