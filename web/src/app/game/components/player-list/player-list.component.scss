@@ -28,23 +28,6 @@ mat-card {
     gap: 16px;
     margin-bottom: 16px;
 
-    // For smaller screens, make it scrollable horizontally
-    @media (max-width: 599px) {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding-bottom: 8px; // Space for scrollbar
-
-      .player-card {
-        flex: 0 0 280px;
-        margin-right: 16px;
-
-        &:last-child {
-          margin-right: 0;
-        }
-      }
-    }
-
     .player-card {
       margin-bottom: 8px;
       transition: all 0.2s ease-in-out;
@@ -54,15 +37,10 @@ mat-card {
 
       &.player-is-active {
         border-left: 5px solid;
-        background-color: var(--mat-sys-primary-container);
+        background-color: var(--mat-sys-secondary-container);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
-        color: var(--mat-sys-on-primary-container);
-
-        // Animate the border
-        //border-left-color: mat.m2-get-color-from-palette($primary-palette);
-        //animation: pulse-border 2s infinite ease-in-out,
-        //pulse-background 2s infinite ease-in-out;
+        color: var(--mat-sys-on-secondary-container);
 
         .mat-mdc-card-title {
           font-weight: bold;

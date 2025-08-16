@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .game-controls {
   padding: 0 16px;
   height: 56px;
@@ -7,6 +9,18 @@
 
   .spacer {
     flex: 1 1 auto; /* This pushes the buttons to the right */
+  }
+
+  .start {
+    @include mat.icon-button-overrides((
+            icon-color: green
+    ))
+  }
+
+  .end {
+    @include mat.icon-button-overrides((
+            icon-color: red
+    ))
   }
 
   button {

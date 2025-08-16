@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 mat-card {
   mat-card-content {
     padding: 16px;
@@ -56,18 +58,39 @@ mat-card {
       input.center-align::-webkit-inner-spin-button {
         display: none;
       }
-    }
 
-    .quick-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: space-between;
+      .decrease {
+        @include mat.button-overrides((
+            outlined-outline-color: var(--mat-sys-error-container),
+            outlined-label-text-color: var(--mat-sys-error)
+        ));
+        @include mat.icon-button-overrides((
+            icon-color: var(--mat-sys-error)
+        ));
+      }
 
-      button {
-        flex: 1;
-        min-width: 60px;
+      .increase {
+        @include mat.button-overrides((
+            outlined-outline-color: var(--mat-sys-primary-container),
+            outlined-label-text-color: var(--mat-sys-primary)
+        ));
+        @include mat.icon-button-overrides((
+            icon-color: var(--mat-sys-primary)
+        ));
+      }
+
+      .quick-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: space-between;
+
+        button {
+          flex: 1;
+          min-width: 60px;
+        }
       }
     }
+
   }
 }

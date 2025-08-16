@@ -16,7 +16,7 @@
               <div class="controls-container">
                 <button
                   mat-icon-button
-                  color="warn"
+                  class="decrease"
                   (click)="updateTracker(tracker.id, -1)"
                   aria-label="Decrease value">
                   <mat-icon>remove</mat-icon>
@@ -34,20 +34,20 @@
 
                 <button
                   mat-icon-button
-                  color="primary"
+                  class="increase"
                   (click)="updateTracker(tracker.id, 1)"
                   aria-label="Increase value">
                   <mat-icon>add</mat-icon>
                 </button>
               </div>
-            </div>
 
-            <!-- Quick adjustment buttons -->
-            <div class="quick-buttons">
-              <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -10)">-10</button>
-              <button mat-stroked-button color="warn" (click)="updateTracker(tracker.id, -5)">-5</button>
-              <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 5)">+5</button>
-              <button mat-stroked-button color="primary" (click)="updateTracker(tracker.id, 10)">+10</button>
+              <!-- Quick adjustment buttons -->
+              <div class="quick-buttons">
+                <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -10)">-10</button>
+                <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -5)">-5</button>
+                <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 5)">+5</button>
+                <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 10)">+10</button>
+              </div>
             </div>
           </mat-card-content>
         </mat-card>

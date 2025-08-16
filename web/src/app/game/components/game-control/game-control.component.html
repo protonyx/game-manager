@@ -10,7 +10,7 @@
       <button
         mat-icon-button
         matTooltip="Start Game"
-        color="accent"
+        class="start"
         (click)="onStartGame()"
         *ngIf="game?.state === GameState.Preparing">
         <mat-icon>play_arrow</mat-icon>
@@ -19,7 +19,6 @@
       <button
         mat-icon-button
         matTooltip="Force End Turn"
-        color="warn"
         (click)="onAdvanceTurn()"
         *ngIf="game?.state === GameState.InProgress">
         <mat-icon>skip_next</mat-icon>
@@ -28,7 +27,7 @@
       <button
         mat-icon-button
         matTooltip="End Game"
-        color="primary"
+        class="end"
         (click)="onEndGame()"
         *ngIf="game?.state === GameState.InProgress">
         <mat-icon>stop</mat-icon>
