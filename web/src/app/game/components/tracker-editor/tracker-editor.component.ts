@@ -79,9 +79,10 @@ export class TrackerEditorComponent implements OnChanges {
     if (changes['trackers'] && this.trackers) {
       this.trackerForm = this.fb.group({});
       for (const tracker of this.trackers) {
+        const startingValue = this.player?.trackerValues[tracker.id] || tracker.startingValue;
         this.trackerForm.addControl(
           tracker.id,
-          this.fb.control(tracker.startingValue),
+          this.fb.control(startingValue),
         );
       }
     }
