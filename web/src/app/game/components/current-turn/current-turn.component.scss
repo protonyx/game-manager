@@ -2,19 +2,6 @@
   border-left: 5px solid;
   transition: all 0.3s ease;
 
-  // Responsive adjustments for small screens
-  @media (max-width: 599px) {
-    mat-card-header {
-      flex-direction: column;
-      align-items: flex-start;
-
-      .mat-mdc-card-header-text {
-        margin-top: 8px;
-        margin-left: 0;
-      }
-    }
-  }
-
   .player-avatar {
     display: flex;
     align-items: center;
