@@ -4,6 +4,33 @@
   box-sizing: border-box;
 }
 
+// Single-column tab layout helpers (minimal styles)
+.single-column-content {
+  padding-top: 6px;
+  /* Reserve space for fixed bottom tabs bar to avoid overlap */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+}
+
+/* Fixed bottom tabs bar for single-column mode */
+.bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--mat-sys-surface, #fff);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+
+  /* Only show the tab header; hide bodies since content is rendered above */
+  .mat-mdc-tab-group {
+    width: 100%;
+  }
+  .mat-mdc-tab-body-wrapper {
+    display: none;
+  }
+}
+
 // Grid layout
 .game-grid {
   display: grid;

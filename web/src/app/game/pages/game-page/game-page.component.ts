@@ -22,6 +22,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, map } from 'rxjs';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -36,6 +38,8 @@ const selectIsCurrentPlayerTurn = createSelector(
     imports: [
         CommonModule,
         MatButtonModule,
+        MatTabsModule,
+        MatIconModule,
         MatExpansionModule,
         MatGridListModule,
         MatCardModule,
@@ -76,6 +80,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
       })
     );
 
+  // Derived layout flags
+  isSingleColumn$: Observable<boolean> = this.cols$.pipe(map(c => c === 1));
+
   // Column spans for different components based on screen size
   leftColSpan$: Observable<number> = this.cols$.pipe(
     map(cols => cols === 1 ? 1 : 1) // Full width on small screens, 1/2 width on larger screens
@@ -84,6 +91,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
   rightColSpan$: Observable<number> = this.cols$.pipe(
     map(cols => cols === 1 ? 1 : 1) // Full width on small screens, 1/2 width on larger screens
   );
+
+  // Local UI state for tabs in single-column mode
+  selectedTab = 0;
 
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 

@@ -8,43 +8,114 @@
     rightColSpan: rightColSpan$
   } as vm">
   <div class="game-page-container">
-    <!-- Responsive grid layout -->
-    <div class="game-grid" [ngClass]="{'single-column': vm.cols === 1, 'two-columns': vm.cols === 2, 'preparing-state': vm.game?.state === 'Preparing'}">
+    <!-- Single column: show top controls and bottom tabs -->
+    <ng-container *ngIf="isSingleColumn$ | async; else twoColumnLayout">
+      <!-- Host controls at the top -->
+      <app-game-control
+        *ngIf="isHost$ | async"
+        class="game-control-card"
+        [game]="vm.game"
+        [isHost]="isHost$ | async"
+        (startGame)="onStartGame(vm.game)"
+        (advanceTurn)="onEndTurn(vm.game)"
+        (endGame)="onEndGame(vm.game)">
+      </app-game-control>
 
-      <!-- Left column (players and game control) -->
-      <div class="left-column">
-        <!-- Game Control (only for host) -->
-        <app-game-control
-          *ngIf="isHost$ | async" class="game-control-card"
-          [game]="vm.game"
-          [isHost]="isHost$ | async"
-          (startGame)="onStartGame(vm.game)"
-          (advanceTurn)="onEndTurn(vm.game)"
-          (endGame)="onEndGame(vm.game)">
-        </app-game-control>
+      <!-- Content area switches by selectedTab; tabs fixed at viewport bottom -->
+      <div class="single-column-content">
+        <ng-container [ngSwitch]="selectedTab">
+          <!-- Player List tab content -->
+          <ng-container *ngSwitchCase="0">
+            <app-player-list
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer"
+              [isHost]="isHost$ | async"
+              (editPlayer)="onPlayerEdit($event)"
+              (kickPlayer)="onPlayerKick($event)"
+              (reorder)="onReorder()">
+            </app-player-list>
+          </ng-container>
 
-        <!-- Player List -->
-        <app-player-list
-          [game]="vm.game"
-          [players]="players$ | async"
-          [currentPlayer]="vm.currentPlayer"
-          [isHost]="isHost$ | async"
-          (editPlayer)="onPlayerEdit($event)"
-          (kickPlayer)="onPlayerKick($event)"
-          (reorder)="onReorder()">
-        </app-player-list>
+          <!-- Turn tab content -->
+          <ng-container *ngSwitchCase="1">
+            <app-current-turn
+              *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer"
+              [isHost]="isHost$ | async"
+              (endTurn)="onEndTurn(vm.game)">
+            </app-current-turn>
+            <app-tracker-editor
+              *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+              [trackers]="vm.trackers"
+              [player]="vm.currentPlayer"
+              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+            </app-tracker-editor>
+          </ng-container>
+        </ng-container>
       </div>
 
-      <!-- Right column (current turn and trackers) -->
-      <div class="right-column">
-        <!-- Current Turn -->
+      <!-- Fixed bottom tabs navigation using Angular Material TabGroup (header only) -->
+      <div class="bottom-tabs">
+        <mat-tab-group
+          headerPosition="below"
+          [selectedIndex]="selectedTab"
+          (selectedIndexChange)="selectedTab = $event">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon aria-hidden="true">group</mat-icon>
+              <span>Player List</span>
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon aria-hidden="true">schedule</mat-icon>
+              <span>Turn</span>
+            </ng-template>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </ng-container>
+
+    <!-- Two column layout (default on medium and larger screens) -->
+    <ng-template #twoColumnLayout>
+      <div class="game-grid" [ngClass]="{'two-columns': vm.cols === 2, 'preparing-state': vm.game?.state === 'Preparing'}">
+        <!-- Left column (players and game control) -->
+        <div class="left-column">
+          <!-- Game Control (only for host) -->
+          <app-game-control
+            *ngIf="isHost$ | async" class="game-control-card"
+            [game]="vm.game"
+            [isHost]="isHost$ | async"
+            (startGame)="onStartGame(vm.game)"
+            (advanceTurn)="onEndTurn(vm.game)"
+            (endGame)="onEndGame(vm.game)">
+          </app-game-control>
+
+          <!-- Player List -->
+          <app-player-list
+            [game]="vm.game"
+            [players]="players$ | async"
+            [currentPlayer]="vm.currentPlayer"
+            [isHost]="isHost$ | async"
+            (editPlayer)="onPlayerEdit($event)"
+            (kickPlayer)="onPlayerKick($event)"
+            (reorder)="onReorder()">
+          </app-player-list>
+        </div>
+
+        <!-- Right column (current turn and trackers) -->
+        <div class="right-column">
+          <!-- Current Turn -->
           <app-current-turn
-                  *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-                  [game]="vm.game"
-                  [players]="players$ | async"
-                  [currentPlayer]="vm.currentPlayer"
-                  [isHost]="isHost$ | async"
-                  (endTurn)="onEndTurn(vm.game)">
+            *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+            [game]="vm.game"
+            [players]="players$ | async"
+            [currentPlayer]="vm.currentPlayer"
+            [isHost]="isHost$ | async"
+            (endTurn)="onEndTurn(vm.game)">
           </app-current-turn>
 
           <!-- Trackers -->
@@ -54,7 +125,8 @@
             [player]="vm.currentPlayer"
             (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
           </app-tracker-editor>
+        </div>
       </div>
-    </div>
+    </ng-template>
   </div>
 </ng-container>
