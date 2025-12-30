@@ -40,8 +40,8 @@
     "@ngrx/operators": "^18.0.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.15",
-    "@angular/cli": "~19.2.15",
+    "@angular/build": "^20.3.13",
+    "@angular/cli": "~20.3.13",
     "@angular/compiler-cli": "^20.3.15",
     "@ngrx/eslint-plugin": "^19.2.1",
     "@types/jasmine": "~5.1.4",
@@ -57,8 +57,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.3.2",
-    "typescript": "~5.8.3",
-    "run-script-os": "^1.1.6"
+    "run-script-os": "^1.1.6",
+    "typescript": "~5.8.3"
   },
   "browser": {
     "http": false,
