@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 
 import { GameControlComponent } from './game-control.component';
 
@@ -8,7 +9,8 @@ describe('GameControlComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [GameControlComponent],
+      imports: [GameControlComponent],
+      providers: [provideMockStore()],
     });
     fixture = TestBed.createComponent(GameControlComponent);
     component = fixture.componentInstance;
