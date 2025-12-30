@@ -50,7 +50,43 @@ export class TrackerEditorComponent implements OnChanges {
 
   trackerForm: FormGroup = this.fb.group({});
 
+  editingTrackerId: string | null = null;
+  keypadValue: string = '';
+  isAdding: boolean = true;
+
   constructor(private fb: FormBuilder) {}
+
+  public onPlusClick(trackerId: string) {
+    this.editingTrackerId = trackerId;
+    this.isAdding = true;
+    this.keypadValue = '';
+  }
+
+  public onMinusClick(trackerId: string) {
+    this.editingTrackerId = trackerId;
+    this.isAdding = false;
+    this.keypadValue = '';
+  }
+
+  public onKeypadClick(key: string) {
+    if (key === 'backspace') {
+      this.keypadValue = this.keypadValue.slice(0, -1);
+    } else {
+      this.keypadValue += key;
+    }
+  }
+
+  public onSave(trackerId: string) {
+    if (this.keypadValue) {
+      const delta = parseInt(this.keypadValue) * (this.isAdding ? 1 : -1);
+      this.updateTracker(trackerId, delta);
+    }
+    this.editingTrackerId = null;
+  }
+
+  public onCancel() {
+    this.editingTrackerId = null;
+  }
 
   public updateTracker(trackerId: string, delta: number) {
     let val = this.player!.trackerValues[trackerId];

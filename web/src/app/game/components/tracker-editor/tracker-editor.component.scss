@@ -90,6 +90,46 @@ mat-card {
           min-width: 60px;
         }
       }
+
+      .keypad-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 8px;
+        background-color: var(--mat-sys-surface-variant);
+        border-radius: 8px;
+
+        .keypad-display {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 16px;
+          background-color: var(--mat-sys-surface);
+          border-radius: 4px;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        .keypad-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+
+          button {
+            height: 48px;
+            font-size: 1.2rem;
+          }
+        }
+
+        .keypad-actions {
+          display: flex;
+          gap: 8px;
+
+          button {
+            flex: 1;
+          }
+        }
+      }
     }
 
   }

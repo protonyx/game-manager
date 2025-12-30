@@ -17,7 +17,7 @@
                 <button
                   mat-icon-button
                   class="decrease"
-                  (click)="updateTracker(tracker.id, -1)"
+                  (click)="onMinusClick(tracker.id)"
                   aria-label="Decrease value">
                   <mat-icon>remove</mat-icon>
                 </button>
@@ -35,18 +35,43 @@
                 <button
                   mat-icon-button
                   class="increase"
-                  (click)="updateTracker(tracker.id, 1)"
+                  (click)="onPlusClick(tracker.id)"
                   aria-label="Increase value">
                   <mat-icon>add</mat-icon>
                 </button>
               </div>
 
-              <!-- Quick adjustment buttons -->
-              <div class="quick-buttons">
+              <!-- Quick adjustment buttons or Keypad -->
+              <div class="quick-buttons" *ngIf="editingTrackerId !== tracker.id">
                 <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -10)">-10</button>
                 <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -5)">-5</button>
                 <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 5)">+5</button>
                 <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 10)">+10</button>
+              </div>
+
+              <div class="keypad-container" *ngIf="editingTrackerId === tracker.id">
+                <div class="keypad-display">
+                  <span>{{ isAdding ? '+' : '-' }}</span>
+                  <span>{{ keypadValue || '0' }}</span>
+                </div>
+                <div class="keypad-grid">
+                  <button mat-stroked-button (click)="onKeypadClick('1')">1</button>
+                  <button mat-stroked-button (click)="onKeypadClick('2')">2</button>
+                  <button mat-stroked-button (click)="onKeypadClick('3')">3</button>
+                  <button mat-stroked-button (click)="onKeypadClick('4')">4</button>
+                  <button mat-stroked-button (click)="onKeypadClick('5')">5</button>
+                  <button mat-stroked-button (click)="onKeypadClick('6')">6</button>
+                  <button mat-stroked-button (click)="onKeypadClick('7')">7</button>
+                  <button mat-stroked-button (click)="onKeypadClick('8')">8</button>
+                  <button mat-stroked-button (click)="onKeypadClick('9')">9</button>
+                  <button mat-stroked-button (click)="onCancel()"><mat-icon>close</mat-icon></button>
+                  <button mat-stroked-button (click)="onKeypadClick('0')">0</button>
+                  <button mat-stroked-button (click)="onKeypadClick('backspace')"><mat-icon>backspace</mat-icon></button>
+                </div>
+                <div class="keypad-actions">
+                  <button mat-raised-button color="primary" (click)="onSave(tracker.id)" [disabled]="!keypadValue">Save</button>
+                  <button mat-button (click)="onCancel()">Cancel</button>
+                </div>
               </div>
             </div>
           </mat-card-content>
