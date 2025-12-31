@@ -31,6 +31,7 @@ export const GameActions = createActionGroup({
     loadPlayer: props<{ playerId: string }>(),
     updateTracker: props<{ playerId: string; tracker: TrackerValue }>(),
     reorderPlayers: emptyProps(),
+    editTracker: props<{ playerId: string, trackerId: string }>(),
     endTurn: props<{ gameId: string }>(),
     startGame: props<{ gameId: string }>(),
     endGame: props<{ gameId: string }>(),
@@ -85,6 +86,13 @@ export const PlayerReorderDialogActions = createActionGroup({
   events: {
     closed: emptyProps(),
     updatePlayerOrder: props<{ players: Player[] }>(),
+  },
+});
+
+export const TrackerEditorDialogActions = createActionGroup({
+  source: 'Tracker Editor Dialog',
+  events: {
+    closed: emptyProps(),
   },
 });
 

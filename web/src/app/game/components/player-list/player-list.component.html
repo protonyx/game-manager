@@ -67,10 +67,16 @@
       <mat-card-content>
         <!-- Player trackers - only show when game is not in Preparing state -->
         <div class="tracker-list" *ngIf="trackers.length > 0 && game?.state !== 'Preparing'">
-          <div *ngFor="let tracker of trackers" class="tracker-item">
+          @for (tracker of trackers; track tracker.id) {
+          <div class="tracker-item">
             <span class="tracker-name">{{ tracker.name }}:</span>
+            @if (currentPlayer === player) {
+            <button mat-button (click)="handleEditTracker(player.id, tracker.id)">{{ getTrackerValue(player, tracker.id) }}</button>
+            } @else {
             <span class="tracker-value">{{ getTrackerValue(player, tracker.id) }}</span>
+            }
           </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>

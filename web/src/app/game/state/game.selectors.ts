@@ -27,7 +27,7 @@ export const selectAllPlayers = createSelector(selectPlayers, selectAll);
 export const selectPlayerById = (playerId: string) =>
   createSelector(
     selectPlayersEntities,
-    (playerEntities) => playerId && playerEntities[playerId],
+    (playerEntities) => (playerId ? playerEntities[playerId] : null),
   );
 
 export const selectCurrentPlayerId = createSelector(
@@ -43,7 +43,7 @@ export const selectCurrentPlayerIsHost = createSelector(
 export const selectCurrentPlayer = createSelector(
   selectCurrentPlayerId,
   selectPlayersEntities,
-  (playerId, entities) => (playerId ? entities[playerId] : null)!,
+  (playerId, entities) => (playerId ? entities[playerId] : undefined),
 );
 
 export const selectSummaryName = createSelector(selectSummary, (summary) => {

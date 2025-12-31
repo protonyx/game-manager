@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Trackers</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="trackers-container">
+      @for (tracker of trackers; track tracker.id) {
+        <mat-card class="tracker-card">
+          <mat-card-header>
+            <mat-card-title>{{ tracker.name }}</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <app-tracker-editor
+              [trackerValue]="player!.trackerValues[tracker.id]"
+              (trackerChange)="onTrackerChange(tracker.id, $event)"
+            ></app-tracker-editor>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

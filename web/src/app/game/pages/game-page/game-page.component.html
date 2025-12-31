@@ -29,11 +29,12 @@
             <app-player-list
               [game]="vm.game"
               [players]="players$ | async"
-              [currentPlayer]="vm.currentPlayer"
+              [currentPlayer]="vm.currentPlayer!"
               [isHost]="isHost$ | async"
               (editPlayer)="onPlayerEdit($event)"
               (kickPlayer)="onPlayerKick($event)"
-              (reorder)="onReorder()">
+              (reorder)="onReorder()"
+              (editTracker)="onEditTracker($event)">
             </app-player-list>
           </ng-container>
 
@@ -47,12 +48,12 @@
               [isHost]="isHost$ | async"
               (endTurn)="onEndTurn(vm.game)">
             </app-current-turn>
-            <app-tracker-editor
+            <app-tracker-list
               *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
               [trackers]="vm.trackers"
               [player]="vm.currentPlayer"
               (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-            </app-tracker-editor>
+            </app-tracker-list>
           </ng-container>
         </ng-container>
       </div>
@@ -98,33 +99,36 @@
           <app-player-list
             [game]="vm.game"
             [players]="players$ | async"
-            [currentPlayer]="vm.currentPlayer"
+            [currentPlayer]="vm.currentPlayer!"
             [isHost]="isHost$ | async"
             (editPlayer)="onPlayerEdit($event)"
             (kickPlayer)="onPlayerKick($event)"
-            (reorder)="onReorder()">
+            (reorder)="onReorder()"
+            (editTracker)="onEditTracker($event)">
           </app-player-list>
         </div>
 
         <!-- Right column (current turn and trackers) -->
         <div class="right-column">
           <!-- Current Turn -->
+          @if (vm.game && vm.game.state === 'InProgress' && vm.currentPlayer) {
           <app-current-turn
-            *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
             [game]="vm.game"
             [players]="players$ | async"
             [currentPlayer]="vm.currentPlayer"
             [isHost]="isHost$ | async"
             (endTurn)="onEndTurn(vm.game)">
           </app-current-turn>
+          }
 
           <!-- Trackers -->
-          <app-tracker-editor
-            *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+          @if (vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer) {
+          <app-tracker-list
             [trackers]="vm.trackers"
             [player]="vm.currentPlayer"
             (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-          </app-tracker-editor>
+          </app-tracker-list>
+          }
         </div>
       </div>
     </ng-template>

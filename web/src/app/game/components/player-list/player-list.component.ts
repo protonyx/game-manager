@@ -60,6 +60,9 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
   @Output()
   public reorder = new EventEmitter<void>();
 
+  @Output()
+  public editTracker: EventEmitter<{playerId: string, trackerId: string}> = new EventEmitter<{playerId: string, trackerId: string}>();
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   dataSource = new MatTableDataSource<Player>();
@@ -166,5 +169,9 @@ export class PlayerListComponent implements OnChanges, AfterViewInit {
 
   handleReorderPlayers() {
     this.reorder.emit();
+  }
+
+  handleEditTracker(playerId: string, trackerId: string) {
+    this.editTracker.emit({playerId, trackerId});
   }
 }

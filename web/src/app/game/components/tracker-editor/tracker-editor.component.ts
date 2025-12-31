@@ -4,12 +4,10 @@ import {
   Input,
   Output,
   OnChanges,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
-import { Player, Tracker, TrackerValue } from '../../models/models';
 import {
-  FormBuilder,
-  FormGroup,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
@@ -22,48 +20,43 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-tracker-editor',
-    templateUrl: './tracker-editor.component.html',
-    styleUrls: ['./tracker-editor.component.scss'],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSliderModule,
-        MatIconModule,
-        MatCardModule,
-    ]
+  selector: 'app-tracker-editor',
+  templateUrl: './tracker-editor.component.html',
+  styleUrls: ['./tracker-editor.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSliderModule,
+    MatIconModule,
+    MatCardModule,
+  ],
 })
 export class TrackerEditorComponent implements OnChanges {
   @Input()
-  public trackers: Tracker[] | null | undefined;
-
-  @Input()
-  public player: Player | null | undefined;
+  public trackerValue: number | null | undefined;
 
   @Output()
-  public updateTrackers: EventEmitter<TrackerValue> =
-    new EventEmitter<TrackerValue>();
+  public trackerChange: EventEmitter<number> =
+    new EventEmitter<number>();
 
-  trackerForm: FormGroup = this.fb.group({});
+  trackerValueControl = new FormControl(0);
 
-  editingTrackerId: string | null = null;
-  keypadValue: string = '';
-  isAdding: boolean = true;
+  keypadActive = false;
+  keypadValue = '';
+  isAdding = true;
 
-  constructor(private fb: FormBuilder) {}
-
-  public onPlusClick(trackerId: string) {
-    this.editingTrackerId = trackerId;
+  public onPlusClick() {
+    this.keypadActive = true;
     this.isAdding = true;
     this.keypadValue = '';
   }
 
-  public onMinusClick(trackerId: string) {
-    this.editingTrackerId = trackerId;
+  public onMinusClick() {
+    this.keypadActive = true;
     this.isAdding = false;
     this.keypadValue = '';
   }
@@ -76,60 +69,36 @@ export class TrackerEditorComponent implements OnChanges {
     }
   }
 
-  public onSave(trackerId: string) {
+  public onSave() {
     if (this.keypadValue) {
       const delta = parseInt(this.keypadValue) * (this.isAdding ? 1 : -1);
-      this.updateTracker(trackerId, delta);
+      this.updateTracker(delta);
     }
-    this.editingTrackerId = null;
+    this.keypadActive = false;
   }
 
   public onCancel() {
-    this.editingTrackerId = null;
+    this.keypadActive = false;
   }
 
-  public updateTracker(trackerId: string, delta: number) {
-    let val = this.player!.trackerValues[trackerId];
+  public updateTracker(delta: number) {
+    let val = this.trackerValueControl.value!;
     val += delta;
 
-    const control = this.trackerForm.controls[trackerId];
-    control.setValue(val);
+    this.trackerValueControl.setValue(val);
 
-    this.updateTrackers.emit({
-      trackerId: trackerId,
-      value: val,
-    });
+    this.trackerChange.emit(val);
   }
 
-  public setTrackerValue(trackerId: string, value: number) {
-    const control = this.trackerForm.controls[trackerId];
-    control.setValue(value);
+  public setTrackerValue(value: number) {
+    this.trackerValueControl.setValue(value);
 
-    this.updateTrackers.emit({
-      trackerId: trackerId,
-      value: value,
-    });
+    this.trackerChange.emit(value);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['trackers'] && this.trackers) {
-      this.trackerForm = this.fb.group({});
-      for (const tracker of this.trackers) {
-        const startingValue = this.player?.trackerValues[tracker.id] || tracker.startingValue;
-        this.trackerForm.addControl(
-          tracker.id,
-          this.fb.control(startingValue),
-        );
-      }
-    }
-
-    if (changes['player'] && this.player && this.trackers) {
-      for (const tracker of this.trackers) {
-        const control = this.trackerForm.controls[tracker.id];
-        if (control) {
-          control.setValue(this.player.trackerValues[tracker.id]);
-        }
-      }
+    if (changes['trackerValue'] && this.trackerValue) {
+      this.trackerValueControl.setValue(this.trackerValue);
     }
   }
 }

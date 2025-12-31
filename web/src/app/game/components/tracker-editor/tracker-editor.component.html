@@ -1,82 +1,68 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Trackers</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <form [formGroup]="trackerForm" class="tracker-form">
-      <div class="trackers-container">
-        <mat-card *ngFor="let tracker of trackers" class="tracker-card">
-          <mat-card-header>
-            <mat-card-title>{{ tracker.name }}</mat-card-title>
-          </mat-card-header>
 
-          <mat-card-content>
-            <div class="tracker-controls">
-              <!-- Value adjustment controls -->
-              <div class="controls-container">
-                <button
-                  mat-icon-button
-                  class="decrease"
-                  (click)="onMinusClick(tracker.id)"
-                  aria-label="Decrease value">
-                  <mat-icon>remove</mat-icon>
-                </button>
+<div class="tracker-controls">
+  <!-- Value adjustment controls -->
+  <div class="controls-container">
+    <button
+      mat-icon-button
+      class="decrease"
+      (click)="onMinusClick()"
+      aria-label="Decrease value">
+      <mat-icon>remove</mat-icon>
+    </button>
 
-                <!-- Direct input for precise value -->
-                <mat-form-field class="value-input">
-                  <input
-                    matInput
-                    type="number"
-                    class="center-align"
-                    [formControlName]="tracker.id"
-                    (change)="setTrackerValue(tracker.id, trackerForm.get(tracker.id)?.value)" />
-                </mat-form-field>
+    <!-- Direct input for precise value -->
+    <mat-form-field class="value-input">
+      <input
+        matInput
+        type="number"
+        class="center-align"
+        [disabled]="true"
+        [formControl]="trackerValueControl"
+        (change)="setTrackerValue(trackerValueControl.value!)" />
+    </mat-form-field>
 
-                <button
-                  mat-icon-button
-                  class="increase"
-                  (click)="onPlusClick(tracker.id)"
-                  aria-label="Increase value">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </div>
+    <button
+      mat-icon-button
+      class="increase"
+      (click)="onPlusClick()"
+      aria-label="Increase value">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
 
-              <!-- Quick adjustment buttons or Keypad -->
-              <div class="quick-buttons" *ngIf="editingTrackerId !== tracker.id">
-                <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -10)">-10</button>
-                <button mat-stroked-button class="decrease" (click)="updateTracker(tracker.id, -5)">-5</button>
-                <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 5)">+5</button>
-                <button mat-stroked-button class="increase" (click)="updateTracker(tracker.id, 10)">+10</button>
-              </div>
+  <!-- Quick adjustment buttons or Keypad -->
+  @if (!keypadActive) {
+  <div class="quick-buttons">
+    <button mat-stroked-button class="decrease" (click)="updateTracker(-10)">-10</button>
+    <button mat-stroked-button class="decrease" (click)="updateTracker(-5)">-5</button>
+    <button mat-stroked-button class="increase" (click)="updateTracker(5)">+5</button>
+    <button mat-stroked-button class="increase" (click)="updateTracker(10)">+10</button>
+  </div>
+  } @else {
+  <div class="keypad-container">
+    <div class="keypad-display">
+      <span>{{ isAdding ? '+' : '-' }}</span>
+      <span>{{ keypadValue || '0' }}</span>
+    </div>
+    <div class="keypad-grid">
+      <button mat-stroked-button (click)="onKeypadClick('1')">1</button>
+      <button mat-stroked-button (click)="onKeypadClick('2')">2</button>
+      <button mat-stroked-button (click)="onKeypadClick('3')">3</button>
+      <button mat-stroked-button (click)="onKeypadClick('4')">4</button>
+      <button mat-stroked-button (click)="onKeypadClick('5')">5</button>
+      <button mat-stroked-button (click)="onKeypadClick('6')">6</button>
+      <button mat-stroked-button (click)="onKeypadClick('7')">7</button>
+      <button mat-stroked-button (click)="onKeypadClick('8')">8</button>
+      <button mat-stroked-button (click)="onKeypadClick('9')">9</button>
+      <button mat-stroked-button (click)="onCancel()"><mat-icon>close</mat-icon></button>
+      <button mat-stroked-button (click)="onKeypadClick('0')">0</button>
+      <button mat-stroked-button (click)="onKeypadClick('backspace')"><mat-icon>backspace</mat-icon></button>
+    </div>
+    <div class="keypad-actions">
+      <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!keypadValue">Save</button>
+      <button mat-button (click)="onCancel()">Cancel</button>
+    </div>
+  </div>
+  }
 
-              <div class="keypad-container" *ngIf="editingTrackerId === tracker.id">
-                <div class="keypad-display">
-                  <span>{{ isAdding ? '+' : '-' }}</span>
-                  <span>{{ keypadValue || '0' }}</span>
-                </div>
-                <div class="keypad-grid">
-                  <button mat-stroked-button (click)="onKeypadClick('1')">1</button>
-                  <button mat-stroked-button (click)="onKeypadClick('2')">2</button>
-                  <button mat-stroked-button (click)="onKeypadClick('3')">3</button>
-                  <button mat-stroked-button (click)="onKeypadClick('4')">4</button>
-                  <button mat-stroked-button (click)="onKeypadClick('5')">5</button>
-                  <button mat-stroked-button (click)="onKeypadClick('6')">6</button>
-                  <button mat-stroked-button (click)="onKeypadClick('7')">7</button>
-                  <button mat-stroked-button (click)="onKeypadClick('8')">8</button>
-                  <button mat-stroked-button (click)="onKeypadClick('9')">9</button>
-                  <button mat-stroked-button (click)="onCancel()"><mat-icon>close</mat-icon></button>
-                  <button mat-stroked-button (click)="onKeypadClick('0')">0</button>
-                  <button mat-stroked-button (click)="onKeypadClick('backspace')"><mat-icon>backspace</mat-icon></button>
-                </div>
-                <div class="keypad-actions">
-                  <button mat-raised-button color="primary" (click)="onSave(tracker.id)" [disabled]="!keypadValue">Save</button>
-                  <button mat-button (click)="onCancel()">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+</div>
