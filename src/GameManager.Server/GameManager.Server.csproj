@@ -11,15 +11,15 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.1.0" />
-    <PackageReference Include="FastEndpoints" Version="5.34.0" />
-    <PackageReference Include="FastEndpoints.Swagger" Version="5.34.0" />
+    <PackageReference Include="FastEndpoints" Version="7.1.1" />
+    <PackageReference Include="FastEndpoints.Swagger" Version="7.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.1" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.0.3" />
-    <PackageReference Include="HotChocolate.Data" Version="15.0.3" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.1.11" />
+    <PackageReference Include="HotChocolate.Data" Version="15.1.11" />
   </ItemGroup>
 
   <ItemGroup>
