@@ -18,6 +18,10 @@ public class UpdatePlayerCommandTests
         var gameName = GameName.From(fixture.Create<string>());
         var game = new Game(gameName.Value, new GameOptions());
         var player = fixture.BuildPlayer(game).Create();
+
+        var gameRepository = fixture.Freeze<Mock<IGameRepository>>();
+        gameRepository.Setup(t => t.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(game);
         var playerRepository = fixture.Freeze<Mock<IPlayerRepository>>();
         playerRepository.Setup(x => x.GetByIdAsync(player.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(player);
