@@ -27,7 +27,7 @@ export const selectAllPlayers = createSelector(selectPlayers, selectAll);
 export const selectPlayerById = (playerId: string) =>
   createSelector(
     selectPlayersEntities,
-    (playerEntities) => playerId && playerEntities[playerId],
+    (playerEntities) => (playerId ? playerEntities[playerId] : null),
   );
 
 export const selectCurrentPlayerId = createSelector(
@@ -43,7 +43,7 @@ export const selectCurrentPlayerIsHost = createSelector(
 export const selectCurrentPlayer = createSelector(
   selectCurrentPlayerId,
   selectPlayersEntities,
-  (playerId, entities) => (playerId ? entities[playerId] : null)!,
+  (playerId, entities) => (playerId ? entities[playerId] : undefined),
 );
 
 export const selectSummaryName = createSelector(selectSummary, (summary) => {
@@ -54,7 +54,7 @@ export const selectSummaryTrackers = createSelector(
   selectSummary,
   (summary) => {
     return summary?.trackers.map((tracker) => {
-      return <TrackerSummary>{
+      return {
         ...tracker,
         trackerHistory: summary.players.reduce((acc, player) => {
           // Starting value
@@ -75,7 +75,7 @@ export const selectSummaryTrackers = createSelector(
           }
           return acc;
         }, new Array<PlayerTrackerHistory>()),
-      };
+      } as TrackerSummary;
     });
   },
 );
@@ -83,14 +83,14 @@ export const selectSummaryTrackers = createSelector(
 export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
   return (
     summary?.players.map((player) => {
-      return <PlayerSummary>{
+      return {
         ...player,
         turnCount: player.turns.length,
         avgTurnDuration:
           player.turns
             .map((t) => t.durationSeconds)
             .reduce((acc, d) => acc + d, 0) / player.turns.length,
-      };
+      } as PlayerSummary;
     }) || new Array<PlayerSummary>()
   );
 });

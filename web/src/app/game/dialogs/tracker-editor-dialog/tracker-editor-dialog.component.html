@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Edit {{ trackerName$ | async }}</h2>
+<mat-dialog-content>
+  <app-tracker-editor
+    #editor
+    [trackerValue]="trackerValue$ | async"
+    (trackerChange)="handleTrackerUpdate($event)"
+  />
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="undefined">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [mat-dialog-close]="newTrackerValue">
+    Update
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,47 @@
+@use '@angular/material' as mat;
+
+.game-controls {
+  padding: 0 16px;
+  height: 56px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+
+  .spacer {
+    flex: 1 1 auto; /* This pushes the buttons to the right */
+  }
+
+  .start {
+    @include mat.icon-button-overrides((
+            icon-color: green
+    ))
+  }
+
+  .end {
+    @include mat.icon-button-overrides((
+            icon-color: red
+    ))
+  }
+
+  button {
+    margin-left: 8px; /* Add horizontal spacing between buttons */
+  }
+
+  span {
+    font-weight: 500;
+  }
+
+  .state {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .timer-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    opacity: 0.8;
+  }
+}

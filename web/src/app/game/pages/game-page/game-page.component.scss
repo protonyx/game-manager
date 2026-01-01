@@ -1,14 +1,117 @@
-@use '@angular/material' as mat;
-@import '../../../variables.scss';
+// Container for the entire game page
+.game-page-container {
+  width: 100%;
+  box-sizing: border-box;
+}
 
-mat-expansion-panel.is-active {
-  border-left: 5px solid mat.m2-get-color-from-palette($primary-palette);
-  background: mat.m2-get-color-from-palette(
-    $primary-palette,
-    'lighter'
-  ) !important;
+// Single-column tab layout helpers (minimal styles)
+.single-column-content {
+  padding-top: 6px;
+  /* Reserve space for fixed bottom tabs bar to avoid overlap */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+}
 
-  .mat-expansion-panel-header {
-    //border-left: 5px solid mat-color($primary-palette);
+/* Fixed bottom tabs bar for single-column mode */
+.bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--mat-sys-surface, #fff);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+
+  /* Only show the tab header; hide bodies since content is rendered above */
+  .mat-mdc-tab-group {
+    width: 100%;
+  }
+  .mat-mdc-tab-body-wrapper {
+    display: none;
+  }
+}
+
+// Grid layout
+.game-grid {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+
+  // Single column layout for small screens
+  &.single-column {
+    grid-template-columns: 1fr;
+
+    .left-column, .right-column {
+      width: 100%;
+    }
+  }
+
+  // Two column layout for larger screens
+  &.two-columns {
+    grid-template-columns: 1fr 1fr;
+
+    @media (min-width: 1200px) {
+      grid-template-columns: 4fr 8fr; // 1/3 - 2/3 split on very large screens
+    }
+
+    // When in preparing state, make left column span both columns
+    &.preparing-state {
+      .left-column {
+        grid-column: 1 / span 2; // Make left column span both columns
+      }
+
+      .right-column {
+        display: none; // Hide right column in preparing state
+      }
+    }
+  }
+}
+
+// Column styles
+.left-column, .right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Card styles
+mat-card {
+  margin-bottom: 16px;
+  transition: all 0.3s ease-in-out;
+  transform-origin: top center;
+  overflow: hidden;
+
+  // Add hover effect
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &.player-list-card {
+    height: 100%;
+  }
+
+  &.current-turn-card {
+    &.is-active {
+      border-left: 5px solid;
+    }
+  }
+
+  &.trackers-card {
+    height: 100%;
+  }
+
+  mat-card-content {
+    padding: 16px 0;
+    transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+  }
+
+  // Animation for card header
+  mat-card-header {
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
   }
 }

@@ -1,15 +1,34 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Game } from '../../models/models';
+import { Game, GameState } from '../../models/models';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { TurnTimerComponent } from '../turn-timer/turn-timer.component';
 
 @Component({
   selector: 'app-game-control',
   templateUrl: './game-control.component.html',
   styleUrls: ['./game-control.component.scss'],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatExpansionModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatIconModule,
+    MatCard,
+    MatCardHeader,
+    MatCardContent,
+    MatCardTitle,
+    TurnTimerComponent,
+  ],
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatExpansionModule],
 })
 export class GameControlComponent {
   @Input()
@@ -27,6 +46,19 @@ export class GameControlComponent {
   @Output()
   public endGame: EventEmitter<void> = new EventEmitter<void>();
 
+  stateLabel(state: GameState | undefined | null): string {
+    switch (state) {
+      case GameState.Preparing:
+        return 'Lobby';
+      case GameState.InProgress:
+        return 'In Progress';
+      case GameState.Complete:
+        return 'Complete';
+      default:
+        return '';
+    }
+  }
+
   onStartGame(): void {
     this.startGame.emit();
   }
@@ -38,4 +70,6 @@ export class GameControlComponent {
   onEndGame() {
     this.endGame.emit();
   }
+
+  protected readonly GameState = GameState;
 }

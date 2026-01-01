@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 
 import { GameSummaryPageComponent } from './game-summary-page.component';
 
@@ -9,6 +10,7 @@ describe('GameSummaryPageComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [GameSummaryPageComponent],
+      providers: [provideMockStore()],
     });
     fixture = TestBed.createComponent(GameSummaryPageComponent);
     component = fixture.componentInstance;

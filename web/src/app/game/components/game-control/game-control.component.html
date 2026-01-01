@@ -1,26 +1,47 @@
-<mat-action-row>
-  <button
-    mat-raised-button
-    type="button"
-    color="accent"
-    (click)="onStartGame()"
-    *ngIf="game?.state === 'Preparing'">
-    Start Game
-  </button>
-  <button
-    mat-raised-button
-    type="button"
-    color="warn"
-    (click)="onAdvanceTurn()"
-    *ngIf="game?.state === 'InProgress'">
-    Force End Turn
-  </button>
-  <button
-    mat-raised-button
-    type="button"
-    color="primary"
-    (click)="onEndGame()"
-    *ngIf="game?.state === 'InProgress'">
-    End Game
-  </button>
-</mat-action-row>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Host Controls</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-toolbar class="game-controls">
+      <span class="state">
+        {{ stateLabel(game?.state) }}
+        @if (game?.state === GameState.InProgress) {
+          <mat-icon class="timer-icon" aria-hidden="true">timer</mat-icon>
+          <app-turn-timer
+            [startTime]="game!.startedDate">
+          </app-turn-timer>
+        }
+      </span>
+      <span class="spacer"></span>
+
+      <button
+        mat-icon-button
+        matTooltip="Start Game"
+        class="start"
+        (click)="onStartGame()"
+        *ngIf="game?.state === GameState.Preparing">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        matTooltip="Force End Turn"
+        (click)="onAdvanceTurn()"
+        *ngIf="game?.state === GameState.InProgress">
+        <mat-icon>skip_next</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        matTooltip="End Game"
+        class="end"
+        (click)="onEndGame()"
+        *ngIf="game?.state === GameState.InProgress">
+        <mat-icon>stop</mat-icon>
+      </button>
+    </mat-toolbar>
+  </mat-card-content>
+</mat-card>
+
+

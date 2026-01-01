@@ -1,24 +1,23 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HighchartsChartModule } from 'highcharts-angular';
-import * as Highcharts from 'highcharts';
+import { HighchartsChartComponent, ChartConstructorType } from 'highcharts-angular';
 import { PlayerSummary, TrackerSummary } from '../../models/models';
 
 @Component({
-  selector: 'app-summary-tracker-chart',
-  standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
-  templateUrl: './summary-tracker-chart.component.html',
-  styleUrls: ['./summary-tracker-chart.component.scss'],
+    selector: 'app-summary-tracker-chart',
+    imports: [CommonModule, HighchartsChartComponent],
+    templateUrl: './summary-tracker-chart.component.html',
+    styleUrls: ['./summary-tracker-chart.component.scss']
 })
 export class SummaryTrackerChartComponent implements OnChanges {
-  Highcharts: typeof Highcharts = Highcharts;
 
   @Input()
   public tracker: TrackerSummary | undefined;
 
   @Input()
   public players: PlayerSummary[] | undefined | null;
+
+  chartConstructor: ChartConstructorType = 'chart';
 
   chartOptions: Highcharts.Options | undefined;
 
@@ -27,8 +26,40 @@ export class SummaryTrackerChartComponent implements OnChanges {
       this.chartOptions = {
         chart: {
           height: '300px',
+          type: 'line'
         },
         title: undefined,
+        xAxis: {
+          title: {
+            text: 'Time (minutes since game start)'
+          },
+          labels: {
+            formatter: function() {
+              // Format seconds as MM:SS
+              const seconds = this.value as number;
+              const minutes = Math.floor(seconds / 60);
+              const remainingSeconds = Math.floor(seconds % 60);
+              return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+          },
+          tickInterval: 30 // Show a tick every 30 seconds
+        },
+        yAxis: {
+          title: {
+            text: 'Value'
+          }
+        },
+        tooltip: {
+          formatter: function() {
+            const seconds = this.x as number;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            const timeString = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            return `<b>${this.series.name}</b><br/>
+                    Time: ${timeString}<br/>
+                    Value: ${this.y}`;
+          }
+        },
         series: this.players!.map((p) => {
           return {
             type: 'line',
@@ -39,7 +70,7 @@ export class SummaryTrackerChartComponent implements OnChanges {
             ).map((th) => [th.secondsSinceGameStart, th.newValue]),
           };
         }),
-      };
+      } as Highcharts.Options;
     }
   }
 }

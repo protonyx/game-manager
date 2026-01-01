@@ -15,20 +15,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-join-game',
-  templateUrl: './join-game.component.html',
-  styleUrls: ['./join-game.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatProgressBarModule,
-  ],
+    selector: 'app-join-game',
+    templateUrl: './join-game.component.html',
+    styleUrls: ['./join-game.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatProgressBarModule,
+    ]
 })
 export class JoinGameComponent {
   @Input()

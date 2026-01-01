@@ -1,0 +1,32 @@
+@use '@angular/material' as mat;
+
+mat-card {
+  mat-card-content {
+    padding: 16px;
+    transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+  }
+}
+
+.tracker-form {
+  width: 100%;
+}
+
+.trackers-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+
+  .tracker-card {
+    margin-bottom: 16px;
+    box-shadow: var(--mat-sys-level2);
+
+    mat-card-header {
+      margin-bottom: 8px;
+    }
+
+  }
+}

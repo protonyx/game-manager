@@ -10,12 +10,11 @@ import { interval, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-turn-timer',
-  templateUrl: './turn-timer.component.html',
-  styleUrls: ['./turn-timer.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [CommonModule],
+    selector: 'app-turn-timer',
+    templateUrl: './turn-timer.component.html',
+    styleUrls: ['./turn-timer.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
 export class TurnTimerComponent implements OnInit, OnDestroy {
   @Input()

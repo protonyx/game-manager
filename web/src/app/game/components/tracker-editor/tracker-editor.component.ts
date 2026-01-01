@@ -4,25 +4,25 @@ import {
   Input,
   Output,
   OnChanges,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
-import { Player, Tracker, TrackerValue } from '../../models/models';
 import {
-  FormBuilder,
-  FormGroup,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tracker-editor',
   templateUrl: './tracker-editor.component.html',
   styleUrls: ['./tracker-editor.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -30,48 +30,75 @@ import { CommonModule } from '@angular/common';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSliderModule,
+    MatIconModule,
+    MatCardModule,
   ],
 })
 export class TrackerEditorComponent implements OnChanges {
   @Input()
-  public trackers: Tracker[] | null | undefined;
-
-  @Input()
-  public player: Player | null | undefined;
+  public trackerValue: number | null | undefined;
 
   @Output()
-  public updateTrackers: EventEmitter<TrackerValue> =
-    new EventEmitter<TrackerValue>();
+  public trackerChange: EventEmitter<number> =
+    new EventEmitter<number>();
 
-  trackerForm: FormGroup = this.fb.group({});
+  trackerValueControl = new FormControl(0);
 
-  constructor(private fb: FormBuilder) {}
+  keypadActive = false;
+  keypadValue = '';
+  isAdding = true;
 
-  public updateTracker(trackerId: string, delta: number) {
-    const control = this.trackerForm.controls[trackerId];
+  public onPlusClick() {
+    this.keypadActive = true;
+    this.isAdding = true;
+    this.keypadValue = '';
+  }
 
-    let val = control.value;
+  public onMinusClick() {
+    this.keypadActive = true;
+    this.isAdding = false;
+    this.keypadValue = '';
+  }
+
+  public onKeypadClick(key: string) {
+    if (key === 'backspace') {
+      this.keypadValue = this.keypadValue.slice(0, -1);
+    } else {
+      this.keypadValue += key;
+    }
+  }
+
+  public onSave() {
+    if (this.keypadValue) {
+      const delta = parseInt(this.keypadValue) * (this.isAdding ? 1 : -1);
+      this.updateTracker(delta);
+    }
+    this.keypadActive = false;
+  }
+
+  public onCancel() {
+    this.keypadActive = false;
+  }
+
+  public updateTracker(delta: number) {
+    let val = this.trackerValueControl.value!;
     val += delta;
-    control.setValue(val);
 
-    this.updateTrackers.emit({
-      trackerId: trackerId,
-      value: val,
-    });
+    this.trackerValueControl.setValue(val);
+
+    this.trackerChange.emit(val);
+  }
+
+  public setTrackerValue(value: number) {
+    this.trackerValueControl.setValue(value);
+
+    this.trackerChange.emit(value);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['player'] || changes['trackers']) {
-      if (this.player && this.trackers) {
-        this.trackerForm = this.fb.group({});
-
-        for (const tracker of this.trackers) {
-          this.trackerForm.addControl(
-            tracker.id,
-            this.fb.control(this.player.trackerValues[tracker.id]),
-          );
-        }
-      }
+    if (changes['trackerValue'] && this.trackerValue) {
+      this.trackerValueControl.setValue(this.trackerValue);
     }
   }
 }

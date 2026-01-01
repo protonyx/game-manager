@@ -15,18 +15,17 @@ import { selectAllPlayers } from '../../state/game.selectors';
 import { Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-player-reorder-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatTableModule,
-    MatIconModule,
-    DragDropModule,
-  ],
-  templateUrl: './player-reorder-dialog.component.html',
-  styleUrl: './player-reorder-dialog.component.scss',
+    selector: 'app-player-reorder-dialog',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatTableModule,
+        MatIconModule,
+        DragDropModule,
+    ],
+    templateUrl: './player-reorder-dialog.component.html',
+    styleUrl: './player-reorder-dialog.component.scss'
 })
 export class PlayerReorderDialogComponent implements OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject<boolean>();
@@ -35,7 +34,7 @@ export class PlayerReorderDialogComponent implements OnDestroy {
     .select(selectAllPlayers)
     .pipe(
       tap(
-        (players) => (this.newPlayers = players.map((p) => <Player>{ ...p })),
+        (players) => (this.newPlayers = players.map((p) => ({ ...p } as Player))),
       ),
     );
 

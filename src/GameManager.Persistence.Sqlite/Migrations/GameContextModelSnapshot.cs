@@ -15,7 +15,7 @@ namespace GameManager.Server.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
                 {
@@ -229,7 +229,7 @@ namespace GameManager.Server.Migrations
 
                             b1.HasKey("GameId");
 
-                            b1.ToTable("Games");
+                            b1.ToTable("Games", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("GameId");

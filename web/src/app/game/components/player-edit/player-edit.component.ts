@@ -15,22 +15,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 
 export interface PlayerEditFormValue {
   name: string;
-  trackers: { [key: string]: number };
+  trackers: Record<string, number>;
 }
 
 @Component({
-  selector: 'app-player-edit',
-  templateUrl: './player-edit.component.html',
-  styleUrls: ['./player-edit.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-  ],
+    selector: 'app-player-edit',
+    templateUrl: './player-edit.component.html',
+    styleUrls: ['./player-edit.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+    ]
 })
 export class PlayerEditComponent implements OnChanges {
   @Input()
@@ -45,7 +44,7 @@ export class PlayerEditComponent implements OnChanges {
   });
 
   get value(): PlayerEditFormValue {
-    return <PlayerEditFormValue>this.playerForm.value;
+    return this.playerForm.value as PlayerEditFormValue;
   }
 
   constructor(private fb: FormBuilder) {}
@@ -59,7 +58,7 @@ export class PlayerEditComponent implements OnChanges {
   }
 
   createTrackerFormGroup(trackers: Tracker[]): FormGroup {
-    const group: { [key: string]: FormControl } = {};
+    const group: Record<string, FormControl> = {};
 
     trackers.forEach((t) => {
       group[t.id] = new FormControl('', Validators.pattern(/-?[0-9]*/));

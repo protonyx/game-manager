@@ -2,75 +2,135 @@
   *ngrxLet="{
     game: game$,
     currentPlayer: currentPlayer$,
-    trackers: trackers$
+    trackers: trackers$,
+    cols: cols$,
+    leftColSpan: leftColSpan$,
+    rightColSpan: rightColSpan$
   } as vm">
-  <mat-accordion multi="true">
-    <mat-expansion-panel *ngIf="isHost$ | async" [expanded]="false">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Game Control</mat-panel-title>
-      </mat-expansion-panel-header>
-
+  <div class="game-page-container">
+    <!-- Single column: show top controls and bottom tabs -->
+    <ng-container *ngIf="isSingleColumn$ | async; else twoColumnLayout">
+      <!-- Host controls at the top -->
       <app-game-control
+        *ngIf="isHost$ | async"
+        class="game-control-card"
         [game]="vm.game"
         [isHost]="isHost$ | async"
         (startGame)="onStartGame(vm.game)"
         (advanceTurn)="onEndTurn(vm.game)"
         (endGame)="onEndGame(vm.game)">
       </app-game-control>
-    </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="true">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Player List</mat-panel-title>
-      </mat-expansion-panel-header>
+      <!-- Content area switches by selectedTab; tabs fixed at viewport bottom -->
+      <div class="single-column-content">
+        <ng-container [ngSwitch]="selectedTab">
+          <!-- Player List tab content -->
+          <ng-container *ngSwitchCase="0">
+            <app-player-list
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer!"
+              [isHost]="isHost$ | async"
+              (editPlayer)="onPlayerEdit($event)"
+              (kickPlayer)="onPlayerKick($event)"
+              (reorder)="onReorder()"
+              (editTracker)="onEditTracker($event)">
+            </app-player-list>
+          </ng-container>
 
-      <app-player-list
-        [game]="vm.game"
-        [players]="players$ | async"
-        [currentPlayer]="vm.currentPlayer"
-        [isHost]="isHost$ | async"
-        (editPlayer)="onPlayerEdit($event)"
-        (kickPlayer)="onPlayerKick($event)"></app-player-list>
+          <!-- Turn tab content -->
+          <ng-container *ngSwitchCase="1">
+            <app-current-turn
+              *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
+              [game]="vm.game"
+              [players]="players$ | async"
+              [currentPlayer]="vm.currentPlayer"
+              [isHost]="isHost$ | async"
+              (endTurn)="onEndTurn(vm.game)">
+            </app-current-turn>
+            <app-tracker-list
+              *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+              [trackers]="vm.trackers"
+              [player]="vm.currentPlayer"
+              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+            </app-tracker-list>
+          </ng-container>
+        </ng-container>
+      </div>
 
-      <mat-action-row *ngIf="isHost$ | async">
-        <button mat-button color="primary" (click)="onReorder()">
-          Reorder
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
+      <!-- Fixed bottom tabs navigation using Angular Material TabGroup (header only) -->
+      <div class="bottom-tabs">
+        <mat-tab-group
+          headerPosition="below"
+          [selectedIndex]="selectedTab"
+          (selectedIndexChange)="selectedTab = $event">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon aria-hidden="true">group</mat-icon>
+              <span>Player List</span>
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon aria-hidden="true">schedule</mat-icon>
+              <span>Turn</span>
+            </ng-template>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </ng-container>
 
-    <mat-expansion-panel
-      *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-      [expanded]="true"
-      [class.is-active]="isMyTurn$ | async">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Current Turn</mat-panel-title>
-      </mat-expansion-panel-header>
-      <app-current-turn
-        [game]="vm.game"
-        [players]="players$ | async"
-        [currentPlayer]="vm.currentPlayer"
-        [isHost]="isHost$ | async"
-        (endTurn)="onEndTurn(vm.game)">
-      </app-current-turn>
-    </mat-expansion-panel>
+    <!-- Two column layout (default on medium and larger screens) -->
+    <ng-template #twoColumnLayout>
+      <div class="game-grid" [ngClass]="{'two-columns': vm.cols === 2, 'preparing-state': vm.game?.state === 'Preparing'}">
+        <!-- Left column (players and game control) -->
+        <div class="left-column">
+          <!-- Game Control (only for host) -->
+          <app-game-control
+            *ngIf="isHost$ | async" class="game-control-card"
+            [game]="vm.game"
+            [isHost]="isHost$ | async"
+            (startGame)="onStartGame(vm.game)"
+            (advanceTurn)="onEndTurn(vm.game)"
+            (endGame)="onEndGame(vm.game)">
+          </app-game-control>
 
-    <mat-expansion-panel
-      [expanded]="true"
-      *ngIf="
-        vm.game?.state === 'InProgress' &&
-        vm.trackers &&
-        vm.trackers.length > 0 &&
-        vm.currentPlayer
-      ">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Trackers</mat-panel-title>
-      </mat-expansion-panel-header>
-      <app-tracker-editor
-        [trackers]="vm.trackers"
-        [player]="vm.currentPlayer"
-        (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-      </app-tracker-editor>
-    </mat-expansion-panel>
-  </mat-accordion>
+          <!-- Player List -->
+          <app-player-list
+            [game]="vm.game"
+            [players]="players$ | async"
+            [currentPlayer]="vm.currentPlayer!"
+            [isHost]="isHost$ | async"
+            (editPlayer)="onPlayerEdit($event)"
+            (kickPlayer)="onPlayerKick($event)"
+            (reorder)="onReorder()"
+            (editTracker)="onEditTracker($event)">
+          </app-player-list>
+        </div>
+
+        <!-- Right column (current turn and trackers) -->
+        <div class="right-column">
+          <!-- Current Turn -->
+          @if (vm.game && vm.game.state === 'InProgress' && vm.currentPlayer) {
+          <app-current-turn
+            [game]="vm.game"
+            [players]="players$ | async"
+            [currentPlayer]="vm.currentPlayer"
+            [isHost]="isHost$ | async"
+            (endTurn)="onEndTurn(vm.game)">
+          </app-current-turn>
+          }
+
+          <!-- Trackers -->
+          @if (vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer) {
+          <app-tracker-list
+            [trackers]="vm.trackers"
+            [player]="vm.currentPlayer"
+            (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+          </app-tracker-list>
+          }
+        </div>
+      </div>
+    </ng-template>
+  </div>
 </ng-container>

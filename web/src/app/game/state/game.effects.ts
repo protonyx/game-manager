@@ -8,6 +8,7 @@ import {
   GamesApiActions,
   PlayerReorderDialogActions,
   PlayersApiActions,
+  TrackerEditorDialogActions,
 } from './game.actions';
 import {
   catchError,
@@ -18,7 +19,10 @@ import {
   mergeMap,
   tap,
   filter,
-  concatMap,
+  groupBy,
+  debounceTime,
+  switchMap,
+  exhaust,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.selectors';
@@ -33,7 +37,8 @@ import { PlayerEditDialogComponent } from '../dialogs/player-edit-dialog/player-
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/player-reorder-dialog.component';
 import { PatchOperation } from '../models/patch';
-import {selectCurrentPlayerId} from "./game.selectors";
+import { AudioService } from '../../shared/services/audio.service';
+import { TrackerEditorDialogComponent } from '../dialogs/tracker-editor-dialog/tracker-editor-dialog.component';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -212,17 +217,12 @@ export const editPlayerDialog = createEffect(
 
         return dialogRef.afterClosed().pipe(
           filter(
-            (result: string | PatchOperation[] | undefined) =>
-              result !== undefined,
+            (result: PatchOperation[] | undefined) => result !== undefined,
           ),
-          map((result: string | PatchOperation[] | undefined) => {
-            if (result === 'kick') {
-              return GameActions.removePlayer({ playerId: action.playerId });
-            }
-
+          map((result: PatchOperation[] | undefined) => {
             return GamesApiActions.patchPlayer({
               playerId: action.playerId,
-              ops: <PatchOperation[]>result,
+              ops: result as PatchOperation[],
             });
           }),
         );
@@ -250,6 +250,35 @@ export const reorderPlayerDialog = createEffect(
 
         return PlayerReorderDialogActions.updatePlayerOrder({
           players: result,
+        });
+      }),
+    );
+  },
+  { functional: true },
+);
+
+export const editTrackerDialog = createEffect(
+  (actions$ = inject(Actions), dialog = inject(MatDialog)) => {
+    return actions$.pipe(
+      ofType(GameActions.editTracker),
+      exhaustMap((action) => {
+        const dialogRef = dialog.open(TrackerEditorDialogComponent, {
+          width: '400px',
+          data: { playerId: action.playerId, trackerId: action.trackerId },
+        });
+
+        return dialogRef.afterClosed().pipe(
+          map((result) => [action, result] as const),
+        );
+      }),
+      map(([action, result]) => {
+        if (result === undefined) {
+          return TrackerEditorDialogActions.closed();
+        }
+
+        return GameActions.updateTracker({
+          playerId: action.playerId,
+          tracker: { trackerId: action.trackerId, value: result },
         });
       }),
     );
@@ -408,18 +437,29 @@ export const updateTracker = createEffect(
     return actions$.pipe(
       ofType(GameActions.updateTracker),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayer)),
-      concatMap(([action, player]) =>
-        gameService
-          .setPlayerTracker(
-            player!.id,
-            action.tracker.trackerId,
-            action.tracker.value,
-          )
-          .pipe(
-            map((player) =>
-              PlayersApiActions.playerUpdated({ player: player }),
-            ),
+      // Create a per-tracker stream so we debounce/cancel independently per tracker
+      groupBy(
+        ([action, player]) => `${player!.id}:${action.tracker.trackerId}`,
+      ),
+      mergeMap((group$) =>
+        group$.pipe(
+          // Debounce bursts of clicks on the same tracker
+          debounceTime(300),
+          // On each debounced emission, send the latest value. switchMap cancels in-flight HTTP for this tracker.
+          switchMap(([action, player]) =>
+            gameService
+              .setPlayerTracker(
+                player!.id,
+                action.tracker.trackerId,
+                action.tracker.value,
+              )
+              .pipe(
+                map((player) => PlayersApiActions.playerUpdated({ player })),
+                // Optional: handle errors without breaking the stream
+                catchError(() => of()),
+              ),
           ),
+        ),
       ),
     );
   },
@@ -506,13 +546,17 @@ export const clearCredentialsOnAuthenticationError = createEffect(
 );
 
 export const clearCredentialsWhenKicked = createEffect(
-  (actions$ = inject(Actions), store = inject(Store), router = inject(Router)) => {
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    router = inject(Router),
+  ) => {
     return actions$.pipe(
       ofType(GameHubActions.playerLeft),
       concatLatestFrom(() => store.select(fromGames.selectCurrentPlayerId)),
       filter(([action, playerId]) => action.playerId === playerId),
       tap(() => {
-          router.navigate(['game', 'join']);
+        router.navigate(['game', 'join']);
       }),
       map(() => GameActions.clearCredentials()),
     );
@@ -528,6 +572,26 @@ export const resetLayoutAfterClearCredentials = createEffect(
     );
   },
   { functional: true },
+);
+
+export const turnAdvanced = createEffect(
+  (
+    actions$ = inject(Actions),
+    store = inject(Store),
+    audioService = inject(AudioService),
+  ) => {
+    return actions$.pipe(
+      ofType(GameHubActions.gameUpdated),
+      concatLatestFrom(() => store.select(fromGames.selectCurrentPlayerId)),
+      filter(
+        ([action, playerId]) => action.game.currentTurnPlayerId === playerId,
+      ),
+      tap(() => {
+        audioService.playTurnChime();
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
 );
 
 export const gameEnded = createEffect(

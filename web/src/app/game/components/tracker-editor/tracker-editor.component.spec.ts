@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TrackerEditorComponent } from './tracker-editor.component';
 
@@ -8,7 +10,8 @@ describe('TrackerEditorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TrackerEditorComponent],
+      imports: [TrackerEditorComponent, NoopAnimationsModule],
+      providers: [provideMockStore()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TrackerEditorComponent);

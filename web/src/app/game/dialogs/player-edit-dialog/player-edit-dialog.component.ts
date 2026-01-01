@@ -21,11 +21,10 @@ import { Observable } from 'rxjs';
 import { PatchOperation } from '../../models/patch';
 
 @Component({
-  selector: 'app-player-edit-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButton, PlayerEditComponent],
-  templateUrl: './player-edit-dialog.component.html',
-  styleUrl: './player-edit-dialog.component.scss',
+    selector: 'app-player-edit-dialog',
+    imports: [CommonModule, MatDialogModule, MatButton, PlayerEditComponent],
+    templateUrl: './player-edit-dialog.component.html',
+    styleUrl: './player-edit-dialog.component.scss'
 })
 export class PlayerEditDialogComponent {
   isHost$ = this.store.select(selectCurrentPlayerIsHost);

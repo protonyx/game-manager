@@ -1,6 +1,0 @@
-@use '@angular/material' as mat;
-
-@import 'app/variables.scss';
-
-@include mat.core();
-@include mat.all-component-themes($my-dark-theme);

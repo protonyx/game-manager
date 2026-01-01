@@ -20,6 +20,7 @@ import { AuthInterceptorService } from './app/game/services/auth-interceptor.ser
 import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
+import { provideHighcharts } from 'highcharts-angular';
 
 export function localStorageSyncReducer(
   reducer: ActionReducer<unknown>,
@@ -30,7 +31,7 @@ export function localStorageSyncReducer(
   })(reducer);
 }
 
-const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
+const metaReducers: MetaReducer<any, any>[] = [localStorageSyncReducer];
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -57,5 +58,6 @@ bootstrapApplication(AppComponent, {
     },
     provideAnimations(),
     provideHttpClient(withInterceptorsFromDi()),
+    provideHighcharts()
   ],
 }).catch((err) => console.error(err));

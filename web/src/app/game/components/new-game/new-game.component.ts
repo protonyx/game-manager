@@ -16,20 +16,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
-  selector: 'app-new-game',
-  templateUrl: './new-game.component.html',
-  styleUrls: ['./new-game.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+    selector: 'app-new-game',
+    templateUrl: './new-game.component.html',
+    styleUrls: ['./new-game.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatCheckboxModule,
+        MatButtonModule,
+        MatIconModule,
+    ]
 })
 export class NewGameComponent {
   @Output()

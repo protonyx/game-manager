@@ -7,11 +7,10 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-new-game-page',
-  templateUrl: './new-game-page.component.html',
-  styleUrls: ['./new-game-page.component.scss'],
-  standalone: true,
-  imports: [CommonModule, MatCardModule, NewGameComponent],
+    selector: 'app-new-game-page',
+    templateUrl: './new-game-page.component.html',
+    styleUrls: ['./new-game-page.component.scss'],
+    imports: [CommonModule, MatCardModule, NewGameComponent]
 })
 export class NewGamePageComponent {
   constructor(private store: Store) {}

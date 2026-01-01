@@ -1,5 +1,5 @@
 <span *ngIf="getElapsedTime() as elapsed">
-  {{ elapsed.hours | number: '2.0' }}:{{ elapsed.minutes | number: '2.0' }}:{{
-    elapsed.seconds | number: '2.0'
-  }}
+  <span *ngIf="elapsed.hours > 0">{{ elapsed.hours | number: '2.0' }}:</span>
+    <span>{{ elapsed.minutes | number: '2.0' }}:</span>
+    <span>{{ elapsed.seconds | number: '2.0' }}</span>
 </span>

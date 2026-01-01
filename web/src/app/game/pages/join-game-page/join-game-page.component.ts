@@ -8,11 +8,10 @@ import { CommonModule } from '@angular/common';
 import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
-  selector: 'app-join-game-page',
-  templateUrl: './join-game-page.component.html',
-  styleUrls: ['./join-game-page.component.scss'],
-  standalone: true,
-  imports: [CommonModule, JoinGameComponent],
+    selector: 'app-join-game-page',
+    templateUrl: './join-game-page.component.html',
+    styleUrls: ['./join-game-page.component.scss'],
+    imports: [CommonModule, JoinGameComponent]
 })
 export class JoinGamePageComponent implements OnDestroy {
   loading = false;

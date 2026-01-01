@@ -1,4 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { of } from 'rxjs';
 
 import { JoinGamePageComponent } from './join-game-page.component';
 
@@ -8,7 +12,11 @@ describe('JoinGamePageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JoinGamePageComponent],
+      imports: [JoinGamePageComponent, NoopAnimationsModule],
+      providers: [
+        provideMockStore(),
+        provideMockActions(() => of()),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(JoinGamePageComponent);
