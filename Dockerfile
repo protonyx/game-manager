@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-api
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-api
 ARG version=0.1-dev
 WORKDIR /src
 COPY ["src/GameManager.Server/GameManager.Server.csproj", "GameManager.Server/"]
@@ -17,7 +17,7 @@ RUN npm install
 COPY ./web ./
 RUN npm run build -- --configuration=production
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 
 COPY --from=build-api /app/publish .
