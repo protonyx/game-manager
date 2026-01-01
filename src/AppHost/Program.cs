@@ -13,7 +13,7 @@ var api = builder.AddProject<GameManager_Server>("api")
     .WithReference(cache)
     .WaitFor(cache);
 
-var app = builder.AddNpmApp("angular", "../../web")
+var app = builder.AddJavaScriptApp("angular", "../../web", "start")
     .WithReference(api)
     .WaitFor(api)
     .WithHttpEndpoint(env: "PORT", port: 4200)
