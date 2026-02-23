@@ -1,0 +1,24 @@
+{
+  "name": "game-manager-e2e",
+  "version": "1.0.0",
+  "description": "Playwright smoke tests for Game Manager application",
+  "scripts": {
+    "test:smoke": "playwright test",
+    "test:smoke:headed": "playwright test --headed",
+    "test:smoke:ui": "playwright test --ui",
+    "test:smoke:report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "smoke-test",
+    "game-manager"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.6.0"
+  }
+}
