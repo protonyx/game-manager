@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:24
 
 WORKDIR /e2e
 
@@ -23,4 +23,5 @@ ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 RUN mkdir -p test-results
 
 # Run tests with BASE_URL environment variable
-ENTRYPOINT ["npm", "run", "test:smoke"]
+ENTRYPOINT ["npm", "run"]
+CMD ["test:smoke"]

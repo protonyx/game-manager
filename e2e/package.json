@@ -2,6 +2,7 @@
   "name": "game-manager-e2e",
   "version": "1.0.0",
   "description": "Playwright smoke tests for Game Manager application",
+  "private": true,
   "scripts": {
     "test:smoke": "playwright test",
     "test:smoke:headed": "playwright test --headed",
