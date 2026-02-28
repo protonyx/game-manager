@@ -1,4 +1,4 @@
-FROM node:24
+FROM mcr.microsoft.com/playwright:v1.58.2
 
 WORKDIR /e2e
 
@@ -8,10 +8,6 @@ RUN npm ci --frozen-lockfile
 
 # Copy test files
 COPY e2e/ .
-
-# Install Playwright browsers to a predictable location
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright-browsers
-RUN npx playwright install --with-deps chromium
 
 # Ensure BASE_URL is provided as environment variable
 ENV BASE_URL=""
