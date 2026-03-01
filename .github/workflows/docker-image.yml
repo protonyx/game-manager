@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.gitversion.outputs.informationalVersion }}
-      meta: ${{ steps.meta.outputs }}
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -42,7 +43,10 @@ jobs:
     - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.0.x'
+    - run: dotnet restore
+      working-directory: ./src
     - run: dotnet test --coverage --coverage-output-format cobertura --report-xunit-trx --report-xunit-html --results-directory ./TestResults
+      working-directory: ./src
     - uses: actions/upload-artifact@v6
       with:
         name: test-results
@@ -67,5 +71,5 @@ jobs:
           version=${{ needs.version.outputs.version }}
         context: .
         push: true
-        tags: ${{ needs.version.outputs.meta }}
-        labels: ${{ needs.version.outputs.meta }}
+        tags: ${{ needs.version.outputs.tags }}
+        labels: ${{ needs.version.outputs.labels }}
