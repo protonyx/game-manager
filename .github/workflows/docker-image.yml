@@ -50,7 +50,7 @@ jobs:
     - uses: actions/upload-artifact@v6
       with:
         name: test-results
-        path: ./TestResults
+        path: ./src/TestResults
 
   build:
     runs-on: ubuntu-latest
