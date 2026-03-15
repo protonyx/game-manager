@@ -1,0 +1,20 @@
+query GetGames($filter: GameStateOperationFilterInput) {
+  games(where: { state: $filter }) {
+    edges {
+      node {
+        id
+        name
+        entryCode
+        state
+        currentTurnPlayerId
+        currentTurnStartTime
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}

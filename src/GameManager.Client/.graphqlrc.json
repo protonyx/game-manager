@@ -1,0 +1,36 @@
+{
+  "schema": "schema.graphql",
+  "documents": "**/*.graphql",
+  "extensions": {
+    "endpoints": {
+      "default": {
+        "url": "http://localhost:5000/graphql",
+        "headers": {
+          "Authorization": "Basic ${token}"
+        }
+      },
+      "test": {
+        "url": "https://game-manager-test.apps.kkennedy.me/graphql",
+        "headers": {
+          "Authorization": "Basic ${token}"
+        }
+      }
+    },
+    "strawberryShake": {
+      "name": "GameManagerClient",
+      "namespace": "GameManager.Client",
+      "url": "http://localhost:5000/graphql",
+      "dependencyInjection": true,
+      "records": {
+        "inputs": false,
+        "entities": false
+      },
+      "transportProfiles": [
+        {
+          "default": "Http",
+          "subscription": "WebSocket"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,161 @@
+schema {
+  query: Query
+}
+
+type GameModel {
+  currentTurnPlayer: PlayerModel
+  players: [PlayerModel]
+  turns: [TurnModel]
+  id: UUID!
+  name: String!
+  entryCode: String
+  state: GameState!
+  options: GameOptions!
+  currentTurnPlayerId: UUID
+  currentTurnStartTime: DateTime
+  trackers: [GameTrackerModel!]!
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+input GameModelFilterInput {
+  and: [GameModelFilterInput!]
+  or: [GameModelFilterInput!]
+  id: CustomGuidOperationFilterInput
+  name: StringOperationFilterInput
+  state: GameStateOperationFilterInput
+}
+
+"An edge in a connection."
+type GamesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: GameModel!
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+input CustomGuidOperationFilterInput {
+  and: [CustomGuidOperationFilterInput!]
+  or: [CustomGuidOperationFilterInput!]
+  eq: UUID
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+"A connection to a list of items."
+type GamesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [GamesEdge!]
+  "A flattened list of the nodes."
+  nodes: [GameModel!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int!
+}
+
+type PlayerTrackerValueModel {
+  name: String!
+  trackerId: UUID!
+  value: Int!
+}
+
+type TurnModel {
+  id: UUID!
+  playerId: UUID!
+  startTime: DateTime!
+  endTime: DateTime!
+  duration: TimeSpan!
+}
+
+"Defines when a policy shall be executed."
+enum ApplyPolicy {
+  "Before the resolver was executed."
+  BEFORE_RESOLVER
+  "After the resolver was executed."
+  AFTER_RESOLVER
+  "The policy is applied in the validation step before the execution."
+  VALIDATION
+}
+
+enum GameState {
+  PREPARING
+  IN_PROGRESS
+  COMPLETE
+}
+
+enum PlayerState {
+  DISCONNECTED
+  CONNECTED
+}
+
+type Query {
+  games("Returns the elements in the list that come after the specified cursor." after: String "Returns the first _n_ elements from the list." first: Int where: GameModelFilterInput): GamesConnection
+  gameById(id: UUID!): GameModel
+}
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
+
+input GameStateOperationFilterInput {
+  eq: GameState
+  neq: GameState
+  in: [GameState!]
+  nin: [GameState!]
+}
+
+scalar UUID
+
+type PlayerModel {
+  id: UUID!
+  gameId: UUID!
+  order: Int!
+  name: String!
+  state: PlayerState!
+  isHost: Boolean!
+  joinedDate: DateTime!
+  trackers: [PlayerTrackerValueModel!]!
+}
+
+type GameTrackerModel {
+  id: UUID!
+  gameId: UUID!
+  name: String!
+  startingValue: Int!
+}
+
+type GameOptions {
+  shareOtherPlayerTrackers: Boolean!
+}
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize("The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field." assumedSize: Int "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments." slicingArguments: [String!] "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query." slicingArgumentDefaultValue: Int "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields." sizedFields: [String!] "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error." requireOneSlicingArgument: Boolean! = true) on FIELD_DEFINITION
