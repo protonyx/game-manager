@@ -1,8 +1,10 @@
 using Projects;
+#pragma warning disable ASPIRECERTIFICATES001
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache")
+    .WithoutHttpsCertificate()
     .WithRedisInsight(c =>
     {
         c.WithExternalHttpEndpoints();
