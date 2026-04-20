@@ -1,4 +1,5 @@
 using GameManager.Domain.Common;
+using GameManager.Domain.Constants;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Domain.Entities;
@@ -12,6 +13,8 @@ public record Player : IEntity<Guid>
     public int Order { get; private set; }
 
     public PlayerName Name { get; private set; }
+
+    public string Color { get; private set; } = PlayerColors.All[0];
 
     public bool Active { get; private set; }
 
@@ -37,6 +40,7 @@ public record Player : IEntity<Guid>
         GameId = player.GameId;
         Order = player.Order;
         Name = player.Name;
+        Color = player.Color;
         Active = player.Active;
         IsHost = player.IsHost;
         JoinedDate = player.JoinedDate;
@@ -96,6 +100,11 @@ public record Player : IEntity<Guid>
     public void SetName(PlayerName name)
     {
         Name = name;
+    }
+
+    public void SetColor(string color)
+    {
+        Color = color;
     }
 
     public Result SetOrder(int newOrder)

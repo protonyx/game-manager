@@ -4,6 +4,7 @@ using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerTrackerUpdated;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
+using GameManager.Domain.Constants;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
@@ -59,6 +60,24 @@ public class UpdatePlayerCommandHandler(
             }
 
             player.SetName(playerNameOrError.Value);
+        }
+
+        // Update Color
+        if (!string.IsNullOrWhiteSpace(request.Player.Color))
+        {
+            if (!PlayerColors.All.Contains(request.Player.Color, StringComparer.OrdinalIgnoreCase))
+            {
+                return GameErrors.PlayerInvalidColor("Color is not in the allowed palette");
+            }
+
+            var isColorUnique = await playerRepository.ColorIsUniqueAsync(player.GameId, request.Player.Color, player.Id, cancellationToken);
+
+            if (!isColorUnique)
+            {
+                return GameErrors.PlayerInvalidColor("Color is already taken by another player");
+            }
+
+            player.SetColor(request.Player.Color);
         }
 
         // Update trackers

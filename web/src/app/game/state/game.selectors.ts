@@ -94,3 +94,12 @@ export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
     }) || new Array<PlayerSummary>()
   );
 });
+
+export const selectTakenColors = (excludePlayerId: string) =>
+  createSelector(
+    selectAllPlayers,
+    (players) =>
+      players
+        .filter((p) => p.id !== excludePlayerId && !!p.color)
+        .map((p) => p.color),
+  );

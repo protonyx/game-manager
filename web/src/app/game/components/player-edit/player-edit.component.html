@@ -4,6 +4,25 @@
     <input matInput formControlName="name" />
   </mat-form-field>
 
+  <div class="color-picker">
+    <label class="color-picker-label">Player Color</label>
+    <div class="color-swatches">
+      <button
+        *ngFor="let c of colors"
+        type="button"
+        class="color-swatch"
+        [class.selected]="isColorSelected(c.hex)"
+        [class.taken]="isColorTaken(c.hex)"
+        [style.background-color]="c.hex"
+        [disabled]="isColorTaken(c.hex)"
+        [matTooltip]="isColorTaken(c.hex) ? c.name + ' (taken)' : c.name"
+        (click)="selectColor(c.hex)"
+        [attr.aria-label]="c.name">
+        <mat-icon *ngIf="isColorSelected(c.hex)" class="check-icon">check</mat-icon>
+      </button>
+    </div>
+  </div>
+
   <div
     class="trackers"
     *ngIf="trackers && trackers.length > 0"

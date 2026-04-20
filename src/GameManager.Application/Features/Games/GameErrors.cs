@@ -16,6 +16,7 @@ public static class GameErrors
         public const string PlayerInvalidId = "player.invalid.id";
         public const string PlayerInvalidState = "player.invalid.state";
         public const string PlayerInvalidName = "player.invalid.name";
+        public const string PlayerInvalidColor = "player.invalid.color";
         public const string PlayerNotAuthorized = "player.not_authorized";
         public const string PlayerNotHost = "player.not_host";
     }
@@ -74,4 +75,11 @@ public static class GameErrors
                 ? "Player name is invalid"
                 : $"Player name is invalid: {reason}",
             errorCode: ErrorCodes.PlayerInvalidName);
+
+    public static ApplicationError PlayerInvalidColor(string? reason = null) =>
+        ApplicationError.Validation(
+            string.IsNullOrWhiteSpace(reason)
+                ? "Player color is invalid"
+                : $"Player color is invalid: {reason}",
+            errorCode: ErrorCodes.PlayerInvalidColor);
 }

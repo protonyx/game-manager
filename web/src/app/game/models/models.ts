@@ -14,6 +14,7 @@ export interface JoinGame {
   entryCode: string;
   name: string;
   observer: boolean;
+  color?: string;
 }
 
 export interface Game {
@@ -82,6 +83,7 @@ export interface Player {
   id: string;
   order: number;
   name: string;
+  color: string;
   state: string;
   trackerValues: Record<string, number>;
 }

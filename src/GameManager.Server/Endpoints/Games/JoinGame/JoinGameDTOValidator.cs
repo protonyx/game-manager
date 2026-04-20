@@ -1,5 +1,6 @@
 using FastEndpoints;
 using FluentValidation;
+using GameManager.Domain.Constants;
 
 namespace GameManager.Server.Endpoints.Games;
 
@@ -14,5 +15,10 @@ public class JoinGameDTOValidator : Validator<JoinGameDTO>
 
         RuleFor(t => t.EntryCode)
             .NotEmpty();
+
+        RuleFor(t => t.Color)
+            .Must(c => c == null || PlayerColors.All.Contains(c, StringComparer.OrdinalIgnoreCase))
+            .WithMessage("Color must be a valid palette color")
+            .When(t => !t.Observer);
     }
 }

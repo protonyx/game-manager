@@ -13,4 +13,6 @@ public class PlayerDTO
     public bool IsHost { get; set; }
 
     public IDictionary<Guid, int> TrackerValues { get; set; } = new Dictionary<Guid, int>();
+
+    public string Color { get; set; } = string.Empty;
 }

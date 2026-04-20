@@ -13,10 +13,13 @@ public class JoinGameCommand : ICommand<PlayerCredentialsDTO>
 
     public bool Observer { get; }
 
-    public JoinGameCommand(string entryCode, string name, bool observer = false)
+    public string? Color { get; }
+
+    public JoinGameCommand(string entryCode, string name, bool observer = false, string? color = null)
     {
         EntryCode = entryCode;
         Name = name;
         Observer = observer;
+        Color = color;
     }
 }
