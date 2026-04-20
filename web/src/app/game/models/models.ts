@@ -85,6 +85,7 @@ export interface Player {
   name: string;
   color: string;
   state: string;
+  isReady?: boolean;
   trackerValues: Record<string, number>;
 }
 

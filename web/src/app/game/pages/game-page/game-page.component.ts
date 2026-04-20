@@ -7,8 +7,9 @@ import {
   selectAllPlayers,
   selectGameTrackers,
   selectCurrentPlayerId,
+  selectTakenColors,
 } from '../../state/game.selectors';
-import { GameActions } from '../../state/game.actions';
+import { GameActions, GamesApiActions } from '../../state/game.actions';
 import { Game, Player, TrackerValue } from '../../models/models';
 import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
 import { TrackerListComponent } from '../../components/tracker-list/tracker-list.component';
@@ -22,9 +23,12 @@ import { LetDirective } from '@ngrx/component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap, of } from 'rxjs';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { PatchOperation } from '../../models/patch';
+import { HostLobbyComponent } from '../../components/host-lobby/host-lobby.component';
+import { PlayerWaitingComponent } from '../../components/player-waiting/player-waiting.component';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -49,6 +53,8 @@ const selectIsCurrentPlayerTurn = createSelector(
     CurrentTurnComponent,
     TrackerListComponent,
     LetDirective,
+    HostLobbyComponent,
+    PlayerWaitingComponent,
   ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
@@ -63,6 +69,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
   isHost$ = this.store.select(selectCurrentPlayerIsHost);
 
   isMyTurn$ = this.store.select(selectIsCurrentPlayerTurn);
+
+  takenColors$: Observable<string[]> = this.store
+    .select(selectCurrentPlayerId)
+    .pipe(
+      switchMap((playerId) =>
+        playerId ? this.store.select(selectTakenColors(playerId)) : of([]),
+      ),
+    );
 
   // Grid layout configuration based on screen size
   cols$: Observable<number> = this.breakpointObserver
@@ -169,6 +183,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
   onEditTracker(event: { playerId: string; trackerId: string }) {
     this.store.dispatch(
       GameActions.editTracker({ playerId: event.playerId, trackerId: event.trackerId })
+    );
+  }
+
+  onReadyToggled(player: Player, isReady: boolean): void {
+    this.store.dispatch(GameActions.setPlayerReady({ playerId: player.id, isReady }));
+  }
+
+  onPlayerPatched(event: { playerId: string; ops: PatchOperation[] }): void {
+    this.store.dispatch(
+      GamesApiActions.patchPlayer({ playerId: event.playerId, ops: event.ops }),
     );
   }
 }

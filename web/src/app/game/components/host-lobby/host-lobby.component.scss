@@ -1,0 +1,65 @@
+.host-lobby {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lobby-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .lobby-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .player-count {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.08);
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+}
+
+.entry-code {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 960px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.no-players {
+  color: rgba(0, 0, 0, 0.45);
+  font-style: italic;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.action-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+
+  .start-btn,
+  .start-anyways-btn {
+    width: 100%;
+  }
+}

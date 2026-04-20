@@ -1,0 +1,40 @@
+<div class="host-lobby">
+  <div class="lobby-header">
+    <h2 class="lobby-title">Lobby</h2>
+    <span class="player-count">{{ playerCount }} player{{ playerCount !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <p class="entry-code">
+    Entry Code: <strong>{{ game?.entryCode }}</strong>
+  </p>
+
+  <div class="player-grid" *ngIf="players && players.length > 0; else noPlayers">
+    <app-lobby-player-card
+      *ngFor="let player of players"
+      [player]="player">
+    </app-lobby-player-card>
+  </div>
+
+  <ng-template #noPlayers>
+    <p class="no-players">Waiting for players to join…</p>
+  </ng-template>
+
+  <div class="action-area">
+    <button
+      mat-flat-button
+      color="primary"
+      class="start-btn"
+      [disabled]="!allReady"
+      (click)="onStartGame()">
+      <mat-icon>play_arrow</mat-icon>
+      Start Game
+    </button>
+
+    <button
+      mat-stroked-button
+      class="start-anyways-btn"
+      (click)="onStartAnyways()">
+      Start Anyways
+    </button>
+  </div>
+</div>
