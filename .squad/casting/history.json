@@ -1,0 +1,16 @@
+{
+  "history_version": "1.0",
+  "assignments": [
+    {
+      "assignment_id": "game-manager-001",
+      "universe": "Firefly",
+      "created_at": "2026-04-20",
+      "agents": [
+        { "name": "Mal", "role": "Lead" },
+        { "name": "Zoe", "role": "Backend Dev" },
+        { "name": "Kaylee", "role": "Frontend Dev" },
+        { "name": "Jayne", "role": "Tester" }
+      ]
+    }
+  ]
+}
