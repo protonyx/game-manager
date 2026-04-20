@@ -144,4 +144,91 @@ public class UpdatePlayerCommandTests
         result.IsFailure.Should().BeTrue();
         result.Error.ErrorCode.Should().Be(GameErrors.ErrorCodes.PlayerInvalidColor);
     }
+
+    [Fact]
+    public async Task UpdatePlayerCommand_WithDifferentPlayerId_ReturnsAuthorizationError()
+    {
+        // Arrange
+        var (fixture, _, _, _, player) = SetupValidPlayer();
+
+        // Override the user context with a different player's ID
+        fixture.SetUser(user =>
+        {
+            user.AddGameId(player.GameId)
+                .AddPlayerId(Guid.NewGuid()); // different player
+        });
+
+        var sut = fixture.Create<UpdatePlayerCommandHandler>();
+        var dto = new UpdatePlayerDTO { IsReady = true };
+        var command = new UpdatePlayerCommand(player.Id, dto);
+
+        // Act
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.ErrorType.Should().Be(ApplicationErrorType.AuthorizationError);
+    }
+
+    [Fact]
+    public async Task UpdatePlayerCommand_WithIsReadyTrue_SetsPlayerReady()
+    {
+        // Arrange
+        var (fixture, _, playerRepository, _, player) = SetupValidPlayer();
+
+        var sut = fixture.Create<UpdatePlayerCommandHandler>();
+        var dto = new UpdatePlayerDTO { IsReady = true };
+        var command = new UpdatePlayerCommand(player.Id, dto);
+
+        // Act
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        playerRepository.Verify(x => x.UpdateAsync(
+            It.Is<Player>(p => p.IsReady == true),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdatePlayerCommand_WithIsReadyFalse_ClearsPlayerReady()
+    {
+        // Arrange
+        var (fixture, _, playerRepository, _, player) = SetupValidPlayer();
+        player.SetReady();
+
+        var sut = fixture.Create<UpdatePlayerCommandHandler>();
+        var dto = new UpdatePlayerDTO { IsReady = false };
+        var command = new UpdatePlayerCommand(player.Id, dto);
+
+        // Act
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        playerRepository.Verify(x => x.UpdateAsync(
+            It.Is<Player>(p => p.IsReady == false),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdatePlayerCommand_WithIsReadyNull_DoesNotChangeReadyState()
+    {
+        // Arrange
+        var (fixture, _, playerRepository, _, player) = SetupValidPlayer();
+        player.SetReady();
+
+        var sut = fixture.Create<UpdatePlayerCommandHandler>();
+        var dto = new UpdatePlayerDTO { IsReady = null };
+        var command = new UpdatePlayerCommand(player.Id, dto);
+
+        // Act
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        playerRepository.Verify(x => x.UpdateAsync(
+            It.Is<Player>(p => p.IsReady == true),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

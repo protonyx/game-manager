@@ -16,6 +16,8 @@ public class PlayerModel
 
     public bool IsHost { get; set; }
 
+    public bool IsReady { get; set; }
+
     public DateTime JoinedDate { get; set; }
 
     public ICollection<PlayerTrackerValueModel> Trackers { get; set; } = new List<PlayerTrackerValueModel>();

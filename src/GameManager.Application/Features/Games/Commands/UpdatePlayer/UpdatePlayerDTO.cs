@@ -7,5 +7,7 @@ namespace GameManager.Application.Features.Games.Commands.UpdatePlayer
         public IDictionary<Guid, int> TrackerValues { get; set; } = new Dictionary<Guid, int>();
 
         public string? Color { get; set; }
+
+        public bool? IsReady { get; set; }
     }
 }

@@ -30,6 +30,9 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .HasDefaultValue(PlayerColors.All[0]);
         builder.Property(t => t.Order);
         builder.Property(t => t.IsHost);
+        builder.Property(t => t.IsReady)
+            .IsRequired()
+            .HasDefaultValue(false);
         builder.Property(t => t.JoinedDate);
 
         builder.HasOne<Game>()

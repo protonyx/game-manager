@@ -80,6 +80,15 @@ public class UpdatePlayerCommandHandler(
             player.SetColor(request.Player.Color);
         }
 
+        // Update IsReady
+        if (request.Player.IsReady.HasValue)
+        {
+            if (request.Player.IsReady.Value)
+                player.SetReady();
+            else
+                player.ClearReady();
+        }
+
         // Update trackers
         var pendingTrackerNotifications = new List<PlayerTrackerUpdatedNotification>();
         foreach (var tracker in request.Player.TrackerValues)

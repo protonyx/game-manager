@@ -20,6 +20,8 @@ public record Player : IEntity<Guid>
 
     public bool IsHost { get; private set; }
 
+    public bool IsReady { get; private set; }
+
     public DateTime JoinedDate { get; private set; }
 
     private readonly List<PlayerConnection> _connections = new();
@@ -43,6 +45,7 @@ public record Player : IEntity<Guid>
         Color = player.Color;
         Active = player.Active;
         IsHost = player.IsHost;
+        IsReady = player.IsReady;
         JoinedDate = player.JoinedDate;
         _trackerValues = player._trackerValues;
     }
@@ -105,6 +108,16 @@ public record Player : IEntity<Guid>
     public void SetColor(string color)
     {
         Color = color;
+    }
+
+    public void SetReady()
+    {
+        IsReady = true;
+    }
+
+    public void ClearReady()
+    {
+        IsReady = false;
     }
 
     public Result SetOrder(int newOrder)
