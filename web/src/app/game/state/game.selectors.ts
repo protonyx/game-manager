@@ -95,6 +95,12 @@ export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
   );
 });
 
+export const selectCurrentPlayerIsObserver = createSelector(
+  selectCredentials,
+  selectCurrentPlayer,
+  (credentials, currentPlayer) => credentials != null && currentPlayer == null,
+);
+
 export const selectTakenColors = (excludePlayerId: string) =>
   createSelector(
     selectAllPlayers,

@@ -3,6 +3,7 @@ import { createSelector, Store } from '@ngrx/store';
 import {
   selectCurrentPlayer,
   selectCurrentPlayerIsHost,
+  selectCurrentPlayerIsObserver,
   selectGame,
   selectAllPlayers,
   selectGameTrackers,
@@ -29,6 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { PatchOperation } from '../../models/patch';
 import { HostLobbyComponent } from '../../components/host-lobby/host-lobby.component';
 import { PlayerWaitingComponent } from '../../components/player-waiting/player-waiting.component';
+import { ObserverWaitingComponent } from '../../components/observer-waiting/observer-waiting.component';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -55,6 +57,7 @@ const selectIsCurrentPlayerTurn = createSelector(
     LetDirective,
     HostLobbyComponent,
     PlayerWaitingComponent,
+    ObserverWaitingComponent,
   ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
@@ -67,6 +70,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
   players$ = this.store.select(selectAllPlayers);
 
   isHost$ = this.store.select(selectCurrentPlayerIsHost);
+
+  isObserver$ = this.store.select(selectCurrentPlayerIsObserver);
 
   isMyTurn$ = this.store.select(selectIsCurrentPlayerTurn);
 

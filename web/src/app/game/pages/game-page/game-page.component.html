@@ -5,6 +5,7 @@
     trackers: trackers$,
     players: players$,
     isHost: isHost$,
+    isObserver: isObserver$,
     takenColors: takenColors$,
     cols: cols$,
     leftColSpan: leftColSpan$,
@@ -24,13 +25,17 @@
       </app-host-lobby>
 
       <app-player-waiting
-        *ngIf="!vm.isHost"
+        *ngIf="!vm.isHost && !vm.isObserver"
         [game]="vm.game"
         [currentPlayer]="vm.currentPlayer!"
         [takenColors]="vm.takenColors"
         (readyToggled)="onReadyToggled(vm.currentPlayer!, $event)"
         (playerPatched)="onPlayerPatched($event)">
       </app-player-waiting>
+
+      <app-observer-waiting
+        *ngIf="vm.isObserver">
+      </app-observer-waiting>
     </ng-container>
 
     <!-- ── Active game (InProgress / Complete) ── -->

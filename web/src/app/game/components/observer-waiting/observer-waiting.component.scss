@@ -1,0 +1,15 @@
+.observer-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.waiting-message {
+  margin: 0;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
+}
