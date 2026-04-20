@@ -28,8 +28,8 @@ describe('PlayerReorderDialogComponent', () => {
 
   it('dropTable moves item and updates order values', () => {
     const players: Player[] = [
-      { id: 'p1', name: 'A', order: 1, state: 'Active', trackerValues: {} },
-      { id: 'p2', name: 'B', order: 2, state: 'Active', trackerValues: {} },
+      { id: 'p1', name: 'A', color: '#D32F2F', order: 1, state: 'Active', trackerValues: {} },
+      { id: 'p2', name: 'B', color: '#1976D2', order: 2, state: 'Active', trackerValues: {} },
     ];
     component.newPlayers = players;
 

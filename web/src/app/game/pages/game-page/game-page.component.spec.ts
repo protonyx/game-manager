@@ -26,7 +26,7 @@ const initialState = {
 };
 
 const mockGame = { id: 'game-1' } as Game;
-const mockPlayer: Player = { id: 'player-1', name: 'Alice', order: 1, state: 'Active', trackerValues: {} };
+const mockPlayer: Player = { id: 'player-1', name: 'Alice', color: '#D32F2F', order: 1, state: 'Active', trackerValues: {} };
 
 describe('GamePageComponent', () => {
   let component: GamePageComponent;

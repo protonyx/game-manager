@@ -9,6 +9,7 @@ const makePlayer = (id: string, order: number = 1): Player => ({
   id,
   order,
   name: `Player ${id}`,
+  color: '#D32F2F',
   state: 'Active',
   trackerValues: {},
 });
