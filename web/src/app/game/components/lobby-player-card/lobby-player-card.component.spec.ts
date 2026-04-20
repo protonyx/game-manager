@@ -41,26 +41,47 @@ describe('LobbyPlayerCardComponent', () => {
     expect(component.avatarInitial).toBe('A');
   });
 
-  it('shows "Waiting…" when not ready', () => {
+  it('shows "Waiting…" when not ready and not host', () => {
     component.player = makePlayer({ isReady: false });
+    component.isHost = false;
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.waiting-label')).toBeTruthy();
     expect(el.querySelector('.ready-label')).toBeNull();
   });
 
-  it('shows "Ready" when ready', () => {
+  it('shows "Ready" when ready and not host', () => {
     component.player = makePlayer({ isReady: true });
+    component.isHost = false;
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.ready-label')).toBeTruthy();
     expect(el.querySelector('.waiting-label')).toBeNull();
   });
 
-  it('adds ready class when player is ready', () => {
+  it('adds ready class when player is ready and not host', () => {
     component.player = makePlayer({ isReady: true });
+    component.isHost = false;
     fixture.detectChanges();
     const card: HTMLElement = fixture.nativeElement.querySelector('.player-card');
     expect(card.classList).toContain('ready');
+  });
+
+  it('shows "Host" label and no ready/waiting when isHost is true', () => {
+    component.player = makePlayer({ isReady: false });
+    component.isHost = true;
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.host-label')).toBeTruthy();
+    expect(el.querySelector('.waiting-label')).toBeNull();
+    expect(el.querySelector('.ready-label')).toBeNull();
+  });
+
+  it('does not add ready class when isHost is true even if isReady is true', () => {
+    component.player = makePlayer({ isReady: true });
+    component.isHost = true;
+    fixture.detectChanges();
+    const card: HTMLElement = fixture.nativeElement.querySelector('.player-card');
+    expect(card.classList).not.toContain('ready');
   });
 });

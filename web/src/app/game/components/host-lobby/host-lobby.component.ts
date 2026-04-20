@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Game, Player } from '../../models/models';
 import { LobbyPlayerCardComponent } from '../lobby-player-card/lobby-player-card.component';
 
@@ -15,6 +16,7 @@ import { LobbyPlayerCardComponent } from '../lobby-player-card/lobby-player-card
     MatButtonModule,
     MatIconModule,
     MatBadgeModule,
+    MatTooltipModule,
     LobbyPlayerCardComponent,
   ],
 })
@@ -24,6 +26,7 @@ export class HostLobbyComponent {
   @Input() currentPlayer: Player | null = null;
 
   @Output() startGame = new EventEmitter<void>();
+  @Output() editPlayer = new EventEmitter<Player>();
 
   get nonHostPlayers(): Player[] {
     return (this.players || []).filter(
@@ -50,5 +53,9 @@ export class HostLobbyComponent {
     if (window.confirm('Start the game now, even though not all players are ready?')) {
       this.startGame.emit();
     }
+  }
+
+  onEditPlayer(player: Player): void {
+    this.editPlayer.emit(player);
   }
 }

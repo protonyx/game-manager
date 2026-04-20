@@ -118,6 +118,18 @@ describe('HostLobbyComponent', () => {
     });
   });
 
+  describe('editPlayer output', () => {
+    it('emits editPlayer when edit button is clicked', () => {
+      spyOn(component.editPlayer, 'emit');
+      const player = makePlayer('p1');
+      component.players = [player];
+      fixture.detectChanges();
+      const editBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.edit-btn');
+      editBtn.click();
+      expect(component.editPlayer.emit).toHaveBeenCalledWith(player);
+    });
+  });
+
   describe('playerCount', () => {
     it('returns number of players', () => {
       component.players = [makePlayer('p1'), makePlayer('p2')];

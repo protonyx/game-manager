@@ -9,10 +9,20 @@
   </p>
 
   <div class="player-grid" *ngIf="players && players.length > 0; else noPlayers">
-    <app-lobby-player-card
-      *ngFor="let player of players"
-      [player]="player">
-    </app-lobby-player-card>
+    <div class="player-card-wrapper" *ngFor="let player of players">
+      <app-lobby-player-card
+        [player]="player"
+        [isHost]="player.id === currentPlayer?.id">
+      </app-lobby-player-card>
+      <button
+        mat-icon-button
+        class="edit-btn"
+        (click)="onEditPlayer(player)"
+        [matTooltip]="'Edit ' + player.name"
+        aria-label="Edit player">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
   </div>
 
   <ng-template #noPlayers>

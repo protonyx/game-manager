@@ -11,6 +11,7 @@ import { Player } from '../../models/models';
 })
 export class LobbyPlayerCardComponent {
   @Input() player!: Player;
+  @Input() isHost = false;
 
   get avatarInitial(): string {
     return this.player?.name?.charAt(0).toUpperCase() || '?';

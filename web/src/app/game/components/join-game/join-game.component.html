@@ -14,26 +14,6 @@
         <input matInput formControlName="playerName" />
       </mat-form-field>
 
-      <div class="color-picker">
-        <label class="color-picker-label">Pick Your Color</label>
-        <div class="color-swatches">
-          <button
-            *ngFor="let c of colors"
-            type="button"
-            class="color-swatch"
-            [class.selected]="isColorSelected(c.hex)"
-            [style.background-color]="c.hex"
-            [matTooltip]="c.name"
-            (click)="selectColor(c.hex)"
-            [attr.aria-label]="c.name">
-            <mat-icon *ngIf="isColorSelected(c.hex)" class="check-icon">check</mat-icon>
-          </button>
-        </div>
-        <mat-error *ngIf="joinGameForm.get('color')?.invalid && joinGameForm.get('color')?.touched">
-          Please select a color
-        </mat-error>
-      </div>
-
       <mat-error *ngIf="errorMessage">
         {{ errorMessage }}
       </mat-error>

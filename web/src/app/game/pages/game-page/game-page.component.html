@@ -19,7 +19,8 @@
         [game]="vm.game"
         [players]="vm.players"
         [currentPlayer]="vm.currentPlayer!"
-        (startGame)="onStartGame(vm.game)">
+        (startGame)="onStartGame(vm.game)"
+        (editPlayer)="onPlayerEdit($event)">
       </app-host-lobby>
 
       <app-player-waiting
