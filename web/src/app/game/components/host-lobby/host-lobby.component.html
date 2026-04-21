@@ -9,19 +9,19 @@
   </p>
 
   <div class="player-grid" *ngIf="players && players.length > 0; else noPlayers">
-    <div class="player-card-wrapper" *ngFor="let player of players">
+    <div
+      class="player-card-wrapper"
+      *ngFor="let player of players"
+      (click)="onEditPlayer(player)"
+      [attr.aria-label]="'Edit ' + player.name"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="onEditPlayer(player)"
+      (keydown.space)="onEditPlayer(player)">
       <app-lobby-player-card
         [player]="player"
         [isHost]="player.id === currentPlayer?.id">
       </app-lobby-player-card>
-      <button
-        mat-icon-button
-        class="edit-btn"
-        (click)="onEditPlayer(player)"
-        [matTooltip]="'Edit ' + player.name"
-        aria-label="Edit player">
-        <mat-icon>edit</mat-icon>
-      </button>
     </div>
   </div>
 

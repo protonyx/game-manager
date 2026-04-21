@@ -11,10 +11,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { Game, Player } from '../../models/models';
-import { PLAYER_COLORS } from '../../models/player-colors';
 import { PatchOperation } from '../../models/patch';
+import { ColorPickerComponent } from '../color-picker/color-picker.component';
 
 @Component({
   selector: 'app-player-waiting',
@@ -27,7 +26,7 @@ import { PatchOperation } from '../../models/patch';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule,
+    ColorPickerComponent,
   ],
 })
 export class PlayerWaitingComponent implements OnChanges {
@@ -37,8 +36,6 @@ export class PlayerWaitingComponent implements OnChanges {
 
   @Output() readyToggled = new EventEmitter<boolean>();
   @Output() playerPatched = new EventEmitter<{ playerId: string; ops: PatchOperation[] }>();
-
-  readonly colors = PLAYER_COLORS;
 
   nameControl = new FormControl('');
 
@@ -65,7 +62,7 @@ export class PlayerWaitingComponent implements OnChanges {
   }
 
   onColorSelect(hex: string): void {
-    if (!this.currentPlayer || this.isColorTaken(hex)) return;
+    if (!this.currentPlayer) return;
     if (hex !== this.currentPlayer.color) {
       this.playerPatched.emit({
         playerId: this.currentPlayer.id,
@@ -76,13 +73,5 @@ export class PlayerWaitingComponent implements OnChanges {
 
   onReadyToggle(): void {
     this.readyToggled.emit(!this.currentPlayer?.isReady);
-  }
-
-  isColorSelected(hex: string): boolean {
-    return this.currentPlayer?.color?.toLowerCase() === hex.toLowerCase();
-  }
-
-  isColorTaken(hex: string): boolean {
-    return this.takenColors.some((c) => c.toLowerCase() === hex.toLowerCase());
   }
 }

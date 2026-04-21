@@ -8,7 +8,28 @@ User: Protonyx (Kevin)
 
 ## Learnings
 
-### 2026-04-20 — Lobby Redesign Review (commit `b9eccbc`)
+### 2026-04-21 — ColorPickerComponent Tests (`color-picker.component.spec.ts`)
+
+Wrote 22 comprehensive tests for the new standalone `ColorPickerComponent`.
+
+**Test coverage:** creation, all PLAYER_COLORS rendered, label input (default + update), `.selected` class, `.taken` class + disabled, click-to-emit, taken click no-emit, case-insensitive matching (both isSelected and isTaken), check/taken icons, empty selectedColor, empty takenColors, `select()` method directly.
+
+**Patterns used:**
+- Standalone component: `imports: [ColorPickerComponent, NoopAnimationsModule]` (NOT `declarations`)
+- Used `By.css('.color-swatch')` queries via `fixture.debugElement.queryAll()`
+- Clicked taken swatch via `component.select(hex)` directly (disabled buttons don't fire DOM clicks)
+- Used `spyOn(component.colorSelected, 'emit')` for emission verification
+- `fixture.detectChanges()` called after mutating `@Input()` properties directly
+
+**Baseline note:** `git stash` does NOT stash untracked files — so a new (untracked) spec file will run in both baseline and post-change runs. The true baseline diff is confirmed with `fdescribe` (all 22 focus-run tests passed).
+
+**Adjacent fixes:** The ColorPickerComponent refactoring left 3 stale spec files with broken tests:
+- `player-edit.component.spec.ts`: removed `isColorSelected`/`isColorTaken` tests (moved to child component); fixed `selectColor() does nothing when taken` (taken guard is now in ColorPickerComponent, not PlayerEditComponent)
+- `player-waiting.component.spec.ts`: same — replaced `color swatch states` block with correct behavior test
+- `host-lobby.component.spec.ts`: edit button removed, replaced with clickable `.player-card-wrapper` div; updated test to click the wrapper instead
+
+**Pre-existing failures (4):** `TrackerEditorDialogComponent should create` (missing Store provider), `AuthInterceptorService` ×3 (uses `inject` before configureTestingModule). These are unchanged from baseline.
+
 
 Reviewed full `IsReady` backend + lobby frontend feature. **PASS WITH NOTES.**
 

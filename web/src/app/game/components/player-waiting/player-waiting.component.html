@@ -19,22 +19,12 @@
 
   <!-- Color picker -->
   <div class="section">
-    <p class="color-picker-label">Your Color</p>
-    <div class="color-swatches">
-      <button
-        *ngFor="let c of colors"
-        type="button"
-        class="color-swatch"
-        [class.selected]="isColorSelected(c.hex)"
-        [class.taken]="isColorTaken(c.hex)"
-        [style.background-color]="c.hex"
-        [disabled]="isColorTaken(c.hex)"
-        [matTooltip]="isColorTaken(c.hex) ? c.name + ' (taken)' : c.name"
-        (click)="onColorSelect(c.hex)"
-        [attr.aria-label]="c.name">
-        <mat-icon *ngIf="isColorSelected(c.hex)" class="check-icon">check</mat-icon>
-      </button>
-    </div>
+    <app-color-picker
+      [label]="'Your Color'"
+      [selectedColor]="currentPlayer?.color ?? ''"
+      [takenColors]="takenColors"
+      (colorSelected)="onColorSelect($event)">
+    </app-color-picker>
   </div>
 
   <!-- Ready button -->

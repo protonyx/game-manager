@@ -12,9 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { PLAYER_COLORS } from '../../models/player-colors';
+import { ColorPickerComponent } from '../color-picker/color-picker.component';
 
 export interface PlayerEditFormValue {
   name: string;
@@ -33,8 +31,7 @@ export interface PlayerEditFormValue {
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        MatIconModule,
-        MatTooltipModule,
+        ColorPickerComponent,
     ]
 })
 export class PlayerEditComponent implements OnChanges {
@@ -46,8 +43,6 @@ export class PlayerEditComponent implements OnChanges {
 
   @Input()
   public takenColors: string[] = [];
-
-  readonly colors = PLAYER_COLORS;
 
   playerForm = this.fb.group({
     name: ['', Validators.required],
@@ -71,17 +66,7 @@ export class PlayerEditComponent implements OnChanges {
   }
 
   selectColor(hex: string): void {
-    if (!this.isColorTaken(hex)) {
-      this.playerForm.patchValue({ color: hex });
-    }
-  }
-
-  isColorTaken(hex: string): boolean {
-    return this.takenColors.some(c => c.toLowerCase() === hex.toLowerCase());
-  }
-
-  isColorSelected(hex: string): boolean {
-    return this.playerForm.value.color?.toLowerCase() === hex.toLowerCase();
+    this.playerForm.patchValue({ color: hex });
   }
 
   createTrackerFormGroup(trackers: Tracker[]): FormGroup {

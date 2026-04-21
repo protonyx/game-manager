@@ -119,13 +119,13 @@ describe('HostLobbyComponent', () => {
   });
 
   describe('editPlayer output', () => {
-    it('emits editPlayer when edit button is clicked', () => {
+    it('emits editPlayer when player card wrapper is clicked', () => {
       spyOn(component.editPlayer, 'emit');
       const player = makePlayer('p1');
       component.players = [player];
       fixture.detectChanges();
-      const editBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.edit-btn');
-      editBtn.click();
+      const wrapper: HTMLElement = fixture.nativeElement.querySelector('.player-card-wrapper');
+      wrapper.click();
       expect(component.editPlayer.emit).toHaveBeenCalledWith(player);
     });
   });

@@ -121,21 +121,9 @@ describe('PlayerWaitingComponent', () => {
   });
 
   describe('color swatch states', () => {
-    it('marks selected color correctly', () => {
-      expect(component.isColorSelected('#D32F2F')).toBeTrue();
-      expect(component.isColorSelected('#1976D2')).toBeFalse();
-    });
-
-    it('marks taken colors correctly', () => {
-      component.takenColors = ['#1976D2'];
-      expect(component.isColorTaken('#1976D2')).toBeTrue();
-      expect(component.isColorTaken('#D32F2F')).toBeFalse();
-    });
-
-    it('does not emit when a taken color is selected', () => {
+    it('does not emit when the same color is re-selected', () => {
       spyOn(component.playerPatched, 'emit');
-      component.takenColors = ['#1976D2'];
-      component.onColorSelect('#1976D2');
+      component.onColorSelect('#D32F2F'); // same as player.color
       expect(component.playerPatched.emit).not.toHaveBeenCalled();
     });
   });

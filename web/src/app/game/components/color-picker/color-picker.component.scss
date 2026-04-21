@@ -1,0 +1,55 @@
+.color-field-label {
+  display: block;
+  font-family: var(--mat-sys-body-small-font, Roboto);
+  font-size: var(--mat-sys-body-small-size, 0.75rem);
+  font-weight: var(--mat-sys-body-small-weight, 400);
+  line-height: var(--mat-sys-body-small-line-height, 1rem);
+  letter-spacing: var(--mat-sys-body-small-tracking, 0.025rem);
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  margin-bottom: 8px;
+}
+
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, opacity 0.2s;
+  padding: 0;
+
+  &.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+
+  &.taken {
+    cursor: not-allowed;
+    background-color: #9e9e9e !important;
+    border-color: transparent;
+    opacity: 0.7;
+  }
+
+  .check-icon {
+    font-size: 20px;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+  }
+
+  .taken-icon {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.85);
+    width: 20px;
+    height: 20px;
+  }
+}
