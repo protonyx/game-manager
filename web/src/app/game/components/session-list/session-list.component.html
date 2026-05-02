@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Rejoin Session</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let session of sessions">
+        <div class="session-item">
+          <div class="session-info">
+            <span class="session-title">Game: {{ session.credentials.gameName || (session.credentials.gameId | slice:0:8) + '...' }}</span>
+            <span class="session-line">Player: {{ session.credentials.playerName || (session.credentials.playerId | slice:0:8) + '...' }}</span>
+          </div>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onRejoin(session)">
+            Rejoin
+          </button>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>

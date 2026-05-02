@@ -30,8 +30,13 @@ export const gameFeature = createFeature({
       };
     }),
     on(GameHubActions.playerUpdated, (state, message): GameState => {
+      const updatedCredentials =
+        state.credentials && message.player.id === state.credentials.playerId
+          ? { ...state.credentials, playerName: message.player.name }
+          : state.credentials;
       return {
         ...state,
+        credentials: updatedCredentials,
         players: playerAdapter.setOne(message.player, state.players),
       };
     }),
@@ -46,15 +51,25 @@ export const gameFeature = createFeature({
       (state, { credentials }): GameState => {
         return {
           ...state,
-          credentials: credentials,
+          credentials: {
+            ...credentials,
+            gameName: credentials.gameName ?? state.credentials?.gameName,
+            playerName: credentials.playerName ?? state.credentials?.playerName,
+          },
         };
       },
     ),
-    on(GamesApiActions.joinedGame, (state, { credentials }): GameState => {
-      return { ...state, credentials: credentials };
+    on(GamesApiActions.joinedGame, (state, { credentials, playerName }): GameState => {
+      return { ...state, credentials: { ...credentials, playerName } };
     }),
     on(GamesApiActions.retrievedGame, (state, { game }): GameState => {
-      return { ...state, game: game };
+      return {
+        ...state,
+        game: game,
+        credentials: state.credentials
+          ? { ...state.credentials, gameName: game.name }
+          : null,
+      };
     }),
     on(
       GamesApiActions.retrievedGameSummary,
@@ -63,8 +78,14 @@ export const gameFeature = createFeature({
       },
     ),
     on(GamesApiActions.retrievedPlayers, (state, { players }): GameState => {
+      const currentPlayer = state.credentials
+        ? players.find((p) => p.id === state.credentials!.playerId)
+        : undefined;
       return {
         ...state,
+        credentials: currentPlayer && state.credentials
+          ? { ...state.credentials, playerName: currentPlayer.name }
+          : state.credentials,
         players: playerAdapter.setAll(players, state.players),
       };
     }),
