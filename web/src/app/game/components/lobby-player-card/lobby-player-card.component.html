@@ -1,0 +1,12 @@
+<div class="player-card" [class.ready]="!isHost && player.isReady" [style.--player-color]="player.color">
+  <div class="avatar" [style.background-color]="player.color">
+    <span class="avatar-initial">{{ avatarInitial }}</span>
+    <mat-icon *ngIf="!isHost && player.isReady" class="ready-badge">check_circle</mat-icon>
+  </div>
+  <div class="player-info">
+    <span class="player-name">{{ player.name }}</span>
+    <span class="host-label" *ngIf="isHost">Host</span>
+    <span class="ready-label" *ngIf="!isHost && player.isReady">Ready</span>
+    <span class="waiting-label" *ngIf="!isHost && !player.isReady">Waiting…</span>
+  </div>
+</div>

@@ -9,6 +9,7 @@ const makePlayer = (id: string, trackerValues: Record<string, number> = {}): Pla
   id,
   order: 1,
   name: `Player ${id}`,
+  color: '#D32F2F',
   state: 'Active',
   trackerValues,
 });

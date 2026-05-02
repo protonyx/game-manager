@@ -94,3 +94,18 @@ export const selectSummaryPlayers = createSelector(selectSummary, (summary) => {
     }) || new Array<PlayerSummary>()
   );
 });
+
+export const selectCurrentPlayerIsObserver = createSelector(
+  selectCredentials,
+  selectCurrentPlayer,
+  (credentials, currentPlayer) => credentials != null && currentPlayer == null,
+);
+
+export const selectTakenColors = (excludePlayerId: string) =>
+  createSelector(
+    selectAllPlayers,
+    (players) =>
+      players
+        .filter((p) => p.id !== excludePlayerId && !!p.color)
+        .map((p) => p.color),
+  );

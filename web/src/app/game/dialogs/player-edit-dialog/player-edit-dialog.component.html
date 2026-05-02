@@ -3,7 +3,8 @@
   <app-player-edit
     #editor
     [player]="player$ | async"
-    [trackers]="trackers$ | async" />
+    [trackers]="trackers$ | async"
+    [takenColors]="(takenColors$ | async) ?? []" />
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="undefined">Cancel</button>

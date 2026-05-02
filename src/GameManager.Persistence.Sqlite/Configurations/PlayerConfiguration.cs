@@ -1,3 +1,4 @@
+using GameManager.Domain.Constants;
 using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +24,15 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .HasMaxLength(PlayerName.MaximumLength);
         builder.Property(t => t.Active)
             .IsRequired();
+        builder.Property(t => t.Color)
+            .IsRequired()
+            .HasMaxLength(7)
+            .HasDefaultValue(PlayerColors.All[0]);
         builder.Property(t => t.Order);
         builder.Property(t => t.IsHost);
+        builder.Property(t => t.IsReady)
+            .IsRequired()
+            .HasDefaultValue(false);
         builder.Property(t => t.JoinedDate);
 
         builder.HasOne<Game>()

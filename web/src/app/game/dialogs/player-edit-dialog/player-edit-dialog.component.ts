@@ -9,6 +9,7 @@ import {
   selectCurrentPlayerIsHost,
   selectGameTrackers,
   selectPlayerById,
+  selectTakenColors,
 } from '../../state/game.selectors';
 import { MatButton } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -33,6 +34,8 @@ export class PlayerEditDialogComponent {
 
   player$: Observable<Player>;
 
+  takenColors$: Observable<string[]>;
+
   constructor(
     private store: Store,
     public dialogRef: MatDialogRef<PlayerEditDialogComponent>,
@@ -41,6 +44,10 @@ export class PlayerEditDialogComponent {
     this.player$ = this.store.select(
       selectPlayerById(data.playerId),
     ) as Observable<Player>;
+
+    this.takenColors$ = this.store.select(
+      selectTakenColors(data.playerId),
+    ) as Observable<string[]>;
   }
 
   formatOps(
@@ -49,6 +56,7 @@ export class PlayerEditDialogComponent {
   ): PatchOperation[] {
     const ops: PatchOperation[] = [
       { op: 'replace', path: '/name', value: value.name },
+      { op: 'replace', path: '/color', value: value.color },
     ];
 
     if (trackers && trackers.length > 0) {

@@ -4,6 +4,15 @@
     <input matInput formControlName="name" />
   </mat-form-field>
 
+  <div class="color-picker">
+    <app-color-picker
+      [label]="'Player Color'"
+      [selectedColor]="playerForm.value.color ?? ''"
+      [takenColors]="takenColors"
+      (colorSelected)="selectColor($event)">
+    </app-color-picker>
+  </div>
+
   <div
     class="trackers"
     *ngIf="trackers && trackers.length > 0"

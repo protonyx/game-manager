@@ -3,6 +3,7 @@ using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerCreated;
+using GameManager.Domain.Constants;
 using GameManager.Domain.ValueObjects;
 
 namespace GameManager.Application.Features.Games.Commands.JoinGame;
@@ -71,6 +72,34 @@ public class JoinGameCommandHandler : ICommandHandler<JoinGameCommand, PlayerCre
             }
 
             var newPlayer = new Player(playerNameOrError.Value, game);
+
+            // Assign color
+            string? chosenColor = request.Color;
+            if (!string.IsNullOrWhiteSpace(chosenColor))
+            {
+                if (!PlayerColors.All.Contains(chosenColor, StringComparer.OrdinalIgnoreCase))
+                {
+                    return GameErrors.PlayerInvalidColor("Color is not in the allowed palette");
+                }
+
+                var isColorUnique = await _playerRepository.ColorIsUniqueAsync(game.Id, chosenColor, cancellationToken: cancellationToken);
+                if (!isColorUnique)
+                {
+                    return GameErrors.PlayerInvalidColor("Color is already taken by another player");
+                }
+
+                newPlayer.SetColor(chosenColor);
+            }
+            else
+            {
+                // Auto-assign first available color
+                var takenColors = await _playerRepository.GetTakenColorsAsync(game.Id, cancellationToken);
+                var available = PlayerColors.All.FirstOrDefault(c => !takenColors.Contains(c, StringComparer.OrdinalIgnoreCase));
+                if (available != null)
+                {
+                    newPlayer.SetColor(available);
+                }
+            }
 
             // Check uniqueness
             var isUnique = await _playerRepository.NameIsUniqueAsync(game.Id, playerNameOrError.Value, cancellationToken: cancellationToken);

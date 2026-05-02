@@ -32,7 +32,7 @@
     <button
       mat-button
       type="button"
-      [disabled]="joinGameForm.invalid || loading"
+      [disabled]="joinGameForm.get('entryCode')?.invalid || loading"
       (click)="onJoinAsObserver()">
       Observe
     </button>

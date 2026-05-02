@@ -66,6 +66,26 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
         return playersWithName == 0;
     }
 
+    public async Task<bool> ColorIsUniqueAsync(Guid gameId, string color, Guid? excludePlayerId = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Set<Player>()
+            .Where(p => p.GameId == gameId && p.Active)
+            .Where(p => p.Color == color);
+
+        if (excludePlayerId.HasValue)
+            query = query.Where(p => p.Id != excludePlayerId.Value);
+
+        return await query.CountAsync(cancellationToken) == 0;
+    }
+
+    public async Task<IReadOnlyList<string>> GetTakenColorsAsync(Guid gameId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<Player>()
+            .Where(p => p.GameId == gameId && p.Active)
+            .Select(p => p.Color)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<bool> PlayerIsActiveAsync(Guid playerId, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Player>()

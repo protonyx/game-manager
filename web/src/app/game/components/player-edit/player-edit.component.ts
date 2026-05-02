@@ -12,9 +12,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ColorPickerComponent } from '../color-picker/color-picker.component';
 
 export interface PlayerEditFormValue {
   name: string;
+  color: string;
   trackers: Record<string, number>;
 }
 
@@ -29,6 +31,7 @@ export interface PlayerEditFormValue {
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
+        ColorPickerComponent,
     ]
 })
 export class PlayerEditComponent implements OnChanges {
@@ -38,8 +41,12 @@ export class PlayerEditComponent implements OnChanges {
   @Input()
   public trackers: Tracker[] | null | undefined;
 
+  @Input()
+  public takenColors: string[] = [];
+
   playerForm = this.fb.group({
     name: ['', Validators.required],
+    color: ['', Validators.required],
     trackers: this.fb.group({}),
   });
 
@@ -53,8 +60,13 @@ export class PlayerEditComponent implements OnChanges {
     this.updateTrackers(this.trackers);
     this.playerForm.reset({
       name: this.player!.name,
+      color: this.player!.color ?? '',
       trackers: this.player!.trackerValues,
     });
+  }
+
+  selectColor(hex: string): void {
+    this.playerForm.patchValue({ color: hex });
   }
 
   createTrackerFormGroup(trackers: Tracker[]): FormGroup {

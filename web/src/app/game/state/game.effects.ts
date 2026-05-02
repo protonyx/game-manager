@@ -311,6 +311,21 @@ export const patchPlayer = createEffect(
   { functional: true },
 );
 
+export const setPlayerReady = createEffect(
+  (actions$ = inject(Actions)) => {
+    return actions$.pipe(
+      ofType(GameActions.setPlayerReady),
+      map(({ playerId, isReady }) =>
+        GamesApiActions.patchPlayer({
+          playerId,
+          ops: [{ op: 'replace', path: '/isReady', value: isReady }],
+        }),
+      ),
+    );
+  },
+  { functional: true },
+);
+
 export const updateLayoutOnGameLoaded = createEffect(
   (actions$ = inject(Actions)) => {
     return actions$.pipe(

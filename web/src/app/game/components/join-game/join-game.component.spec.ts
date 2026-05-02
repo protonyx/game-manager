@@ -27,12 +27,12 @@ describe('JoinGameComponent', () => {
   });
 
   it('form is valid when entryCode and playerName are filled', () => {
-    component.joinGameForm.setValue({ entryCode: 'ABC123', playerName: 'Alice' });
+    component.joinGameForm.patchValue({ entryCode: 'ABC123', playerName: 'Alice' });
     expect(component.joinGameForm.valid).toBeTrue();
   });
 
   it('onSubmit() emits joinGame with observer: false and correct values', () => {
-    component.joinGameForm.setValue({ entryCode: 'ABC123', playerName: 'Alice' });
+    component.joinGameForm.patchValue({ entryCode: 'ABC123', playerName: 'Alice' });
     let emitted: JoinGame | undefined;
     component.joinGame.subscribe((v) => (emitted = v));
 
@@ -42,17 +42,17 @@ describe('JoinGameComponent', () => {
   });
 
   it('onJoinAsObserver() emits joinGame with observer: true', () => {
-    component.joinGameForm.setValue({ entryCode: 'XYZ', playerName: 'Bob' });
+    component.joinGameForm.patchValue({ entryCode: 'XYZ', playerName: 'Bob' });
     let emitted: JoinGame | undefined;
     component.joinGame.subscribe((v) => (emitted = v));
 
     component.onJoinAsObserver();
 
-    expect(emitted).toEqual({ entryCode: 'XYZ', name: 'Bob', observer: true });
+    expect(emitted).toEqual(jasmine.objectContaining({ entryCode: 'XYZ', observer: true }));
   });
 
   it('emitted values have whitespace trimmed', () => {
-    component.joinGameForm.setValue({ entryCode: '  ABC  ', playerName: '  Alice  ' });
+    component.joinGameForm.patchValue({ entryCode: '  ABC  ', playerName: '  Alice  ' });
     let emitted: JoinGame | undefined;
     component.joinGame.subscribe((v) => (emitted = v));
 
@@ -60,5 +60,10 @@ describe('JoinGameComponent', () => {
 
     expect(emitted?.entryCode).toBe('ABC');
     expect(emitted?.name).toBe('Alice');
+  });
+
+  it('does not render a color picker', () => {
+    const colorPicker = fixture.nativeElement.querySelector('.color-picker');
+    expect(colorPicker).toBeNull();
   });
 });

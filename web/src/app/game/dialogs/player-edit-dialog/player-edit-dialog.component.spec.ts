@@ -43,19 +43,23 @@ describe('PlayerEditDialogComponent', () => {
   });
 
   describe('formatOps', () => {
-    it('returns only name op when trackers is null', () => {
-      const value: PlayerEditFormValue = { name: 'Bob', trackers: {} };
+    it('returns name and color ops when trackers is null', () => {
+      const value: PlayerEditFormValue = { name: 'Bob', color: '#D32F2F', trackers: {} };
       const ops = component.formatOps(value, null);
-      expect(ops).toEqual([{ op: 'replace', path: '/name', value: 'Bob' }]);
+      expect(ops).toEqual([
+        { op: 'replace', path: '/name', value: 'Bob' },
+        { op: 'replace', path: '/color', value: '#D32F2F' },
+      ]);
     });
 
-    it('returns name op plus tracker ops when trackers are provided', () => {
-      const value: PlayerEditFormValue = { name: 'Alice', trackers: { t1: 5 } };
+    it('returns name, color, and tracker ops when trackers are provided', () => {
+      const value: PlayerEditFormValue = { name: 'Alice', color: '#1976D2', trackers: { t1: 5 } };
       const trackers: Tracker[] = [{ id: 't1', name: 'Score', startingValue: 0 }];
       const ops = component.formatOps(value, trackers);
-      expect(ops.length).toBe(2);
+      expect(ops.length).toBe(3);
       expect(ops[0]).toEqual({ op: 'replace', path: '/name', value: 'Alice' });
-      expect(ops[1]).toEqual({ op: 'replace', path: '/trackerValues/t1', value: 5 });
+      expect(ops[1]).toEqual({ op: 'replace', path: '/color', value: '#1976D2' });
+      expect(ops[2]).toEqual({ op: 'replace', path: '/trackerValues/t1', value: 5 });
     });
   });
 });

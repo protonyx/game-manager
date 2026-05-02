@@ -15,7 +15,7 @@ namespace GameManager.Server.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
 
             modelBuilder.Entity("GameManager.Domain.Entities.Game", b =>
                 {
@@ -43,7 +43,7 @@ namespace GameManager.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("StartedDate")
@@ -69,11 +69,23 @@ namespace GameManager.Server.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(7)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("#D32F2F");
+
                     b.Property<Guid>("GameId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsHost")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsReady")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("JoinedDate")
                         .HasColumnType("TEXT");
@@ -124,6 +136,7 @@ namespace GameManager.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("StartingValue")
@@ -229,7 +242,7 @@ namespace GameManager.Server.Migrations
 
                             b1.HasKey("GameId");
 
-                            b1.ToTable("Games", (string)null);
+                            b1.ToTable("Games");
 
                             b1.WithOwner()
                                 .HasForeignKey("GameId");

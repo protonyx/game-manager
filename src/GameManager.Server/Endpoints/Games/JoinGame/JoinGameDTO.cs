@@ -16,4 +16,9 @@ public class JoinGameDTO
     /// Join as an observer instead of a player
     /// </summary>
     public bool Observer { get; set; } = false;
+
+    /// <summary>
+    /// Player color (hex value from palette)
+    /// </summary>
+    public string? Color { get; set; }
 }

@@ -1,0 +1,55 @@
+.player-waiting {
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.game-info {
+  text-align: center;
+
+  .game-name {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .entry-code {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.name-field {
+  width: 100%;
+}
+
+.ready-section {
+  margin-top: auto;
+  padding-top: 8px;
+
+  .ready-btn {
+    width: 100%;
+    height: 52px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+
+    &.is-ready {
+      background-color: #388e3c;
+      color: #fff;
+    }
+  }
+}

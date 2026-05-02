@@ -1,0 +1,42 @@
+<div class="player-waiting">
+  <!-- Game info header -->
+  <div class="game-info">
+    <h2 class="game-name">{{ game?.name }}</h2>
+    <p class="entry-code">Entry Code: <strong>{{ game?.entryCode }}</strong></p>
+  </div>
+
+  <!-- Name field -->
+  <div class="section">
+    <mat-form-field appearance="outline" class="name-field">
+      <mat-label>Your Name</mat-label>
+      <input
+        matInput
+        [formControl]="nameControl"
+        (blur)="onNameBlur()"
+        autocomplete="off" />
+    </mat-form-field>
+  </div>
+
+  <!-- Color picker -->
+  <div class="section">
+    <app-color-picker
+      [label]="'Your Color'"
+      [selectedColor]="currentPlayer?.color ?? ''"
+      [takenColors]="takenColors"
+      (colorSelected)="onColorSelect($event)">
+    </app-color-picker>
+  </div>
+
+  <!-- Ready button -->
+  <div class="ready-section">
+    <button
+      mat-flat-button
+      class="ready-btn"
+      [class.is-ready]="currentPlayer?.isReady"
+      [color]="currentPlayer?.isReady ? undefined : 'primary'"
+      (click)="onReadyToggle()">
+      <mat-icon>{{ currentPlayer?.isReady ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+      {{ currentPlayer?.isReady ? "Ready ✓" : "I'm Ready" }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<label class="color-field-label">{{ label }}</label>
+<div class="color-swatches">
+  <button
+    *ngFor="let c of colors"
+    type="button"
+    class="color-swatch"
+    [class.selected]="isSelected(c.hex)"
+    [class.taken]="isTaken(c.hex)"
+    [style.background-color]="c.hex"
+    [disabled]="isTaken(c.hex)"
+    [matTooltip]="isTaken(c.hex) ? c.name + ' (taken)' : c.name"
+    (click)="select(c.hex)"
+    [attr.aria-label]="c.name">
+    <mat-icon *ngIf="isSelected(c.hex)" class="check-icon">check</mat-icon>
+    <mat-icon *ngIf="isTaken(c.hex)" class="taken-icon">close</mat-icon>
+  </button>
+</div>

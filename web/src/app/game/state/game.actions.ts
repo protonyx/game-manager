@@ -35,6 +35,7 @@ export const GameActions = createActionGroup({
     endTurn: props<{ gameId: string }>(),
     startGame: props<{ gameId: string }>(),
     endGame: props<{ gameId: string }>(),
+    setPlayerReady: props<{ playerId: string; isReady: boolean }>(),
   },
 });
 
