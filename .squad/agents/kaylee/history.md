@@ -53,3 +53,22 @@ User: Protonyx (Kevin)
 - Observers join via `observer: true` in JoinGameCommand. The backend skips player creation and returns credentials with `PlayerId = Guid.Empty`. No player entity ever appears in the store for an observer.
 - Detecting observer: `credentials` set but `selectCurrentPlayer` is `undefined` — simplest reliable signal.
 - All components in this codebase are standalone (use `imports: []` in `@Component`) — task instructions saying "standalone: false + NgModule" were incorrect for this repo.
+
+### Between Turns — Host Controls Placement Mockup (2025)
+
+**What was built:**
+- Created `host-controls-mockup.html` in session files: side-by-side phone-frame (375×667px) comparison of two host-controls layouts
+- **Option A**: taller footer (~110px) holds "Up Next" info row + two action buttons (Advance Turn in green, End Game as red outline)
+- **Option B**: minimal 64px footer ("Up Next" only) + a ⚙ FAB anchored bottom-right; tap reveals an animated pop-up menu with Advance Turn + End Game rows; tap scrim or FAB again to dismiss
+- Both frames share: pinned 72px header (avatar circle, player name, live ticking timer), scrollable middle zone with 4 compact player cards, dark theme (`--bg-primary: #1a1a1a`)
+- FAB uses CSS `opacity + transform` transition (no JS jank), scrim overlay, and `rotate(45deg)` on the trigger icon to signal open state
+
+**Design decisions made:**
+- Option A footer height: ~110px (Up Next row ~32px + gap + action row ~46px + padding); this meaningfully reduces scroll real estate on 375px width
+- Option B FAB sits at `bottom: 80px` (above the 64px footer + 16px gap), right-aligned; actions stagger upward with label chips for legibility
+- Chose ▶ / ✕ icons (Unicode) to avoid external icon dependencies
+- Added a scrim backdrop in Option B so the FAB feels modal and dismisses easily
+
+**Key facts:**
+- Mockup is fully self-contained (Google Fonts import only, no CDN JS/CSS)
+- Both timers tick in sync from a single `setInterval` — same elapsed time shown on both frames
