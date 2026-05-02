@@ -1,0 +1,25 @@
+mat-list-item {
+  margin-bottom: 8px;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.session-title {
+  font-weight: 500;
+}
+
+.session-line {
+  font-size: 0.875rem;
+  color: var(--mat-list-item-secondary-text-color);
+}

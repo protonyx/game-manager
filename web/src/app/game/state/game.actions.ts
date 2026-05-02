@@ -15,6 +15,7 @@ import {
   PlayerUpdatedMessage,
 } from '../models/messages';
 import { PatchOperation } from '../models/patch';
+import { StoredSession } from '../services/session.service';
 
 export const GameActions = createActionGroup({
   source: 'Games Page',
@@ -23,6 +24,7 @@ export const GameActions = createActionGroup({
     joinGame: props<{ joinGame: JoinGame }>(),
     leaveGame: emptyProps(),
     clearCredentials: emptyProps(),
+    restoreSession: props<{ session: StoredSession }>(),
     loadGame: props<{ gameId: string }>(),
     loadGameSummary: props<{ gameId: string }>(),
     loadPlayers: props<{ gameId: string }>(),
@@ -62,6 +64,7 @@ export const GamesApiActions = createActionGroup({
     joinedGame: props<{
       credentials: PlayerCredentials;
       entryCode: string;
+      playerName: string;
     }>(),
     joinedGameError: props<{ error: string }>(),
     leftGame: emptyProps(),

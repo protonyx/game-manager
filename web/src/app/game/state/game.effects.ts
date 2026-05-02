@@ -39,6 +39,7 @@ import { PlayerReorderDialogComponent } from '../dialogs/player-reorder-dialog/p
 import { PatchOperation } from '../models/patch';
 import { AudioService } from '../../shared/services/audio.service';
 import { TrackerEditorDialogComponent } from '../dialogs/tracker-editor-dialog/tracker-editor-dialog.component';
+import { SessionService } from '../services/session.service';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -95,6 +96,7 @@ export const joinGame = createEffect(
             GamesApiActions.joinedGame({
               credentials: data,
               entryCode: action.joinGame.entryCode,
+              playerName: action.joinGame.name,
             }),
           ),
           catchError((error) => {
@@ -757,6 +759,39 @@ export const signalrReconnect = createEffect(
       ofType(GameHubActions.hubReconnect),
       exhaustMap(() => {
         return fromPromise(hubService.reconnect());
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);
+
+export const destroySessionOnClearCredentials = createEffect(
+  (
+    actions$ = inject(Actions),
+    sessionService = inject(SessionService),
+  ) => {
+    return actions$.pipe(
+      ofType(GameActions.clearCredentials),
+      tap(() => {
+        sessionService.destroyCurrentSession();
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);
+
+export const restoreSession = createEffect(
+  (
+    actions$ = inject(Actions),
+    sessionService = inject(SessionService),
+    router = inject(Router),
+  ) => {
+    return actions$.pipe(
+      ofType(GameActions.restoreSession),
+      tap(({ session }) => {
+        sessionService.restoreSession(session);
+        // Reload the page to rehydrate from the restored session
+        window.location.href = '/game';
       }),
     );
   },

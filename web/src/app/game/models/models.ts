@@ -100,4 +100,6 @@ export interface PlayerCredentials {
   playerId: string;
   token: string;
   isHost: boolean;
+  gameName?: string;
+  playerName?: string;
 }
