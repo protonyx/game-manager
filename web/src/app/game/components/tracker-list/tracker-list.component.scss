@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
-  padding-bottom: 96px; // clear pinned End Turn button in parent layout
 }
 
 .tracker-card {

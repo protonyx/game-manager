@@ -111,3 +111,67 @@ User: Protonyx (Kevin)
 - `web/src/app/game/components/player-list/player-list.component.html` (compact mode @if/@else branching)
 - `web/src/app/game/components/player-list/player-list.component.scss` (compact-player-list styles)
 
+### Tracker Card Margin Fix (2026-05-02)
+
+**Issue:**
+Tracker cards in the "My Turn" view lost their horizontal margins/padding after the layout refactor. Cards were rendering edge-to-edge with the screen edges.
+
+**Root cause:**
+`.mt-content` in `game-page.component.scss` had `padding: 8px 0` — only vertical padding, no horizontal. The `trackers-grid` had 16px gap between cards but no padding around the grid container itself.
+
+**Fix applied:**
+Changed `.mt-content` padding from `8px 0` to `8px 16px` to add 16px horizontal padding on both left and right sides.
+
+**Files modified:**
+- `web/src/app/game/pages/game-page/game-page.component.scss` (line 33: `.mt-content` padding updated)
+
+**Key learnings:**
+- When scrollable content containers have no horizontal padding, child grids render edge-to-edge
+- Container-level padding is more reliable than per-item margins for consistent content inset
+- Always verify mobile-first layouts visually after layout component changes — flex containers can lose padding when CSS specificity changes
+
+### Host Controls in My Turn Footer (2026-05-02)
+
+**What was built:**
+- Added host controls button to the My Turn view footer (`.mt-footer`), sitting next to the End Turn button
+- Button is a `mat-mini-fab` with primary color and settings/close icon toggle (reuses existing `fabOpen` state)
+- Only visible when `vm.isHost` is true
+- Opens an overlay menu with "End Game" action (styled as `mat-raised-button` with warn color)
+- Menu uses fixed positioning at bottom-right, with backdrop scrim for modal dismissal
+- Footer layout uses flexbox: End Turn button takes `flex: 1 1 auto`, host settings button is `flex: 0 0 auto` with 12px gap
+
+**Key patterns learned:**
+- The same `fabOpen` boolean can be reused across different layouts (My Turn and Between Turns) — no need for separate state variables
+- Host controls in My Turn only need "End Game" action, not "Advance Turn" (host can use their own End Turn button)
+- Fixed position overlays need explicit z-index layering: backdrop at z-index 100, menu at 101, footer at 10
+- `mat-mini-fab` is better than `mat-fab` for secondary actions in a footer — keeps the primary action (End Turn) visually dominant
+- Bottom-positioned overlays should account for `env(safe-area-inset-bottom)` in their positioning: `bottom: calc(68px + 12px + env(safe-area-inset-bottom))`
+- Backdrop should cover the entire viewport (`position: fixed` with all edges at 0) and use semi-transparent black (`rgba(0, 0, 0, 0.5)`)
+
+**Files modified:**
+- `web/src/app/game/pages/game-page/game-page.component.html` (added host settings button and menu overlay in My Turn layout)
+- `web/src/app/game/pages/game-page/game-page.component.scss` (footer flexbox, host button, menu and backdrop styles)
+
+### My Turn Footer Pin Fix (2026-05-02)
+
+**Issue:**
+The "End Turn" button in the My Turn view was sliding down the page every time tracker increment/decrement buttons were clicked. The tracker editor component can toggle between normal mode and keypad mode, causing dramatic height changes in the tracker cards.
+
+**Root cause:**
+The `.mt-footer` was using `flex: 0 0 auto` within the flex layout, making it part of the normal document flow. When tracker cards expanded (especially when switching to keypad mode), the content area height changed, pushing the footer down — it wasn't truly pinned to the viewport bottom.
+
+**Fix applied:**
+- Changed `.mt-footer` from `flex: 0 0 auto` to `position: fixed` with `bottom: 0; left: 0; right: 0` to pin it to the viewport bottom
+- Updated `.mt-content` padding-bottom from `8px 16px` to `calc(68px + 12px + env(safe-area-inset-bottom))` to provide clearance for the fixed footer
+- Removed `padding-bottom: 96px` from `.trackers-grid` in `tracker-list.component.scss` — no longer needed since the footer is truly fixed
+
+**Key learnings:**
+- When footer buttons must remain accessible regardless of content changes, use `position: fixed` not `flex: 0 0 auto`
+- Scrollable content areas need bottom padding equal to (footer height + gap + safe-area-inset) to prevent content from being obscured
+- Child components shouldn't compensate for parent layout issues with hardcoded padding — fix the root layout instead
+- Always test dynamic content height changes (like form mode toggles) to verify fixed positioning works correctly
+
+**Files modified:**
+- `web/src/app/game/pages/game-page/game-page.component.scss` (`.mt-footer` position fixed, `.mt-content` padding-bottom)
+- `web/src/app/game/components/tracker-list/tracker-list.component.scss` (removed hardcoded padding-bottom)
+

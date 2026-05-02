@@ -68,7 +68,7 @@
             </app-tracker-list>
           </div>
 
-          <!-- Pinned bottom: End Turn button -->
+          <!-- Pinned bottom: End Turn button + Host Controls -->
           <div class="mt-footer">
             <button
               mat-raised-button
@@ -79,7 +79,29 @@
               (click)="onEndTurn(vm.game)">
               End Turn
             </button>
+            <button
+              *ngIf="vm.isHost"
+              mat-mini-fab
+              color="primary"
+              type="button"
+              class="host-settings-btn"
+              (click)="fabOpen = !fabOpen"
+              aria-label="Host controls">
+              <mat-icon>{{ fabOpen ? 'close' : 'settings' }}</mat-icon>
+            </button>
           </div>
+
+          <!-- Host controls menu overlay -->
+          <ng-container *ngIf="vm.isHost && fabOpen">
+            <div class="host-menu-backdrop" (click)="fabOpen = false"></div>
+            <div class="host-menu">
+              <button mat-raised-button color="warn" type="button"
+                (click)="onEndGame(vm.game); fabOpen = false">
+                <mat-icon>stop</mat-icon>
+                End Game
+              </button>
+            </div>
+          </ng-container>
 
         </div>
       </ng-container>
