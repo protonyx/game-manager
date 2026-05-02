@@ -5,7 +5,7 @@ import { SimpleChange } from '@angular/core';
 import { CurrentTurnComponent } from './current-turn.component';
 import { Game, GameState, Player } from '../../models/models';
 
-const makePlayer = (id: string, order: number = 1): Player => ({
+const makePlayer = (id: string, order = 1): Player => ({
   id,
   order,
   name: `Player ${id}`,
@@ -85,9 +85,27 @@ describe('CurrentTurnComponent', () => {
     expect(component.isMyTurn).toBeFalse();
   });
 
-  it('emits endTurn when onEndTurn() is called', () => {
-    spyOn(component.endTurn, 'emit');
-    component.onEndTurn();
-    expect(component.endTurn.emit).toHaveBeenCalled();
+  it('renders .my-turn-header element when isMyTurn is true', () => {
+    const p1 = makePlayer('p1', 1);
+    const p2 = makePlayer('p2', 2);
+    component.game = makeGame('p1');
+    component.players = [p1, p2];
+    component.currentPlayer = p1;
+    component.ngOnChanges({ game: new SimpleChange(null, component.game, true) });
+    fixture.detectChanges();
+    const header = fixture.nativeElement.querySelector('.my-turn-header');
+    expect(header).not.toBeNull();
+  });
+
+  it('displays "Your Turn" label', () => {
+    const p1 = makePlayer('p1', 1);
+    const p2 = makePlayer('p2', 2);
+    component.game = makeGame('p1');
+    component.players = [p1, p2];
+    component.currentPlayer = p1;
+    component.ngOnChanges({ game: new SimpleChange(null, component.game, true) });
+    fixture.detectChanges();
+    const label = fixture.nativeElement.querySelector('.your-turn-label');
+    expect(label?.textContent?.trim()).toBe('Your Turn');
   });
 });

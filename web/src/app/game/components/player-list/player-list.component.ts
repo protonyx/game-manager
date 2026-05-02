@@ -40,6 +40,9 @@ import { PlayerService } from '../../services/player.service';
 })
 export class PlayerListComponent implements OnChanges, AfterViewInit {
   @Input()
+  public compactMode = false;
+
+  @Input()
   public game: Game | null = null;
 
   @Input()

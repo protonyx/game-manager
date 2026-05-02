@@ -72,3 +72,42 @@ User: Protonyx (Kevin)
 **Key facts:**
 - Mockup is fully self-contained (Google Fonts import only, no CDN JS/CSS)
 - Both timers tick in sync from a single `setInterval` — same elapsed time shown on both frames
+
+### Full-Screen Game Experience (2026-05-02)
+
+**What was built:**
+- Added `hideChrome` input to `LayoutComponent` with `@HostBinding('class.hide-chrome')` to apply class to host element
+- Layout template wraps toolbar with `@if (!hideChrome)` and changes sidenav `[opened]` to `[opened]="sidenavOpen && !hideChrome"`
+- Layout styles updated: `.navbar-is-mobile:not(.hide-chrome) mat-sidenav-content` conditional margin-top prevents unwanted offset
+- `app.component.ts` adds `isGameInProgress$` observable that maps `game?.state === 'InProgress'`
+- `app.component.html` binds `[hideChrome]="(isGameInProgress$ | async) ?? false"` to layout (nullish coalescing required for strict null checks)
+- `game-page.component.ts` imports `Router` and adds `onLeaveGame()` method that dispatches `GameActions.leaveGame()` + navigates to join page
+- Between-turns header (`bt-header-content`) now includes entry code label and logout button after the timer
+- My-turn header (`mt-header`) gets an overlay logout button positioned absolutely in top-right corner
+- Compact player list completely redesigned: no outer `mat-card`, @if/@else branching renders horizontal card rows in compact mode
+- Each compact player card: 6px color bar + 48px avatar circle + player name + badges (You/Playing) + tracker values
+- Active player styling: border with player color + box-shadow glow
+- Compact styles: dark theme, surface-container background, 12px border-radius, 16px padding, 12px margin-bottom
+
+**Key patterns learned:**
+- When hiding layout chrome for immersive views, entry code and navigation must be relocated INTO the feature component — not just hidden in the toolbar
+- Use `@HostBinding('class.xyz')` to apply conditional classes to the component host element so child templates can reference them with `:not(.xyz)` selectors
+- Nullish coalescing operator (`?? false`) is required when passing async boolean observables to strict boolean `@Input()` properties
+- In Angular templates, `@if (condition) { ... } @else { ... }` branching is cleaner than `*ngIf` for structurally different rendering modes
+- Compact/inline player cards should skip the `mat-card` wrapper entirely — use plain divs with custom styling to match dark-theme mockups
+- Player badges ("You", "Playing") should be inline with the name row, not as subtitles, for horizontal card layouts
+- Always position leave/logout buttons with `position: absolute` when overlaying on existing headers to avoid layout shift
+- When adding Router navigation in components that already have Store injected, ensure Router is imported from `@angular/router` and injected in constructor
+
+**Files modified:**
+- `web/src/app/shared/layout/layout.component.ts` (hideChrome input + HostBinding)
+- `web/src/app/shared/layout/layout.component.html` (conditional toolbar + sidenav)
+- `web/src/app/shared/layout/layout.component.scss` (margin-top guard)
+- `web/src/app/app.component.ts` (isGameInProgress$ observable)
+- `web/src/app/app.component.html` (hideChrome binding)
+- `web/src/app/game/pages/game-page/game-page.component.ts` (Router import + onLeaveGame method)
+- `web/src/app/game/pages/game-page/game-page.component.html` (entry code + leave buttons in both headers)
+- `web/src/app/game/pages/game-page/game-page.component.scss` (button styles for leave/entry-code)
+- `web/src/app/game/components/player-list/player-list.component.html` (compact mode @if/@else branching)
+- `web/src/app/game/components/player-list/player-list.component.scss` (compact-player-list styles)
+

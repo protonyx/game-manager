@@ -5,6 +5,7 @@
   <app-layout
     [title]="title$ | async"
     [sidenavOpen]="sidenavOpen$ | async"
+    [hideChrome]="(isGameInProgress$ | async) ?? false"
     (toggleSidenav)="toggleSidenav()"
     (closeSidenav)="closeSidenav()">
     <toolbar-actions>

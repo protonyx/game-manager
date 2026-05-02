@@ -16,7 +16,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -32,12 +31,14 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatSliderModule,
     MatIconModule,
-    MatCardModule,
   ],
 })
 export class TrackerEditorComponent implements OnChanges {
   @Input()
   public trackerValue: number | null | undefined;
+
+  @Input()
+  public playerColor: string = '#888888';
 
   @Output()
   public trackerChange: EventEmitter<number> =

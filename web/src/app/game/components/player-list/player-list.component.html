@@ -1,3 +1,29 @@
+@if (compactMode) {
+  <div class="compact-player-list">
+    <div *ngFor="let player of filteredPlayers"
+         class="compact-player-row"
+         [class.player-is-active]="checkIsPlayerTurn(player)"
+         [style.--active-player-color]="getPlayerColor(player)">
+      <div class="color-bar" [style.background-color]="getPlayerColor(player)"></div>
+      <div class="player-avatar" [style.background-color]="getPlayerColor(player)">
+        {{ player.order }}
+      </div>
+      <div class="player-info">
+        <div class="player-header-row">
+          <span class="player-name">{{ player.name }}</span>
+          <span *ngIf="checkIsMe(player)" class="badge badge-you">You</span>
+          <span *ngIf="checkIsPlayerTurn(player)" class="badge badge-playing">Playing</span>
+        </div>
+        <div class="player-trackers" *ngIf="trackers.length > 0 && game?.state !== 'Preparing'">
+          <div *ngFor="let tracker of trackers" class="tracker-item-compact">
+            <span class="tracker-label">{{ tracker.name }}</span>
+            <span class="tracker-val">{{ getTrackerValue(player, tracker.id) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
 <mat-card class="player-list-card">
   <mat-card-header>
     <mat-card-title>Players</mat-card-title>
@@ -19,16 +45,19 @@
 
   <mat-card-content>
   <!-- Search input - only show when there are more than 10 players -->
+  @if (!compactMode) {
   <mat-form-field class="search-field" *ngIf="dataSource.data.length > 10">
     <mat-label>Search players</mat-label>
     <input matInput [(ngModel)]="searchText" (keyup)="applyFilter($event)" placeholder="Search by name">
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
+  }
 
   <!-- Card-based player list -->
   <div class="player-cards-container">
     <mat-card *ngFor="let player of filteredPlayers"
               class="player-card"
+              [class.compact]="compactMode"
               [class.player-is-active]="checkIsPlayerTurn(player)"
               [ngStyle]="{'border-left-color': getPlayerColor(player)}">
       <mat-card-header>
@@ -88,6 +117,7 @@
   </div>
 
   <!-- Pagination - only show when there's more than 1 page worth of results -->
+  @if (!compactMode) {
   <mat-paginator
     *ngIf="dataSource.data.length > pageSize"
     [length]="dataSource.data.length"
@@ -95,6 +125,8 @@
     [pageSizeOptions]="pageSizeOptions"
     aria-label="Select page">
   </mat-paginator>
+  }
 
   </mat-card-content>
 </mat-card>
+}

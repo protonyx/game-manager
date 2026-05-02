@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 import {
   selectCurrentPlayer,
   selectCurrentPlayerIsHost,
@@ -12,21 +13,15 @@ import {
 } from '../../state/game.selectors';
 import { GameActions, GamesApiActions } from '../../state/game.actions';
 import { Game, Player, TrackerValue } from '../../models/models';
-import { TrackerEditorComponent } from '../../components/tracker-editor/tracker-editor.component';
 import { TrackerListComponent } from '../../components/tracker-list/tracker-list.component';
 import { CommonModule } from '@angular/common';
 import { CurrentTurnComponent } from '../../components/current-turn/current-turn.component';
 import { PlayerListComponent } from '../../components/player-list/player-list.component';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { GameControlComponent } from '../../components/game-control/game-control.component';
 import { MatButtonModule } from '@angular/material/button';
 import { LetDirective } from '@ngrx/component';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatCardModule } from '@angular/material/card';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, map, switchMap, of } from 'rxjs';
-import { MatTabsModule } from '@angular/material/tabs';
+import { Observable, map, switchMap, of, combineLatest } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
+import { TurnTimerComponent } from '../../components/turn-timer/turn-timer.component';
 import { PatchOperation } from '../../models/patch';
 import { HostLobbyComponent } from '../../components/host-lobby/host-lobby.component';
 import { PlayerWaitingComponent } from '../../components/player-waiting/player-waiting.component';
@@ -45,15 +40,11 @@ const selectIsCurrentPlayerTurn = createSelector(
   imports: [
     CommonModule,
     MatButtonModule,
-    MatTabsModule,
     MatIconModule,
-    MatExpansionModule,
-    MatGridListModule,
-    MatCardModule,
-    GameControlComponent,
     PlayerListComponent,
     CurrentTurnComponent,
     TrackerListComponent,
+    TurnTimerComponent,
     LetDirective,
     HostLobbyComponent,
     PlayerWaitingComponent,
@@ -83,49 +74,35 @@ export class GamePageComponent implements OnInit, OnDestroy {
       ),
     );
 
-  // Grid layout configuration based on screen size
-  cols$: Observable<number> = this.breakpointObserver
-    .observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-      Breakpoints.Medium,
-      Breakpoints.Large,
-      Breakpoints.XLarge,
-    ])
-    .pipe(
-      map((result) => {
-        if (result.breakpoints[Breakpoints.XSmall]) {
-          return 1; // 1 column for extra small devices
-        } else if (result.breakpoints[Breakpoints.Small]) {
-          return 1; // 1 column for small devices
-        } else if (result.breakpoints[Breakpoints.Medium]) {
-          return 2; // 2 columns for medium devices
-        } else {
-          return 2; // 2 columns for large and extra large devices
-        }
-      }),
-    );
-
-  // Derived layout flags
-  isSingleColumn$: Observable<boolean> = this.cols$.pipe(map((c) => c === 1));
-
-  // Column spans for different components based on screen size
-  leftColSpan$: Observable<number> = this.cols$.pipe(
-    map((cols) => (cols === 1 ? 1 : 1)), // Full width on small screens, 1/2 width on larger screens
+  currentTurnPlayer$: Observable<Player | undefined> = combineLatest([
+    this.game$,
+    this.players$
+  ]).pipe(
+    map(([game, players]) => {
+      if (!players || !game?.currentTurnPlayerId) return undefined;
+      return players.find(p => p.id === game.currentTurnPlayerId);
+    })
   );
 
-  rightColSpan$: Observable<number> = this.cols$.pipe(
-    map((cols) => (cols === 1 ? 1 : 1)), // Full width on small screens, 1/2 width on larger screens
+  nextTurnPlayer$: Observable<Player | undefined> = combineLatest([
+    this.game$,
+    this.players$
+  ]).pipe(
+    map(([game, players]) => {
+      if (!players || !game?.currentTurnPlayerId) return undefined;
+      const idx = players.findIndex(p => p.id === game.currentTurnPlayerId);
+      if (idx < 0) return undefined;
+      return players[(idx + 1) % players.length];
+    })
   );
 
-  // Local UI state for tabs in single-column mode
-  selectedTab = 0;
+  fabOpen = false;
 
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
   constructor(
     private store: Store,
-    private breakpointObserver: BreakpointObserver,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -166,6 +143,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   async onLeave(): Promise<void> {
     this.store.dispatch(GameActions.leaveGame());
+  }
+
+  onLeaveGame(): void {
+    this.store.dispatch(GameActions.leaveGame());
+    this.router.navigate(['/game', 'join']);
   }
 
   onPlayerEdit(player: Player): void {

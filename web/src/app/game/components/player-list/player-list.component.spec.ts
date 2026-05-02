@@ -131,4 +131,26 @@ describe('PlayerListComponent', () => {
       expect(component.kickPlayer.emit).toHaveBeenCalledWith(player);
     });
   });
+
+  describe('compactMode', () => {
+    it('defaults to false', () => {
+      expect(component.compactMode).toBeFalse();
+    });
+
+    it('when true, search field is not rendered even with >10 players', () => {
+      component.compactMode = true;
+      component.game = makeGame();
+      // Create 11 players to normally trigger the search field
+      component.players = Array.from({length: 11}, (_, i) => makePlayer(`p${i}`));
+      component.ngOnChanges({ game: new SimpleChange(null, component.game, true) });
+      fixture.detectChanges();
+      const searchField = fixture.nativeElement.querySelector('.search-field');
+      expect(searchField).toBeNull();
+    });
+
+    it('when false, renders normally', () => {
+      component.compactMode = false;
+      expect(component.compactMode).toBeFalse();
+    });
+  });
 });

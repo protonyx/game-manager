@@ -42,5 +42,9 @@ mat-sidenav {
 }
 
 mat-sidenav-content {
+  margin-top: 0;
+}
+
+.navbar-is-mobile:not(.hide-chrome) mat-sidenav-content {
   margin-top: 56px;
 }

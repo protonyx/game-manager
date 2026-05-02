@@ -7,9 +7,9 @@
     isHost: isHost$,
     isObserver: isObserver$,
     takenColors: takenColors$,
-    cols: cols$,
-    leftColSpan: leftColSpan$,
-    rightColSpan: rightColSpan$
+    isMyTurn: isMyTurn$,
+    currentTurnPlayer: currentTurnPlayer$,
+    nextTurnPlayer: nextTurnPlayer$
   } as vm">
   <div class="game-page-container">
 
@@ -38,101 +38,87 @@
       </app-observer-waiting>
     </ng-container>
 
-    <!-- ── Active game (InProgress / Complete) ── -->
-    <ng-container *ngIf="vm.game?.state !== 'Preparing'">
-      <!-- Single column: show top controls and bottom tabs -->
-      <ng-container *ngIf="isSingleColumn$ | async; else twoColumnLayout">
-        <!-- Host controls at the top -->
-        <app-game-control
-          *ngIf="isHost$ | async"
-          class="game-control-card"
-          [game]="vm.game"
-          [isHost]="isHost$ | async"
-          (startGame)="onStartGame(vm.game)"
-          (advanceTurn)="onEndTurn(vm.game)"
-          (endGame)="onEndGame(vm.game)">
-        </app-game-control>
+    <!-- ── Active game (InProgress) ── -->
+    <ng-container *ngIf="vm.game?.state === 'InProgress'">
 
-        <!-- Content area switches by selectedTab; tabs fixed at viewport bottom -->
-        <div class="single-column-content">
-          <ng-container [ngSwitch]="selectedTab">
-            <!-- Player List tab content -->
-            <ng-container *ngSwitchCase="0">
-              <app-player-list
-                [game]="vm.game"
-                [players]="vm.players"
-                [currentPlayer]="vm.currentPlayer!"
-                [isHost]="isHost$ | async"
-                (editPlayer)="onPlayerEdit($event)"
-                (kickPlayer)="onPlayerKick($event)"
-                (reorder)="onReorder()"
-                (editTracker)="onEditTracker($event)">
-              </app-player-list>
-            </ng-container>
+      <!-- MY TURN LAYOUT -->
+      <ng-container *ngIf="vm.isMyTurn">
+        <div class="my-turn-layout">
 
-            <!-- Turn tab content -->
-            <ng-container *ngSwitchCase="1">
-              <app-current-turn
-                *ngIf="vm.game && vm.game.state === 'InProgress' && vm.currentPlayer"
-                [game]="vm.game"
-                [players]="vm.players"
-                [currentPlayer]="vm.currentPlayer"
-                [isHost]="isHost$ | async"
-                (endTurn)="onEndTurn(vm.game)">
-              </app-current-turn>
-              <app-tracker-list
-                *ngIf="vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
-                [trackers]="vm.trackers"
-                [player]="vm.currentPlayer"
-                (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-              </app-tracker-list>
-            </ng-container>
-          </ng-container>
-        </div>
+          <!-- Pinned top: "Your Turn" header strip -->
+          <div class="mt-header">
+            <app-current-turn
+              *ngIf="vm.currentPlayer"
+              [game]="vm.game"
+              [players]="vm.players"
+              [currentPlayer]="vm.currentPlayer">
+            </app-current-turn>
+            <button mat-icon-button class="mt-leave-btn" type="button" (click)="onLeaveGame()" aria-label="Leave game">
+              <mat-icon>logout</mat-icon>
+            </button>
+          </div>
 
-        <!-- Fixed bottom tabs navigation using Angular Material TabGroup (header only) -->
-        <div class="bottom-tabs">
-          <mat-tab-group
-            headerPosition="below"
-            [selectedIndex]="selectedTab"
-            (selectedIndexChange)="selectedTab = $event">
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon aria-hidden="true">group</mat-icon>
-                <span>Player List</span>
-              </ng-template>
-            </mat-tab>
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon aria-hidden="true">schedule</mat-icon>
-                <span>Turn</span>
-              </ng-template>
-            </mat-tab>
-          </mat-tab-group>
+          <!-- Scrollable middle: tracker cards -->
+          <div class="mt-content">
+            <app-tracker-list
+              *ngIf="vm.trackers && vm.trackers.length > 0 && vm.currentPlayer"
+              [trackers]="vm.trackers"
+              [player]="vm.currentPlayer"
+              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
+            </app-tracker-list>
+          </div>
+
+          <!-- Pinned bottom: End Turn button -->
+          <div class="mt-footer">
+            <button
+              mat-raised-button
+              class="end-turn-btn"
+              type="button"
+              [style.background-color]="vm.currentPlayer?.color ?? null"
+              [style.color]="'white'"
+              (click)="onEndTurn(vm.game)">
+              End Turn
+            </button>
+          </div>
+
         </div>
       </ng-container>
 
-      <!-- Two column layout (default on medium and larger screens) -->
-      <ng-template #twoColumnLayout>
-        <div class="game-grid" [ngClass]="{'two-columns': vm.cols === 2}">
-          <!-- Left column (players and game control) -->
-          <div class="left-column">
-            <!-- Game Control (only for host) -->
-            <app-game-control
-              *ngIf="isHost$ | async" class="game-control-card"
-              [game]="vm.game"
-              [isHost]="isHost$ | async"
-              (startGame)="onStartGame(vm.game)"
-              (advanceTurn)="onEndTurn(vm.game)"
-              (endGame)="onEndGame(vm.game)">
-            </app-game-control>
+      <!-- BETWEEN TURNS LAYOUT -->
+      <ng-container *ngIf="!vm.isMyTurn">
+        <div class="between-turns-layout">
 
-            <!-- Player List -->
+          <!-- Pinned top: current player header -->
+          <div class="bt-header" [style.--player-color]="vm.currentTurnPlayer?.color ?? '#888888'">
+            <div class="bt-player-stripe"></div>
+            <div class="bt-header-content">
+              <div class="bt-player-avatar" [style.background-color]="vm.currentTurnPlayer?.color">
+                {{ vm.currentTurnPlayer?.order }}
+              </div>
+              <div class="bt-player-info">
+                <span class="bt-player-name">{{ vm.currentTurnPlayer?.name }}</span>
+                <span class="bt-turn-label">Current Turn</span>
+              </div>
+              <app-turn-timer
+                *ngIf="vm.game?.lastTurnStartTime"
+                [startTime]="vm.game!.lastTurnStartTime"
+                class="bt-timer">
+              </app-turn-timer>
+              <span class="bt-entry-code" *ngIf="vm.game?.entryCode && vm.isHost">Entry Code: {{ vm.game?.entryCode }}</span>
+              <button mat-icon-button class="bt-leave-btn" type="button" (click)="onLeaveGame()" aria-label="Leave game">
+                <mat-icon>logout</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Scrollable middle: compact player list -->
+          <div class="bt-content">
             <app-player-list
+              [compactMode]="true"
               [game]="vm.game"
               [players]="vm.players"
               [currentPlayer]="vm.currentPlayer!"
-              [isHost]="isHost$ | async"
+              [isHost]="vm.isHost"
               (editPlayer)="onPlayerEdit($event)"
               (kickPlayer)="onPlayerKick($event)"
               (reorder)="onReorder()"
@@ -140,30 +126,67 @@
             </app-player-list>
           </div>
 
-          <!-- Right column (current turn and trackers) -->
-          <div class="right-column">
-            <!-- Current Turn -->
-            @if (vm.game && vm.game.state === 'InProgress' && vm.currentPlayer) {
-            <app-current-turn
-              [game]="vm.game"
-              [players]="vm.players"
-              [currentPlayer]="vm.currentPlayer"
-              [isHost]="isHost$ | async"
-              (endTurn)="onEndTurn(vm.game)">
-            </app-current-turn>
-            }
-
-            <!-- Trackers -->
-            @if (vm.game?.state === 'InProgress' && vm.trackers && vm.trackers.length > 0 && vm.currentPlayer) {
-            <app-tracker-list
-              [trackers]="vm.trackers"
-              [player]="vm.currentPlayer"
-              (updateTrackers)="onTrackerUpdate(vm.currentPlayer, $event)">
-            </app-tracker-list>
-            }
+          <!-- Pinned bottom: Up Next footer -->
+          <div class="bt-footer">
+            <span class="up-next-label">Up Next</span>
+            <div class="up-next-player" [style.background-color]="vm.nextTurnPlayer?.color">
+              {{ vm.nextTurnPlayer?.order }}
+            </div>
+            <span class="up-next-name">{{ vm.nextTurnPlayer?.name }}</span>
           </div>
+
+          <!-- FAB: Host controls (floating above footer) -->
+          <ng-container *ngIf="vm.isHost">
+            <div class="host-fab-container" [class.open]="fabOpen">
+              @if (fabOpen) {
+                <div class="fab-actions">
+                  <button mat-fab extended color="warn" type="button"
+                    (click)="onEndGame(vm.game); fabOpen = false">
+                    <mat-icon>stop</mat-icon>
+                    End Game
+                  </button>
+                  <button mat-fab extended color="primary" type="button"
+                    (click)="onEndTurn(vm.game); fabOpen = false">
+                    <mat-icon>skip_next</mat-icon>
+                    Advance Turn
+                  </button>
+                </div>
+              }
+              <button mat-fab color="primary" type="button" class="main-fab"
+                (click)="fabOpen = !fabOpen">
+                <mat-icon>{{ fabOpen ? 'close' : 'settings' }}</mat-icon>
+              </button>
+            </div>
+          </ng-container>
+
         </div>
-      </ng-template>
+      </ng-container>
+
+    </ng-container>
+
+    <!-- ── Complete state ── -->
+    <ng-container *ngIf="vm.game?.state === 'Complete'">
+      <div class="game-complete">
+        <div class="game-complete-header">
+          <mat-icon class="complete-icon">emoji_events</mat-icon>
+          <h2>Game Complete</h2>
+        </div>
+        <app-player-list
+          [game]="vm.game"
+          [players]="vm.players"
+          [currentPlayer]="vm.currentPlayer!"
+          [isHost]="vm.isHost"
+          (editPlayer)="onPlayerEdit($event)"
+          (kickPlayer)="onPlayerKick($event)"
+          (reorder)="onReorder()"
+          (editTracker)="onEditTracker($event)">
+        </app-player-list>
+        <div class="game-complete-actions" *ngIf="vm.isHost">
+          <button mat-raised-button color="warn" (click)="onEndGame(vm.game)">
+            End Game
+          </button>
+        </div>
+      </div>
     </ng-container>
 
   </div>
