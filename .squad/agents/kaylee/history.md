@@ -27,3 +27,29 @@ User: Protonyx (Kevin)
 - Color picker: the `player-edit` component pattern (circular swatches, `.selected`/`.taken` classes, `check` icon overlay) should be borrowed across the app
 - `<label>` for non-form controls triggers `@angular-eslint/template/label-has-associated-control`; use `<p>` instead
 - The `prefer-inject` constructor lint errors and `exhaust` unused import in `game.effects.ts` are pre-existing issues throughout the codebase
+
+### Bug Fixes (2025-04)
+
+**Bugs fixed:**
+- **Host status in lobby card**: `LobbyPlayerCardComponent` got a new `@Input() isHost = false`. When `isHost` is true the card shows a "Host" label (styled in primary color, uppercase) and suppresses the ready/waiting labels and ready badge. `HostLobbyComponent` passes `[isHost]="player.id === currentPlayer?.id"` to each card.
+- **Color picker removed from join form**: `JoinGameComponent` had a 12-swatch color picker that was removed. The `color` form control (previously `Validators.required`) was dropped entirely. Form is now valid with just `entryCode` + `playerName`. `onSubmit()` no longer sends a color. `MatIconModule`, `MatTooltipModule`, and `PLAYER_COLORS` imports removed from the join component. Color selection lives only in `app-player-waiting`.
+- **Host edit controls in lobby**: `HostLobbyComponent` gained `@Output() editPlayer = new EventEmitter<Player>()` and `onEditPlayer(player)`. Each player card in the grid is now wrapped in `.player-card-wrapper` containing an `edit` icon button. `game-page.component.html` wires `(editPlayer)="onPlayerEdit($event)"` on `app-host-lobby`, routing through the existing `GameActions.editPlayer` dispatch that opens the player-edit dialog.
+
+**Patterns confirmed:**
+- `@typescript-eslint/no-inferrable-types`: don't annotate boolean/string/number inputs with their obvious type (e.g. `@Input() isHost = false` not `@Input() isHost: boolean = false`)
+- Pre-existing test failures (AuthInterceptorService, TrackerEditorDialogComponent) are unrelated to lobby work — baseline 4 failures, 158 successes
+
+### Observer Waiting View (2025-04)
+
+**What was built:**
+- Added `selectCurrentPlayerIsObserver` selector: detects observer by checking `credentials != null && currentPlayer == null`. When a user joins as observer, the backend does NOT create a player entity (Guid.Empty playerId), so the player store has no matching entity.
+- Created `app-observer-waiting` standalone component: `mat-spinner` + "Waiting for the game to start..." message, no interactive elements.
+- Updated `game-page.component.html` lobby routing to three branches:
+  - Host → `app-host-lobby`
+  - Player (non-host, non-observer) → `app-player-waiting` (`*ngIf="!vm.isHost && !vm.isObserver"`)
+  - Observer → `app-observer-waiting` (`*ngIf="vm.isObserver"`)
+
+**Key facts learned:**
+- Observers join via `observer: true` in JoinGameCommand. The backend skips player creation and returns credentials with `PlayerId = Guid.Empty`. No player entity ever appears in the store for an observer.
+- Detecting observer: `credentials` set but `selectCurrentPlayer` is `undefined` — simplest reliable signal.
+- All components in this codebase are standalone (use `imports: []` in `@Component`) — task instructions saying "standalone: false + NgModule" were incorrect for this repo.
