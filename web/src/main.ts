@@ -22,12 +22,29 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideHighcharts } from 'highcharts-angular';
 
+const SESSION_ID_KEY = 'game_manager_session_id';
+export const SESSION_STORAGE_PREFIX = 'game_manager_session_';
+
+export function getSessionId(): string {
+  let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
+  }
+  return sessionId;
+}
+
+export function clearSessionId(): void {
+  sessionStorage.removeItem(SESSION_ID_KEY);
+}
+
 export function localStorageSyncReducer(
   reducer: ActionReducer<unknown>,
 ): ActionReducer<unknown> {
   return localStorageSync({
     keys: [{ [gameFeatureKey]: ['credentials'] }],
     rehydrate: true,
+    storageKeySerializer: (key) => `${SESSION_STORAGE_PREFIX}${getSessionId()}_${key}`,
   })(reducer);
 }
 

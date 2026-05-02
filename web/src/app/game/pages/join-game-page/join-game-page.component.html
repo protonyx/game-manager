@@ -1,6 +1,28 @@
 <div class="container login-container">
-  <app-join-game
-    [loading]="loading"
-    [errorMessage]="error$ | async"
-    (joinGame)="onJoinGame($event)"></app-join-game>
+  <ng-container *ngIf="sessions.length > 0; else joinOnly">
+    <mat-tab-group>
+      <mat-tab label="Join Game">
+        <div class="tab-content">
+          <app-join-game
+            [loading]="loading"
+            [errorMessage]="error$ | async"
+            (joinGame)="onJoinGame($event)"></app-join-game>
+        </div>
+      </mat-tab>
+      <mat-tab label="Rejoin Session">
+        <div class="tab-content">
+          <app-session-list
+            [sessions]="sessions"
+            (rejoin)="onRejoinSession($event)"></app-session-list>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
+
+  <ng-template #joinOnly>
+    <app-join-game
+      [loading]="loading"
+      [errorMessage]="error$ | async"
+      (joinGame)="onJoinGame($event)"></app-join-game>
+  </ng-template>
 </div>
