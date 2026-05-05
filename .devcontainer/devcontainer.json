@@ -10,7 +10,7 @@
       "version": "latest",
       "workloads": "aspire"
     },
-    "ghcr.io/devcontainers/features/node:1": {
+    "ghcr.io/devcontainers/features/node:2": {
       "version": "lts",
       "pnpmVersion": "latest",
       "nvmVersion": "latest"
