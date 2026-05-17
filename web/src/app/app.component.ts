@@ -45,6 +45,8 @@ export class AppComponent {
 
   isActiveGame$ = this.activeGame$.pipe(map((game) => game !== null));
 
+  isGameInProgress$ = this.activeGame$.pipe(map((game) => game?.state === 'InProgress'));
+
   constructor(
     private store: Store,
     private router: Router,

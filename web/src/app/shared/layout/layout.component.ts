@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -24,6 +24,14 @@ export class LayoutComponent {
 
   @Input()
   public sidenavOpen: boolean | null | undefined;
+
+  @Input()
+  public hideChrome = false;
+
+  @HostBinding('class.hide-chrome')
+  get hideChromeClass() {
+    return this.hideChrome;
+  }
 
   @Output()
   public closeSidenav: EventEmitter<void> = new EventEmitter<void>();

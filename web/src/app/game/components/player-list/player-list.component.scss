@@ -105,3 +105,157 @@ mat-card {
     font-style: italic;
   }
 }
+
+// Compact mode — used in between-turns view
+.player-card.compact {
+  margin-bottom: 8px;
+
+  // Tighter padding on card header
+  ::ng-deep .mat-mdc-card-header {
+    padding: 8px 12px;
+  }
+
+  // Tighter content padding
+  ::ng-deep .mat-mdc-card-content {
+    padding: 0 12px 8px;
+  }
+
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.75rem;
+    line-height: 32px;
+  }
+
+  // Tracker values displayed as horizontal chips in compact mode
+  .tracker-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0;
+  }
+
+  .tracker-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--mat-sys-surface-container-high);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+// More prominent active player in compact mode
+.player-card.compact.player-is-active {
+  border-left-width: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  ::ng-deep .mat-mdc-card-header {
+    background-color: var(--mat-sys-surface-container-highest);
+  }
+}
+
+// ── COMPACT PLAYER LIST (between-turns view) ──────────────────────────────────
+
+.compact-player-list {
+  padding: 8px 16px;
+  color-scheme: dark;
+}
+
+.compact-player-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--mat-sys-surface-container);
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+
+  &.player-is-active {
+    border-color: var(--active-player-color, #888);
+    box-shadow: 0 0 0 1px var(--active-player-color, #888);
+  }
+
+  .color-bar {
+    width: 6px;
+    height: 48px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .player-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .player-info {
+    flex: 1;
+  }
+
+  .player-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .player-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
+  }
+
+  .badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.badge-you {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    &.badge-playing {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  .player-trackers {
+    display: flex;
+    gap: 16px;
+  }
+
+  .tracker-item-compact {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tracker-label {
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tracker-val {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--mat-sys-on-surface);
+  }
+}

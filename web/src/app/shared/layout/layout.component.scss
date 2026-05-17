@@ -42,5 +42,17 @@ mat-sidenav {
 }
 
 mat-sidenav-content {
+  margin-top: 0;
+}
+
+.navbar-is-mobile:not(.hide-chrome) mat-sidenav-content {
   margin-top: 56px;
+}
+
+// When chrome is hidden (game in progress), remove sidenav margin from content
+.hide-chrome mat-sidenav-content,
+.hide-chrome .mat-sidenav-content,
+.hide-chrome .mat-drawer-content {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }

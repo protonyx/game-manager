@@ -1,18 +1,10 @@
 import {
   Component,
-  EventEmitter,
   Input,
   OnChanges,
-  Output,
   SimpleChanges,
 } from '@angular/core';
 import { Game, Player } from '../../models/models';
-import { MatButtonModule } from '@angular/material/button';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatBadgeModule } from '@angular/material/badge';
 import { TurnTimerComponent } from '../turn-timer/turn-timer.component';
 import { CommonModule } from '@angular/common';
 import { PlayerService } from '../../services/player.service';
@@ -24,12 +16,6 @@ import { PlayerService } from '../../services/player.service';
     imports: [
         CommonModule,
         TurnTimerComponent,
-        MatExpansionModule,
-        MatButtonModule,
-        MatCardModule,
-        MatIconModule,
-        MatProgressBarModule,
-        MatBadgeModule,
     ]
 })
 export class CurrentTurnComponent implements OnChanges {
@@ -41,9 +27,6 @@ export class CurrentTurnComponent implements OnChanges {
 
   @Input()
   public currentPlayer: Player | null = null;
-
-  @Output()
-  public endTurn = new EventEmitter<void>();
 
   @Input()
   public isHost: boolean | null = false;
@@ -111,9 +94,5 @@ export class CurrentTurnComponent implements OnChanges {
       // Calculate progress as a percentage of DEFAULT_TURN_TIME
       this.turnProgress = Math.min(100, (this.turnDuration / this.DEFAULT_TURN_TIME) * 100);
     }
-  }
-
-  onEndTurn() {
-    this.endTurn.emit();
   }
 }

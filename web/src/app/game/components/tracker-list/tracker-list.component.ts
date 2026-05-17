@@ -1,10 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import {
-  MatCard,
-  MatCardContent,
-  MatCardHeader,
-  MatCardTitle,
-} from '@angular/material/card';
 import {ReactiveFormsModule} from "@angular/forms";
 import { Player, Tracker, TrackerValue } from '../../models/models';
 import { TrackerEditorComponent } from '../tracker-editor/tracker-editor.component';
@@ -12,10 +6,6 @@ import { TrackerEditorComponent } from '../tracker-editor/tracker-editor.compone
 @Component({
   selector: 'app-tracker-list',
   imports: [
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
     ReactiveFormsModule,
     TrackerEditorComponent,
   ],

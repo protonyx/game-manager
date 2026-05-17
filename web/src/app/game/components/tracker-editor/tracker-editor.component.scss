@@ -3,103 +3,108 @@
 .tracker-controls {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  padding: 12px 16px 16px;
+  gap: 12px;
+}
 
-  .controls-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 8px;
-    justify-content: center;
+.main-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.tracker-value {
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  min-width: 120px;
+  transition: color 0.2s ease;
+}
+
+.btn-adjust {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  border: none;
+  font-size: 36px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  background-color: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+
+  &:active {
+    transform: scale(0.93);
+    opacity: 0.8;
   }
+}
 
-  .value-input {
-    width: 80px;
-    margin: 0 8px;
-  }
+.btn-minus {
+  color: var(--player-color, var(--mat-sys-on-surface));
+  justify-self: start;
+}
 
-  .center-align {
-    text-align: center;
-  }
+.btn-plus {
+  color: var(--player-color, var(--mat-sys-on-surface));
+  justify-self: end;
+}
 
-  input.center-align {
-    -moz-appearance: textfield;
-  }
+.quick-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 
-  input.center-align::-webkit-outer-spin-button,
-  input.center-align::-webkit-inner-spin-button {
-    display: none;
+  .decrease, .increase {
+    --mdc-outlined-button-outline-color: var(--player-color);
+    --mdc-outlined-button-label-text-color: var(--player-color);
   }
 
   .decrease {
-    @include mat.button-overrides((
-        outlined-outline-color: var(--mat-sys-error-container),
-        outlined-label-text-color: var(--mat-sys-error)
-    ));
-    @include mat.icon-button-overrides((
-        icon-color: var(--mat-sys-error)
-    ));
+    opacity: 0.7;
   }
+}
 
-  .increase {
-    @include mat.button-overrides((
-        outlined-outline-color: var(--mat-sys-primary-container),
-        outlined-label-text-color: var(--mat-sys-primary)
-    ));
-    @include mat.icon-button-overrides((
-        icon-color: var(--mat-sys-primary)
-    ));
-  }
+.keypad-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+  background-color: var(--mat-sys-surface-variant);
+  border-radius: 8px;
 
-  .quick-buttons {
+  .keypad-display {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
     justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: var(--mat-sys-surface);
+    border-radius: 4px;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+
+    button {
+      height: 48px;
+      font-size: 1.2rem;
+    }
+  }
+
+  .keypad-actions {
+    display: flex;
+    gap: 8px;
 
     button {
       flex: 1;
-      min-width: 60px;
-    }
-  }
-
-  .keypad-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 8px;
-    background-color: var(--mat-sys-surface-variant);
-    border-radius: 8px;
-
-    .keypad-display {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 16px;
-      background-color: var(--mat-sys-surface);
-      border-radius: 4px;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    .keypad-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-
-      button {
-        height: 48px;
-        font-size: 1.2rem;
-      }
-    }
-
-    .keypad-actions {
-      display: flex;
-      gap: 8px;
-
-      button {
-        flex: 1;
-      }
     }
   }
 }

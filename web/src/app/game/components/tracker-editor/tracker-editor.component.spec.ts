@@ -24,6 +24,10 @@ describe('TrackerEditorComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('@Input() playerColor defaults to "#888888"', () => {
+    expect(component.playerColor).toBe('#888888');
+  });
+
   it('onPlusClick() sets keypadActive=true, isAdding=true, keypadValue=""', () => {
     component.onPlusClick();
 

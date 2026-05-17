@@ -1,68 +1,44 @@
-
 <div class="tracker-controls">
-  <!-- Value adjustment controls -->
-  <div class="controls-container">
-    <button
-      mat-icon-button
-      class="decrease"
-      (click)="onMinusClick()"
-      aria-label="Decrease value">
-      <mat-icon>remove</mat-icon>
-    </button>
-
-    <!-- Direct input for precise value -->
-    <mat-form-field class="value-input">
-      <input
-        matInput
-        type="number"
-        class="center-align"
-        [disabled]="true"
-        [formControl]="trackerValueControl"
-        (change)="setTrackerValue(trackerValueControl.value!)" />
-    </mat-form-field>
-
-    <button
-      mat-icon-button
-      class="increase"
-      (click)="onPlusClick()"
-      aria-label="Increase value">
-      <mat-icon>add</mat-icon>
-    </button>
-  </div>
-
-  <!-- Quick adjustment buttons or Keypad -->
   @if (!keypadActive) {
-  <div class="quick-buttons">
-    <button mat-stroked-button class="decrease" (click)="updateTracker(-10)">-10</button>
-    <button mat-stroked-button class="decrease" (click)="updateTracker(-5)">-5</button>
-    <button mat-stroked-button class="increase" (click)="updateTracker(5)">+5</button>
-    <button mat-stroked-button class="increase" (click)="updateTracker(10)">+10</button>
-  </div>
-  } @else {
-  <div class="keypad-container">
-    <div class="keypad-display">
-      <span>{{ isAdding ? '+' : '-' }}</span>
-      <span>{{ keypadValue || '0' }}</span>
+    <!-- Main controls: [minus | value | plus] in 1fr auto 1fr grid -->
+    <div class="main-controls">
+      <button class="btn-adjust btn-minus" type="button" (click)="onMinusClick()" aria-label="Decrease value">−</button>
+      <span class="tracker-value" [style.color]="playerColor">{{ trackerValueControl.value }}</span>
+      <button class="btn-adjust btn-plus" type="button" (click)="onPlusClick()" aria-label="Increase value">+</button>
     </div>
-    <div class="keypad-grid">
-      <button mat-stroked-button (click)="onKeypadClick('1')">1</button>
-      <button mat-stroked-button (click)="onKeypadClick('2')">2</button>
-      <button mat-stroked-button (click)="onKeypadClick('3')">3</button>
-      <button mat-stroked-button (click)="onKeypadClick('4')">4</button>
-      <button mat-stroked-button (click)="onKeypadClick('5')">5</button>
-      <button mat-stroked-button (click)="onKeypadClick('6')">6</button>
-      <button mat-stroked-button (click)="onKeypadClick('7')">7</button>
-      <button mat-stroked-button (click)="onKeypadClick('8')">8</button>
-      <button mat-stroked-button (click)="onKeypadClick('9')">9</button>
-      <button mat-stroked-button (click)="onCancel()"><mat-icon>close</mat-icon></button>
-      <button mat-stroked-button (click)="onKeypadClick('0')">0</button>
-      <button mat-stroked-button (click)="onKeypadClick('backspace')"><mat-icon>backspace</mat-icon></button>
-    </div>
-    <div class="keypad-actions">
-      <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!keypadValue">Save</button>
-      <button mat-button (click)="onCancel()">Cancel</button>
-    </div>
-  </div>
-  }
 
+    <!-- Quick adjustment row -->
+    <div class="quick-buttons">
+      <button mat-stroked-button class="decrease" type="button" (click)="updateTracker(-10)">−10</button>
+      <button mat-stroked-button class="decrease" type="button" (click)="updateTracker(-5)">−5</button>
+      <button mat-stroked-button class="increase" type="button" (click)="updateTracker(5)">+5</button>
+      <button mat-stroked-button class="increase" type="button" (click)="updateTracker(10)">+10</button>
+    </div>
+  } @else {
+    <!-- Keypad: unchanged behavior, updated visuals -->
+    <div class="keypad-container">
+      <div class="keypad-display">
+        <span class="keypad-sign">{{ isAdding ? '+' : '−' }}</span>
+        <span class="keypad-input">{{ keypadValue || '0' }}</span>
+      </div>
+      <div class="keypad-grid">
+        <button mat-stroked-button type="button" (click)="onKeypadClick('1')">1</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('2')">2</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('3')">3</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('4')">4</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('5')">5</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('6')">6</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('7')">7</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('8')">8</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('9')">9</button>
+        <button mat-stroked-button type="button" (click)="onCancel()"><mat-icon>close</mat-icon></button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('0')">0</button>
+        <button mat-stroked-button type="button" (click)="onKeypadClick('backspace')"><mat-icon>backspace</mat-icon></button>
+      </div>
+      <div class="keypad-actions">
+        <button mat-raised-button color="primary" type="button" (click)="onSave()" [disabled]="!keypadValue">Save</button>
+        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  }
 </div>

@@ -1,5 +1,6 @@
-<div class="navbar-container" [class.navbar-is-mobile]="mobileQuery.matches">
+<div class="navbar-container" [class.navbar-is-mobile]="mobileQuery.matches" [class.hide-chrome]="hideChrome">
   <!-- Top Navbar -->
+  @if (!hideChrome) {
   <mat-toolbar class="navbar" color="primary">
     <button mat-icon-button (click)="toggleSidenav.emit()">
       <mat-icon>menu</mat-icon>
@@ -13,12 +14,13 @@
         <ng-content select="toolbar-actions"></ng-content>
     </span>
   </mat-toolbar>
+  }
 
   <mat-sidenav-container
     class="navbar-sidenav-container"
     (backdropClick)="closeSidenav.emit()">
     <mat-sidenav
-      [opened]="sidenavOpen"
+      [opened]="sidenavOpen && !hideChrome"
       fixedTopGap="56"
       [mode]="mobileQuery.matches ? 'over' : 'side'"
       [fixedInViewport]="mobileQuery.matches"
