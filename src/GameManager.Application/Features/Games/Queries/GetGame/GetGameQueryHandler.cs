@@ -1,6 +1,7 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 
 namespace GameManager.Application.Features.Games.Queries.GetGame;
 
@@ -8,9 +9,9 @@ public class GetGameQueryHandler : IQueryHandler<GetGameQuery, GetGameQueryRespo
 {
     private readonly IGameRepository _gameRepository;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public GetGameQueryHandler(IGameRepository gameRepository, IMapper mapper)
+    public GetGameQueryHandler(IGameRepository gameRepository, DtoMapper mapper)
     {
         _gameRepository = gameRepository;
         _mapper = mapper;
@@ -25,7 +26,7 @@ public class GetGameQueryHandler : IQueryHandler<GetGameQuery, GetGameQueryRespo
             return GameErrors.GameNotFound(request.GameId);
         }
 
-        var dto = _mapper.Map<GameDTO>(game);
+        var dto = _mapper.GameToDto(game);
 
         return new GetGameQueryResponse(dto, game.ETag);
     }

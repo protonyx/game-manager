@@ -1,6 +1,6 @@
-using AutoMapper;
 using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 using GameManager.Application.Messages;
 using MediatR;
 
@@ -11,9 +11,9 @@ public class GameUpdatedNotificationHandler : INotificationHandler<GameUpdatedNo
 
     private readonly IGameClientNotificationService _gameClientNotificationService;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public GameUpdatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, IMapper mapper)
+    public GameUpdatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, DtoMapper mapper)
     {
         _gameClientNotificationService = gameClientNotificationService;
         _mapper = mapper;
@@ -22,7 +22,7 @@ public class GameUpdatedNotificationHandler : INotificationHandler<GameUpdatedNo
     public Task Handle(GameUpdatedNotification notification, CancellationToken cancellationToken)
     {
         var game = notification.Game;
-        var dto = _mapper.Map<GameDTO>(game);
+        var dto = _mapper.GameToDto(game);
 
         var message = new GameStateChangedMessage()
         {

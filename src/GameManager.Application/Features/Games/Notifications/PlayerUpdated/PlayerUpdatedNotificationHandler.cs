@@ -1,5 +1,6 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 using GameManager.Application.Messages;
 
 namespace GameManager.Application.Features.Games.Notifications.PlayerUpdated;
@@ -8,9 +9,9 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
 {
     private readonly IGameClientNotificationService _gameClientNotificationService;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public PlayerUpdatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, IMapper mapper)
+    public PlayerUpdatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, DtoMapper mapper)
     {
         _gameClientNotificationService = gameClientNotificationService;
         _mapper = mapper;
@@ -26,7 +27,7 @@ public class PlayerUpdatedNotificationHandler : INotificationHandler<PlayerUpdat
             return;
         }
 
-        var dto = _mapper.Map<PlayerDTO>(player);
+        var dto = _mapper.PlayerToDto(player);
 
         var message = new PlayerUpdatedMessage()
         {

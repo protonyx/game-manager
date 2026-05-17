@@ -2,9 +2,9 @@ using FastEndpoints;
 using GameManager.Application.Features.Games.Commands.UpdatePlayer;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayer;
+using GameManager.Application.Mappers;
 using GameManager.Server.Authorization;
 using Microsoft.AspNetCore.JsonPatch.Exceptions;
-using IMapper = AutoMapper.IMapper;
 
 namespace GameManager.Server.Endpoints.Players;
 
@@ -12,9 +12,9 @@ public class PatchPlayerEndpoint : Endpoint<PatchPlayerDTO, Results<Ok<PlayerDTO
 {
     private readonly IMediator _mediator;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public PatchPlayerEndpoint(IMediator mediator, IMapper mapper)
+    public PatchPlayerEndpoint(IMediator mediator, DtoMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
@@ -45,7 +45,7 @@ public class PatchPlayerEndpoint : Endpoint<PatchPlayerDTO, Results<Ok<PlayerDTO
             return result.Error.ToProblemDetails();
         }
 
-        var player = _mapper.Map<UpdatePlayerDTO>(result.Value);
+        var player = _mapper.PlayerDtoToUpdatePlayerDto(result.Value);
 
         try
         {

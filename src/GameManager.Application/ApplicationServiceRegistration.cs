@@ -1,7 +1,6 @@
 using System.Reflection;
 using FluentValidation;
 using GameManager.Application.Pipelines;
-using GameManager.Application.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameManager.Application;

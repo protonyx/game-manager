@@ -6,7 +6,8 @@ using FastEndpoints.Swagger;
 using GameManager.Application;
 using GameManager.Application.Authorization;
 using GameManager.Application.Contracts;
-using GameManager.Application.Profiles;
+using GameManager.Application.Mappers;
+using GameManager.Server.Mappers;
 using GameManager.Persistence.Sqlite;
 using GameManager.Server;
 using GameManager.Server.Authentication;
@@ -189,10 +190,8 @@ else
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddMaps(typeof(DtoProfile), typeof(GraphQlProfile));
-});
+builder.Services.AddSingleton<DtoMapper>();
+builder.Services.AddSingleton<GraphQlMapper>();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();

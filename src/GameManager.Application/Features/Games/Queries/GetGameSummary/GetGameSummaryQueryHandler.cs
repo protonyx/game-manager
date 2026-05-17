@@ -1,6 +1,7 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 
 namespace GameManager.Application.Features.Games.Queries.GetGameSummary;
 
@@ -14,14 +15,14 @@ public class GetGameSummaryQueryHandler : IQueryHandler<GetGameSummaryQuery, Gam
 
     private readonly ITrackerHistoryRepository _trackerHistoryRepository;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
     public GetGameSummaryQueryHandler(
         IGameRepository gameRepository,
         IPlayerRepository playerRepository,
         ITurnRepository turnRepository,
         ITrackerHistoryRepository trackerHistoryRepository,
-        IMapper mapper)
+        DtoMapper mapper)
     {
         _gameRepository = gameRepository;
         _playerRepository = playerRepository;
@@ -54,18 +55,18 @@ public class GetGameSummaryQueryHandler : IQueryHandler<GetGameSummaryQuery, Gam
             CreatedDate = game.CreatedDate,
             StartedDate = game.StartedDate,
             CompletedDate = game.CompletedDate,
-            Trackers = game.Trackers.Select(_mapper.Map<TrackerDTO>).ToList(),
+            Trackers = game.Trackers.Select(_mapper.TrackerToDto).ToList(),
             Players = players.Select(p =>
             {
-                var dto = _mapper.Map<PlayerSummaryDTO>(p);
+                var dto = _mapper.PlayerToSummaryDto(p);
 
                 dto.Turns = turns.Where(t => t.PlayerId == p.Id)
-                    .Select(_mapper.Map<TurnDTO>)
+                    .Select(_mapper.TurnToDto)
                     .ToList();
                 dto.TrackerHistory = trackerHistory.Where(t => t.PlayerId == p.Id)
                     .Select(t =>
                     {
-                        var thDto = _mapper.Map<TrackerHistoryDTO>(t);
+                        var thDto = _mapper.TrackerHistoryToDto(t);
                         var timeDiff = thDto.ChangedTime - (game.StartedDate ?? game.CreatedDate);
                         thDto.SecondsSinceGameStart = (int) Math.Abs(timeDiff.TotalSeconds);
 
