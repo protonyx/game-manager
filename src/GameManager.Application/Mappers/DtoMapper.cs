@@ -17,7 +17,7 @@ public partial class DtoMapper
     public partial GameDTO GameToDto(Game game);
 
     public partial GameOptionsDTO GameOptionsToDto(GameOptions options);
-    public partial GameOptions DtoToGameOptions(GameOptionsDTO dto);
+    public partial GameOptions? DtoToGameOptions(GameOptionsDTO? dto);
 
     [MapProperty("Name.Value", "Name")]
     [MapperIgnoreTarget("State")]
