@@ -136,4 +136,8 @@ export class GameService {
   public unsubscribePush(endpoint: string): Observable<void> {
     return this.http.post<void>(this.apiUrl('Push/Unsubscribe'), { endpoint });
   }
+
+  public getVapidPublicKey(): Observable<{ publicKey: string }> {
+    return this.http.get<{ publicKey: string }>(this.apiUrl('Push/PublicKey'));
+  }
 }

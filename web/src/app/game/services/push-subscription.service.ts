@@ -7,6 +7,11 @@ import { GameService } from './game.service';
 export class PushSubscriptionService {
   private readonly gameService = inject(GameService);
 
+  // Cached once per app session: avoids re-fetching the (immutable per-deployment) key on
+  // every subscribe attempt. Populated lazily rather than at startup so pages that never use
+  // push don't pay the extra request.
+  private vapidPublicKeyPromise: Promise<string> | null = null;
+
   isSupported(): boolean {
     return (
       environment.production &&
@@ -42,9 +47,7 @@ export class PushSubscriptionService {
 
   async requestPermissionAndSubscribe(): Promise<boolean> {
     if (!this.isSupported()) return false;
-    if (!environment.vapidPublicKey.trim()) {
-      throw new Error('Web Push is not configured: the VAPID public key is missing.');
-    }
+    const vapidPublicKey = await this.getVapidPublicKey();
     if ((await Notification.requestPermission()) !== 'granted') return false;
 
     const registration = await navigator.serviceWorker.ready;
@@ -52,7 +55,7 @@ export class PushSubscriptionService {
       (await registration.pushManager.getSubscription()) ??
       (await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(environment.vapidPublicKey),
+        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey),
       }));
     await this.registerSubscription(subscription);
     return true;
@@ -97,6 +100,27 @@ export class PushSubscriptionService {
         auth,
       }),
     );
+  }
+
+  // Fetches the server-configured VAPID public key on demand rather than baking it into the
+  // build, so it can be rotated via server configuration without a frontend redeploy.
+  private async getVapidPublicKey(): Promise<string> {
+    if (!this.vapidPublicKeyPromise) {
+      this.vapidPublicKeyPromise = firstValueFrom(this.gameService.getVapidPublicKey())
+        .then((response) => response.publicKey)
+        .catch((error) => {
+          // Allow retrying on the next subscribe attempt instead of caching a failure forever.
+          this.vapidPublicKeyPromise = null;
+          throw error;
+        });
+    }
+
+    const vapidPublicKey = await this.vapidPublicKeyPromise;
+    if (!vapidPublicKey.trim()) {
+      throw new Error('Web Push is not configured: the server has no VAPID public key.');
+    }
+
+    return vapidPublicKey;
   }
 
   private urlBase64ToUint8Array(base64: string): Uint8Array {
