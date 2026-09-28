@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Game,
@@ -18,7 +18,7 @@ import { PatchOperation } from '../models/patch';
 export class GameService {
   readonly version = 'v1';
 
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   private apiUrl(resourcePath: string): string {
     return `${environment.baseUrl}/api/${this.version}/${resourcePath}`;
@@ -123,5 +123,17 @@ export class GameService {
     const url = this.apiUrl(`Players/${playerId}`);
 
     return this.http.delete<never>(url);
+  }
+
+  public subscribePush(subscription: {
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+  }): Observable<void> {
+    return this.http.post<void>(this.apiUrl('Push/Subscribe'), subscription);
+  }
+
+  public unsubscribePush(endpoint: string): Observable<void> {
+    return this.http.post<void>(this.apiUrl('Push/Unsubscribe'), { endpoint });
   }
 }

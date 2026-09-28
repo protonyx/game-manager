@@ -9,6 +9,13 @@
     (toggleSidenav)="toggleSidenav()"
     (closeSidenav)="closeSidenav()">
     <toolbar-actions>
+      <button
+        *ngIf="canInstall$ | async"
+        mat-button
+        type="button"
+        (click)="installApp()">
+        Install app
+      </button>
       <span *ngIf="isActiveGame$ | async">
         Entry Code: <strong>{{ vm.game?.entryCode }}</strong>
       </span>

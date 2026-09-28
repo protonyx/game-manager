@@ -57,6 +57,26 @@ dotnet test
 openssl rand -base64 32
 ```
 
+### Push notifications (VAPID)
+
+Generate a VAPID key pair for each environment:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Set the public key in both `web/src/environments/environment.ts` (and
+`environment.production.ts` for production) as `vapidPublicKey`, and in the
+server's `PushNotifications:VapidPublicKey` configuration. These public keys
+must match. Keep the private key out of source control; configure it locally
+with `dotnet user-secrets set "PushNotifications:VapidPrivateKey" "<private-key>"`
+from `src/GameManager.Server`, and configure production with the
+`PushNotifications__VapidPrivateKey` environment variable. Set
+`PushNotifications:VapidSubject` to a contact URI for the deployment.
+
+Rotating the VAPID key pair invalidates existing browser push subscriptions;
+players need to re-enable turn notifications after rotation.
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

@@ -12,4 +12,5 @@ public interface IPlayerRepository : IAsyncRepository<Player>
     Task<IReadOnlyList<string>> GetTakenColorsAsync(Guid gameId, CancellationToken cancellationToken = default);
     Task<bool> PlayerIsActiveAsync(Guid playerId, CancellationToken cancellationToken = default);
     Task<bool> UpdateHeartbeatAsync(Guid playerId, string connectionId, CancellationToken cancellationToken = default);
+    Task<bool> HasLiveConnectionAsync(Guid playerId, DateTime since, CancellationToken cancellationToken = default);
 }

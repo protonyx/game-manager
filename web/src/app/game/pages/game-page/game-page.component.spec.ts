@@ -5,6 +5,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { GamePageComponent } from './game-page.component';
 import { GameActions } from '../../state/game.actions';
 import { Game, Player } from '../../models/models';
+import { provideHttpClient } from '@angular/common/http';
 
 const initialState = {
   game: {
@@ -36,7 +37,7 @@ describe('GamePageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [GamePageComponent, NoopAnimationsModule],
-      providers: [provideMockStore({ initialState })],
+      providers: [provideMockStore({ initialState }), provideHttpClient()],
     }).compileComponents();
 
     mockStore = TestBed.inject(MockStore);

@@ -21,6 +21,8 @@ import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient } from '@a
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideHighcharts } from 'highcharts-angular';
+import { provideServiceWorker } from '@angular/service-worker';
+import { environment } from './environments/environment';
 
 const SESSION_ID_KEY = 'game_manager_session_id';
 export const SESSION_STORAGE_PREFIX = 'game_manager_session_';
@@ -48,7 +50,7 @@ export function localStorageSyncReducer(
   })(reducer);
 }
 
-const metaReducers: MetaReducer<any, any>[] = [localStorageSyncReducer];
+const metaReducers: MetaReducer[] = [localStorageSyncReducer];
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -75,6 +77,10 @@ bootstrapApplication(AppComponent, {
     },
     provideAnimations(),
     provideHttpClient(withInterceptorsFromDi()),
-    provideHighcharts()
+    provideHighcharts(),
+    provideServiceWorker('custom-service-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 }).catch((err) => console.error(err));

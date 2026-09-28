@@ -9,6 +9,19 @@
   box-sizing: border-box;
 }
 
+// Fixed, positioned just below the app toolbar (which sits at the very top of the
+// viewport) so this bar doesn't compete for the same pixels as the toolbar content
+// (e.g. the host's "Entry Code" label) — that overlap previously made this bar
+// invisible/unclickable even though it was technically present in the DOM.
+.push-controls {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top));
+  right: 8px;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+}
+
 // ── MY TURN LAYOUT ──────────────────────────────────────────────────────────
 
 .my-turn-layout {
@@ -62,6 +75,8 @@
 }
 
 .host-menu-backdrop {
+  border: 0;
+  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
