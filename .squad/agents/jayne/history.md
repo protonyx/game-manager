@@ -44,3 +44,40 @@ Reviewed full `IsReady` backend + lobby frontend feature. **PASS WITH NOTES.**
 - The PATCH endpoint pattern: load PlayerDTO → map to UpdatePlayerDTO → apply JSON Patch → save. `DefaultContractResolver` used but camelCase paths work (consistent with pre-existing color/name patches).
 - `playerAdapter.setOne` in the reducer correctly handles SignalR `PlayerUpdated` messages — whole entity replaced, so `isReady` propagates correctly.
 - `allReady` correctly guards with `=== true` (not just truthy) to handle the `isReady?: boolean` optional case where undefined would incorrectly pass a truthiness check.
+
+### 2026-06-04 — PlayerToDto Mapper Test Coverage (`DtoMapperTests.cs`)
+
+Added 6 comprehensive tests for `PlayerToDto` mapper business logic that was previously untested.
+
+**Test coverage:**
+1. `State = Disconnected` when `Connections.Count == 0`
+2. `State = Connected` when `Connections.Count > 0` (single connection)
+3. `State = Connected` with multiple connections (verified 3 connections)
+4. `TrackerValues` dictionary correctly maps `TrackerId → Value` (tested 3 trackers with different values)
+5. Empty `TrackerValues` returns empty dictionary (not null)
+6. All properties map correctly end-to-end (Id, Name, IsHost, IsReady, Color, State)
+
+**Patterns used:**
+- Created new dedicated test file `src/GameManager.Tests/Mappers/DtoMapperTests.cs` for mapper-specific tests (cleaner separation from query handler tests)
+- Used real `DtoMapper` instance (not mocked) — consistent with existing `GetPlayerQueryTests` pattern
+- Used reflection to set private fields (`_trackers` list, `Id` property) when needed for test setup
+- Used `Tracker.Create()` factory method for proper Tracker entity construction
+- Used `Player.AddConnection()` public API to test connection state logic
+- FluentAssertions for all assertions (consistent with existing test style)
+
+**Domain entity construction pattern:**
+- `Game` + `GameOptions` → `new Game(GameName, GameOptions)`
+- `Tracker.Create(game, TrackerName, startingValue)` returns `Result<Tracker>`
+- `Player` constructor auto-initializes `TrackerValues` from game's trackers with starting values
+- `player.SetTracker(trackerId, value)` modifies tracker values (returns `Result`)
+- `player.AddConnection(connectionId)` adds to internal `_connections` list
+
+**Test execution:**
+- All 51 tests passed (45 existing + 6 new)
+- Run command: `dotnet run --project src/GameManager.Tests/GameManager.Tests.csproj --no-build`
+- Note: `dotnet test` command hung indefinitely on this environment; `dotnet run` on the test project worked correctly with xUnit v3 Microsoft.Testing.Platform
+
+**Business logic validated:**
+- The `PlayerToDto` wrapper correctly applies connection-based state logic (core business rule for player connectivity)
+- TrackerValues dictionary mapping preserves TrackerId keys and current values (critical for game state serialization)
+- Empty collections handled correctly (no null reference issues)

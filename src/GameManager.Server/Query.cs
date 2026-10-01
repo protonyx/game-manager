@@ -1,8 +1,8 @@
-using AutoMapper.QueryableExtensions;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Server.Authorization;
 using GameManager.Server.DataLoaders;
 using GameManager.Server.Filters;
+using GameManager.Server.Mappers;
 using GameManager.Server.Models;
 using HotChocolate.Authorization;
 using HotChocolate.Resolvers;
@@ -18,14 +18,13 @@ public class Query
     [UseFiltering(typeof(GameFilterType))]
     public async Task<Connection<GameModel>> GetGames(
         IGameRepository gameRepository,
-        IMapper mapper,
+        GraphQlMapper mapper,
         IResolverContext resolverContext,
         string? after,
         int? first,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<GameModel> query = gameRepository.Query()
-            .ProjectTo<GameModel>(mapper.ConfigurationProvider)
+        IQueryable<GameModel> query = mapper.ProjectToGameModel(gameRepository.Query())
             .OrderBy(t => t.Id);
 
         // Apply filters

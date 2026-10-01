@@ -1,4 +1,5 @@
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Server.Mappers;
 using GameManager.Server.Models;
 
 namespace GameManager.Server.DataLoaders;
@@ -7,13 +8,13 @@ public class TurnsByGameIdDataLoader : BatchDataLoader<Guid, TurnModel[]>
 {
     private readonly ITurnRepository _turnRepository;
 
-    private readonly IMapper _mapper;
+    private readonly GraphQlMapper _mapper;
 
     public TurnsByGameIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
         ITurnRepository turnRepository,
-        IMapper mapper)
+        GraphQlMapper mapper)
         : base(batchScheduler, options)
     {
         _turnRepository = turnRepository;
@@ -27,7 +28,7 @@ public class TurnsByGameIdDataLoader : BatchDataLoader<Guid, TurnModel[]>
         foreach (var gameId in keys)
         {
             result[gameId] = (await _turnRepository.GetTurnsByGameId(gameId, cancellationToken))
-                .Select(_mapper.Map<TurnModel>)
+                .Select(_mapper.TurnToModel)
                 .ToArray();
         }
 

@@ -4,6 +4,7 @@ using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Notifications.PlayerTrackerUpdated;
 using GameManager.Application.Features.Games.Notifications.PlayerUpdated;
+using GameManager.Application.Mappers;
 using GameManager.Domain.Constants;
 using GameManager.Domain.ValueObjects;
 
@@ -12,7 +13,7 @@ namespace GameManager.Application.Features.Games.Commands.UpdatePlayer;
 public class UpdatePlayerCommandHandler(
     IPlayerRepository playerRepository,
     IGameRepository gameRepository,
-    IMapper mapper,
+    DtoMapper mapper,
     IUserContext userContext,
     IMediator mediator)
     : ICommandHandler<UpdatePlayerCommand, PlayerDTO>
@@ -119,7 +120,7 @@ public class UpdatePlayerCommandHandler(
             await mediator.Publish(pendingNotification, cancellationToken);
         }
 
-        var dto = mapper.Map<PlayerDTO>(updatedPlayer);
+        var dto = mapper.PlayerToDto(updatedPlayer);
 
         return dto;
     }

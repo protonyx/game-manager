@@ -1,5 +1,5 @@
-using AutoMapper;
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Server.Mappers;
 using GameManager.Server.Models;
 using GreenDonut;
 
@@ -9,11 +9,11 @@ public class PlayerByIdDataLoader : BatchDataLoader<Guid, PlayerModel>
 {
     private readonly IPlayerRepository _playerRepository;
 
-    private readonly IMapper _mapper;
+    private readonly GraphQlMapper _mapper;
 
     public PlayerByIdDataLoader(
         IPlayerRepository playerRepository,
-        IMapper mapper,
+        GraphQlMapper mapper,
         IBatchScheduler batchScheduler,
         DataLoaderOptions options)
         : base(batchScheduler, options)
@@ -26,6 +26,6 @@ public class PlayerByIdDataLoader : BatchDataLoader<Guid, PlayerModel>
     {
         var players = await _playerRepository.GetManyByIdAsync(keys, cancellationToken);
 
-        return players.Select(_mapper.Map<PlayerModel>).ToDictionary(p => p.Id);
+        return players.Select(_mapper.PlayerToModel).ToDictionary(p => p.Id);
     }
 }

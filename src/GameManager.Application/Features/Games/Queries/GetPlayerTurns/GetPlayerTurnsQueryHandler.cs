@@ -1,6 +1,7 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Errors;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 
 namespace GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 
@@ -8,9 +9,9 @@ public class GetPlayerTurnsQueryHandler : IQueryHandler<GetPlayerTurnsQuery, IRe
 {
     private readonly ITurnRepository _turnRepository;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public GetPlayerTurnsQueryHandler(ITurnRepository turnRepository, IMapper mapper)
+    public GetPlayerTurnsQueryHandler(ITurnRepository turnRepository, DtoMapper mapper)
     {
         _turnRepository = turnRepository;
         _mapper = mapper;
@@ -20,6 +21,6 @@ public class GetPlayerTurnsQueryHandler : IQueryHandler<GetPlayerTurnsQuery, IRe
     {
         var turns = await _turnRepository.GetTurnsByPlayerId(request.PlayerId, cancellationToken);
 
-        return turns.Select(_mapper.Map<TurnDTO>).ToList();
+        return turns.Select(_mapper.TurnToDto).ToList();
     }
 }

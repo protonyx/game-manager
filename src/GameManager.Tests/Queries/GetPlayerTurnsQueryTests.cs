@@ -6,15 +6,17 @@ using FluentAssertions;
 using GameManager.Application.Features.Games.DTO;
 using GameManager.Application.Features.Games.Queries.GetPlayerTurns;
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Application.Mappers;
 using GameManager.Domain.Entities;
 using Moq;
-using AutoMapper;
 using Xunit;
 
 namespace GameManager.Tests.Queries;
 
 public class GetPlayerTurnsQueryTests
 {
+    private readonly DtoMapper _mapper = new();
+
     [Fact]
     public async Task GetPlayerTurnsQuery_Should_Return_Turns()
     {
@@ -25,20 +27,11 @@ public class GetPlayerTurnsQueryTests
             Turn.Create(playerId, DateTime.UtcNow.AddMinutes(-10), DateTime.UtcNow.AddMinutes(-5)).Value,
             Turn.Create(playerId, DateTime.UtcNow.AddMinutes(-4), DateTime.UtcNow).Value,
         };
-        var turnDtos = new List<TurnDTO>
-        {
-            new TurnDTO { StartTime = turns[0].StartTime, EndTime = turns[0].EndTime, DurationSeconds = (int)turns[0].Duration.TotalSeconds },
-            new TurnDTO { StartTime = turns[1].StartTime, EndTime = turns[1].EndTime, DurationSeconds = (int)turns[1].Duration.TotalSeconds }
-        };
 
         var repoMock = new Mock<ITurnRepository>();
         repoMock.Setup(r => r.GetTurnsByPlayerId(playerId, It.IsAny<CancellationToken>())).ReturnsAsync(turns);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map<TurnDTO>(turns[0])).Returns(turnDtos[0]);
-        mapperMock.Setup(m => m.Map<TurnDTO>(turns[1])).Returns(turnDtos[1]);
-
-        var handler = new GetPlayerTurnsQueryHandler(repoMock.Object, mapperMock.Object);
+        var handler = new GetPlayerTurnsQueryHandler(repoMock.Object, _mapper);
         var query = new GetPlayerTurnsQuery(playerId);
 
         // Act
@@ -46,6 +39,9 @@ public class GetPlayerTurnsQueryTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(turnDtos);
+        result.Value.Should().HaveCount(2);
+        result.Value[0].StartTime.Should().Be(turns[0].StartTime);
+        result.Value[0].DurationSeconds.Should().Be((int)turns[0].Duration.TotalSeconds);
+        result.Value[1].StartTime.Should().Be(turns[1].StartTime);
     }
 }

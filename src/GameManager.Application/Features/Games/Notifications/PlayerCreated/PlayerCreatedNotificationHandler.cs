@@ -1,5 +1,6 @@
 using GameManager.Application.Contracts;
 using GameManager.Application.Features.Games.DTO;
+using GameManager.Application.Mappers;
 using GameManager.Application.Messages;
 
 namespace GameManager.Application.Features.Games.Notifications.PlayerCreated;
@@ -8,9 +9,9 @@ public class PlayerCreatedNotificationHandler : INotificationHandler<PlayerCreat
 {
     private readonly IGameClientNotificationService _gameClientNotificationService;
 
-    private readonly IMapper _mapper;
+    private readonly DtoMapper _mapper;
 
-    public PlayerCreatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, IMapper mapper)
+    public PlayerCreatedNotificationHandler(IGameClientNotificationService gameClientNotificationService, DtoMapper mapper)
     {
         _gameClientNotificationService = gameClientNotificationService;
         _mapper = mapper;
@@ -19,7 +20,7 @@ public class PlayerCreatedNotificationHandler : INotificationHandler<PlayerCreat
     public Task Handle(PlayerCreatedNotification notification, CancellationToken cancellationToken)
     {
         var player = notification.Player;
-        var dto = _mapper.Map<PlayerDTO>(player);
+        var dto = _mapper.PlayerToDto(player);
 
         var message = new PlayerJoinedMessage()
         {

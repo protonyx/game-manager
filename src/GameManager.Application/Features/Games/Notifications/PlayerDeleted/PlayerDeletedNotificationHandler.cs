@@ -1,4 +1,3 @@
-using AutoMapper;
 using GameManager.Application.Contracts;
 using GameManager.Application.Messages;
 using MediatR;

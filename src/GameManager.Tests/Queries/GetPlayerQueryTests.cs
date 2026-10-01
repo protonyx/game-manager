@@ -7,16 +7,18 @@ using GameManager.Application.Features.Games.Queries.GetPlayer;
 using GameManager.Application.Features.Games;
 using GameManager.Application.Contracts.Persistence;
 using GameManager.Application.Errors;
+using GameManager.Application.Mappers;
 using GameManager.Domain.Entities;
 using GameManager.Domain.ValueObjects;
 using Moq;
 using Xunit;
-using AutoMapper;
 
 namespace GameManager.Tests.Queries;
 
 public class GetPlayerQueryTests
 {
+    private readonly DtoMapper _mapper = new();
+
     [Fact]
     public async Task GetPlayerQuery_Should_Return_Player()
     {
@@ -24,16 +26,12 @@ public class GetPlayerQueryTests
         var playerId = Guid.NewGuid();
         var game = new Game(GameName.From("TestGame").Value, new GameOptions());
         var player = new Player(PlayerName.From("Test Player").Value, game);
-        typeof(Player).GetProperty("Id")!.SetValue(player, playerId); // Set Id for test
-        var playerDto = new PlayerDTO { Id = playerId, Name = "Test Player" };
+        typeof(Player).GetProperty("Id")!.SetValue(player, playerId);
 
         var repoMock = new Mock<IPlayerRepository>();
         repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync(player);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map<PlayerDTO>(player)).Returns(playerDto);
-
-        var handler = new GetPlayerQueryHandler(repoMock.Object, mapperMock.Object);
+        var handler = new GetPlayerQueryHandler(repoMock.Object, _mapper);
         var query = new GetPlayerQuery(playerId);
 
         // Act
@@ -41,7 +39,8 @@ public class GetPlayerQueryTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(playerDto);
+        result.Value.Id.Should().Be(playerId);
+        result.Value.Name.Should().Be("Test Player");
     }
 
     [Fact]
@@ -51,8 +50,7 @@ public class GetPlayerQueryTests
         var playerId = Guid.NewGuid();
         var repoMock = new Mock<IPlayerRepository>();
         repoMock.Setup(r => r.GetByIdAsync(playerId, It.IsAny<CancellationToken>())).ReturnsAsync((Player?) null);
-        var mapperMock = new Mock<IMapper>();
-        var handler = new GetPlayerQueryHandler(repoMock.Object, mapperMock.Object);
+        var handler = new GetPlayerQueryHandler(repoMock.Object, _mapper);
         var query = new GetPlayerQuery(playerId);
 
         // Act

@@ -1,5 +1,5 @@
-using AutoMapper;
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Server.Mappers;
 using GameManager.Server.Models;
 using GreenDonut;
 
@@ -9,11 +9,11 @@ public class TrackerByIdDataLoader : BatchDataLoader<Guid, GameTrackerModel>
 {
     private readonly ITrackerRepository _trackerRepository;
 
-    private readonly IMapper _mapper;
+    private readonly GraphQlMapper _mapper;
 
     public TrackerByIdDataLoader(
         ITrackerRepository trackerRepository,
-        IMapper mapper,
+        GraphQlMapper mapper,
         IBatchScheduler batchScheduler,
         DataLoaderOptions options)
         : base(batchScheduler, options)
@@ -27,6 +27,6 @@ public class TrackerByIdDataLoader : BatchDataLoader<Guid, GameTrackerModel>
         CancellationToken cancellationToken)
     {
         var result = await _trackerRepository.GetManyByIdAsync(keys, cancellationToken);
-        return result.Select(_mapper.Map<GameTrackerModel>).ToDictionary(t => t.Id);
+        return result.Select(_mapper.TrackerToModel).ToDictionary(t => t.Id);
     }
 }

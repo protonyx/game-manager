@@ -18,3 +18,18 @@ Added `IsReady` (bool) to the `Player` domain entity and wired it through the fu
 - **Migration**: Created `AddPlayerIsReady` migration via `dotnet ef migrations add AddPlayerIsReady --startup-project ../GameManager.Server` from `GameManager.Persistence.Sqlite/`.
 - **Tests**: Added `PlayerTests` domain unit tests (4 tests); added 3 new `UpdatePlayerCommandTests` for `IsReady = true/false/null` paths. All 45 tests pass.
 - The PATCH endpoint uses AutoMapper `PlayerDTO → UpdatePlayerDTO` then JSON Patch, so `IsReady?` in `UpdatePlayerDTO` naturally flows through without endpoint changes.
+
+### Fix Mapperly nullable crash in DtoToGameOptions (2026-06-04)
+Fixed runtime crash where `CreateGameCommandHandler` passed nullable `GameOptionsDTO?` to Mapperly's `DtoToGameOptions` method.
+
+**The Problem**: The original signature `public partial GameOptions DtoToGameOptions(GameOptionsDTO dto)` was non-nullable on both input and output. When `request.Options` was null, Mapperly's generated code dereferenced it, causing a `NullReferenceException`.
+
+**The Fix**:
+- Changed signature in `DtoMapper.cs` to: `public partial GameOptions? DtoToGameOptions(GameOptionsDTO? dto)`
+- With nullable input and output, Mapperly generates null-propagating code: if input is null, output is null
+- The call site in `CreateGameCommandHandler.cs` already had the right pattern: `var options = _mapper.DtoToGameOptions(request.Options) ?? new GameOptions();`
+- With the nullable signature, the `?? new GameOptions()` fallback now works correctly
+
+**Key insight**: Mapperly respects nullable annotations on partial method signatures. When both input and output are nullable, it generates defensive null checks. This makes the call-site null-coalescing pattern effective.
+
+Build succeeded (37 warnings, 0 errors). All 51 tests pass.

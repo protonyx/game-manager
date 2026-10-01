@@ -1,4 +1,5 @@
 using GameManager.Application.Contracts.Persistence;
+using GameManager.Server.Mappers;
 using GameManager.Server.Models;
 
 namespace GameManager.Server.DataLoaders;
@@ -7,13 +8,13 @@ public class PlayersByGameIdDataLoader : BatchDataLoader<Guid, PlayerModel[]>
 {
     private readonly IPlayerRepository _repository;
 
-    private readonly IMapper _mapper;
+    private readonly GraphQlMapper _mapper;
 
     public PlayersByGameIdDataLoader(
         IBatchScheduler batchScheduler,
         DataLoaderOptions options,
         IPlayerRepository repository,
-        IMapper mapper)
+        GraphQlMapper mapper)
         : base(batchScheduler, options)
     {
         _repository = repository;
@@ -27,7 +28,7 @@ public class PlayersByGameIdDataLoader : BatchDataLoader<Guid, PlayerModel[]>
         foreach (var gameId in keys)
         {
             result[gameId] = (await _repository.GetByGameIdAsync(gameId, cancellationToken))
-                .Select(_mapper.Map<PlayerModel>)
+                .Select(_mapper.PlayerToModel)
                 .ToArray();
         }
 
