@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import {
   selectTitle,
   selectSidenavOpen,
@@ -12,11 +12,12 @@ import { GameActions } from './game/state/game.actions';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { LayoutActions } from './shared/state/layout.actions';
-import { MatIconButton } from '@angular/material/button';
+import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatListItem, MatNavList } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
 import { map } from 'rxjs';
 import { LetDirective } from '@ngrx/component';
+import { InstallPromptService } from './shared/services/install-prompt.service';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ import { LetDirective } from '@ngrx/component';
     LayoutComponent,
     MatIcon,
     MatIconButton,
+    MatButtonModule,
     MatListItem,
     MatNavList,
     RouterLink,
@@ -37,6 +39,10 @@ import { LetDirective } from '@ngrx/component';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppComponent {
+  private readonly store = inject(Store);
+  private readonly router = inject(Router);
+  private readonly installPrompt = inject(InstallPromptService);
+
   title$ = this.store.select(selectTitle);
 
   sidenavOpen$ = this.store.select(selectSidenavOpen);
@@ -47,10 +53,15 @@ export class AppComponent {
 
   isGameInProgress$ = this.activeGame$.pipe(map((game) => game?.state === 'InProgress'));
 
-  constructor(
-    private store: Store,
-    private router: Router,
-  ) {}
+  canInstall$ = this.installPrompt.available$;
+
+  async installApp(): Promise<void> {
+    try {
+      await this.installPrompt.promptInstall();
+    } catch (error) {
+      console.error('Could not start app installation.', error);
+    }
+  }
 
   onLeaveGame(): void {
     this.closeSidenav();

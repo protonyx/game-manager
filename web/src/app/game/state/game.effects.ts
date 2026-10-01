@@ -22,7 +22,6 @@ import {
   groupBy,
   debounceTime,
   switchMap,
-  exhaust,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromGames from './game.selectors';
@@ -40,6 +39,7 @@ import { PatchOperation } from '../models/patch';
 import { AudioService } from '../../shared/services/audio.service';
 import { TrackerEditorDialogComponent } from '../dialogs/tracker-editor-dialog/tracker-editor-dialog.component';
 import { SessionService } from '../services/session.service';
+import { PushSubscriptionService } from '../services/push-subscription.service';
 
 const { selectRouteParam, selectCurrentRoute } = getRouterSelectors();
 
@@ -611,6 +611,34 @@ export const turnAdvanced = createEffect(
   { functional: true, dispatch: false },
 );
 
+export const resubscribePushOnJoin = createEffect(
+  (actions$ = inject(Actions), push = inject(PushSubscriptionService)) => {
+    return actions$.pipe(
+      ofType(GamesApiActions.joinedGame),
+      tap(() => {
+        void push.resubscribeExisting().catch((error) => {
+          console.error('Could not update the push subscription after joining a game.', error);
+        });
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);
+
+export const unsubscribePushOnLeaveOrEnd = createEffect(
+  (actions$ = inject(Actions), push = inject(PushSubscriptionService)) => {
+    return actions$.pipe(
+      ofType(GamesApiActions.leftGame, GameHubActions.gameEnded),
+      tap(() => {
+        void push.unsubscribe().catch((error) => {
+          console.error('Could not unsubscribe from turn notifications.', error);
+        });
+      }),
+    );
+  },
+  { functional: true, dispatch: false },
+);
+
 export const gameEnded = createEffect(
   (actions$ = inject(Actions)) => {
     return actions$.pipe(
@@ -784,7 +812,6 @@ export const restoreSession = createEffect(
   (
     actions$ = inject(Actions),
     sessionService = inject(SessionService),
-    router = inject(Router),
   ) => {
     return actions$.pipe(
       ofType(GameActions.restoreSession),

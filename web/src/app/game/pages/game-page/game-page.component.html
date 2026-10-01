@@ -12,6 +12,33 @@
     nextTurnPlayer: nextTurnPlayer$
   } as vm">
   <div class="game-page-container">
+    <div
+      class="push-controls"
+      *ngIf="(pushSupported || showIosInstallGuide || (canInstall$ | async)) && vm.game && vm.game.state !== 'Complete' && !vm.isObserver">
+      <button
+        *ngIf="showIosInstallGuide"
+        mat-button
+        type="button"
+        (click)="showIosInstallInstructions()">
+        Add to Home Screen for turn notifications
+      </button>
+      <ng-container *ngIf="pushSupported && !showIosInstallGuide">
+        <span>
+          {{ pushPermission === 'denied' ? 'Blocked' : pushEnabled ? 'On' : 'Off' }}
+        </span>
+        <button mat-stroked-button type="button" (click)="onPushToggle()">
+          <mat-icon>{{ pushEnabled ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+          {{ pushEnabled ? 'Turn notifications off' : 'Enable turn notifications' }}
+        </button>
+      </ng-container>
+      <button
+        *ngIf="canInstall$ | async"
+        mat-button
+        type="button"
+        (click)="installApp()">
+        Install app
+      </button>
+    </div>
 
     <!-- ── Lobby (Preparing state) ── -->
     <ng-container *ngIf="vm.game?.state === 'Preparing'">
@@ -93,7 +120,11 @@
 
           <!-- Host controls menu overlay -->
           <ng-container *ngIf="vm.isHost && fabOpen">
-            <div class="host-menu-backdrop" (click)="fabOpen = false"></div>
+            <button
+              class="host-menu-backdrop"
+              type="button"
+              aria-label="Close host controls"
+              (click)="fabOpen = false"></button>
             <div class="host-menu">
               <button mat-raised-button color="warn" type="button"
                 (click)="onEndGame(vm.game); fabOpen = false">

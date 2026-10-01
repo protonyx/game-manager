@@ -105,4 +105,12 @@ public class PlayerRepository : BaseRepository<Player>, IPlayerRepository
 
         return affectedResults > 0;
     }
+
+    public Task<bool> HasLiveConnectionAsync(
+        Guid playerId,
+        DateTime since,
+        CancellationToken cancellationToken = default)
+        => _context.Set<PlayerConnection>()
+            .AnyAsync(connection => connection.PlayerId == playerId && connection.LastHeartbeat >= since,
+                cancellationToken);
 }

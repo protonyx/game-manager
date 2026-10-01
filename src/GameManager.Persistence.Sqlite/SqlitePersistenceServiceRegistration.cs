@@ -29,6 +29,7 @@ public static class SqlitePersistenceServiceRegistration
         services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IGameRepository, GameRepository>();
         services.AddScoped<IPlayerRepository, PlayerRepository>();
+        services.AddScoped<IPushSubscriptionRepository, PushSubscriptionRepository>();
         services.AddScoped<ITrackerHistoryRepository, TrackerHistoryRepository>();
         services.AddScoped<ITrackerRepository, TrackerRepository>();
         services.AddScoped<ITurnRepository, TurnRepository>();

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import {
@@ -26,6 +26,11 @@ import { PatchOperation } from '../../models/patch';
 import { HostLobbyComponent } from '../../components/host-lobby/host-lobby.component';
 import { PlayerWaitingComponent } from '../../components/player-waiting/player-waiting.component';
 import { ObserverWaitingComponent } from '../../components/observer-waiting/observer-waiting.component';
+import { PushSubscriptionService } from '../../services/push-subscription.service';
+import { PushInstructionsDialogComponent } from '../../dialogs/push-instructions-dialog/push-instructions-dialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { InstallPromptService } from '../../../shared/services/install-prompt.service';
 
 const selectIsCurrentPlayerTurn = createSelector(
   selectCurrentPlayerId,
@@ -41,6 +46,8 @@ const selectIsCurrentPlayerTurn = createSelector(
     CommonModule,
     MatButtonModule,
     MatIconModule,
+    MatDialogModule,
+    MatSnackBarModule,
     PlayerListComponent,
     CurrentTurnComponent,
     TrackerListComponent,
@@ -52,6 +59,20 @@ const selectIsCurrentPlayerTurn = createSelector(
   ],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
+  private readonly store = inject(Store);
+  private readonly router = inject(Router);
+  private readonly pushSubscription = inject(PushSubscriptionService);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly installPrompt = inject(InstallPromptService);
+
+  readonly pushSupported = this.pushSubscription.isSupported();
+  readonly showIosInstallGuide =
+    this.pushSubscription.isIos() && !this.pushSubscription.isStandalone();
+  readonly canInstall$ = this.installPrompt.available$;
+  pushEnabled = false;
+  pushPermission: NotificationPermission = 'default';
+
   currentPlayer$ = this.store.select(selectCurrentPlayer);
 
   game$ = this.store.select(selectGame);
@@ -100,12 +121,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
   lockResolver: ((value: PromiseLike<unknown> | unknown) => void) | undefined;
 
-  constructor(
-    private store: Store,
-    private router: Router,
-  ) {}
-
   ngOnInit(): void {
+    this.pushPermission = this.pushSubscription.permission();
+    void this.refreshPushStatus().catch((error) => {
+      console.error('Could not read push notification status.', error);
+    });
+
     // Request a web lock to prevent tab from sleeping
     if (navigator && navigator.locks && navigator.locks.request) {
       const promise = new Promise((res) => {
@@ -148,6 +169,77 @@ export class GamePageComponent implements OnInit, OnDestroy {
   onLeaveGame(): void {
     this.store.dispatch(GameActions.leaveGame());
     this.router.navigate(['/game', 'join']);
+  }
+
+  async onPushToggle(): Promise<void> {
+    if (!this.pushSupported) return;
+
+    if (this.pushEnabled) {
+      try {
+        await this.pushSubscription.unsubscribe();
+        this.pushEnabled = false;
+      } catch (error) {
+        console.error('Could not disable turn notifications.', error);
+        this.snackBar.open('Could not disable turn notifications. Please try again.', 'Dismiss', {
+          duration: 5000,
+        });
+      }
+      return;
+    }
+
+    if (this.pushSubscription.isIos() && !this.pushSubscription.isStandalone()) {
+      this.showPushInstructions(
+        'Add Game Manager to your Home Screen',
+        "To get turn notifications on iPhone or iPad, tap the Share button and choose 'Add to Home Screen', then open Game Manager from your Home Screen.",
+      );
+      return;
+    }
+
+    if (this.pushSubscription.permission() === 'denied') {
+      this.showPushInstructions(
+        'Notifications are blocked',
+        'Allow notifications for Game Manager in your browser or device settings, then try again.',
+      );
+      return;
+    }
+
+    try {
+      this.pushEnabled = await this.pushSubscription.requestPermissionAndSubscribe();
+      this.pushPermission = this.pushSubscription.permission();
+    } catch (error) {
+      console.error('Could not enable turn notifications.', error);
+      this.snackBar.open('Could not enable turn notifications. Please try again.', 'Dismiss', {
+        duration: 5000,
+      });
+    }
+  }
+
+  showIosInstallInstructions(): void {
+    this.showPushInstructions(
+      'Add Game Manager to your Home Screen',
+      "To get turn notifications on iPhone or iPad, tap the Share button and choose 'Add to Home Screen', then open Game Manager from your Home Screen.",
+    );
+  }
+
+  async installApp(): Promise<void> {
+    try {
+      await this.installPrompt.promptInstall();
+    } catch (error) {
+      console.error('Could not start app installation.', error);
+    }
+  }
+
+  private async refreshPushStatus(): Promise<void> {
+    if (!this.pushSupported) return;
+    this.pushEnabled = await this.pushSubscription.isSubscribed();
+    this.pushPermission = this.pushSubscription.permission();
+  }
+
+  private showPushInstructions(title: string, message: string): void {
+    this.dialog.open(PushInstructionsDialogComponent, {
+      data: { title, message },
+      width: '360px',
+    });
   }
 
   onPlayerEdit(player: Player): void {

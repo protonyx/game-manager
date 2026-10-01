@@ -15,6 +15,7 @@ using GameManager.Server.DataLoaders;
 using GameManager.Server.HostedServices;
 using GameManager.Server.Services;
 using GameManager.Server.Types;
+using Lib.Net.Http.WebPush;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
@@ -196,6 +197,9 @@ builder.Services.AddAutoMapper(cfg =>
 
 builder.Services.AddApplicationServices();
 builder.Services.AddSqlitePersistenceServices();
+builder.Services.Configure<PushNotificationOptions>(builder.Configuration.GetSection("PushNotifications"));
+builder.Services.AddHttpClient<PushServiceClient>();
+builder.Services.AddScoped<IPushSender, PushSender>();
 
 builder.Services.AddHostedService<GamePruningService>();
 

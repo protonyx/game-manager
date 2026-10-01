@@ -57,6 +57,35 @@ dotnet test
 openssl rand -base64 32
 ```
 
+### Push notifications (VAPID)
+
+Generate a VAPID key pair for each environment:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Configure both keys on the server only, the same way the JWT signing secret is
+configured, so the key pair can be rotated per-environment without a frontend
+rebuild:
+
+```bash
+dotnet user-secrets set "PushNotifications:VapidPublicKey" "<public-key>"
+dotnet user-secrets set "PushNotifications:VapidPrivateKey" "<private-key>"
+```
+
+from `src/GameManager.Server` for local development, or the
+`PushNotifications__VapidPublicKey` / `PushNotifications__VapidPrivateKey`
+environment variables in production. Set `PushNotifications:VapidSubject` to a
+contact URI for the deployment.
+
+The Angular app never has the key baked into its build; it fetches the public
+key from `GET /api/v1/Push/PublicKey` the first time a player tries to enable
+turn notifications and caches it in memory for the rest of the session.
+
+Rotating the VAPID key pair invalidates existing browser push subscriptions;
+players need to re-enable turn notifications after rotation.
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
